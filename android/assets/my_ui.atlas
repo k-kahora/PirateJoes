@@ -1,0 +1,20 @@
+
+my_ui.png
+size: 256,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+button
+  rotate: false
+  xy: 1, 1
+  size: 21, 16
+  orig: 21, 16
+  offset: 0, 0
+  index: -1
+font-export
+  rotate: false
+  xy: 1, 19
+  size: 140, 140
+  orig: 140, 140
+  offset: 0, 0
+  index: -1
