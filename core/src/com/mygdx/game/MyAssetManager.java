@@ -29,7 +29,7 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> charecterIdleLeft = new AssetDescriptor<TextureAtlas>("spriteSheets/idleLeft.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> slime = new AssetDescriptor<TextureAtlas>("spriteSheets/slime_right.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap.atlas", TextureAtlas.class);
-    public AssetDescriptor<TextureAtlas> secondTileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMapLayerTwo.atlas", TextureAtlas.class);
+    public AssetDescriptor<TextureAtlas> collisionMap = new AssetDescriptor<TextureAtlas>("spriteSheets/collision_map.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
 
     public AssetDescriptor<Texture> storeManager = new AssetDescriptor<Texture>("sprites/Manager.png", Texture.class);
@@ -50,7 +50,7 @@ public class MyAssetManager {
         manager.load(charecterIdleLeft);
         manager.load(slime);
         manager.load(tileMap);
-        manager.load(secondTileMap);
+        manager.load(collisionMap);
         manager.load(bulletSprite);
 
         //manager.load(skinAtlas);

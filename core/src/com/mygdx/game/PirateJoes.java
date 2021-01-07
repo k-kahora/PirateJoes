@@ -7,34 +7,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.nio.channels.spi.SelectorProvider;
 
 
 public class PirateJoes extends Game {
 
-	public static final int WIDTH = 480;
-	public static final int HEIGHT = 270;
-
-	public static final int ASPECT_H = 10;
-	public static final int ASPECT_W = 5;
-
 	public static final Vector3 mouseCordinates = new Vector3();
 
 
-	SpriteBatch batch;
-
-
-
+	static SpriteBatch batch;
 	Stage stage;
-
-
-
-
-
-
-
-
 
 
 
@@ -49,10 +34,9 @@ public class PirateJoes extends Game {
 
 		//setScreen(new MainMenu());
 
-		batch = new SpriteBatch();
 
 
-
+		batch = getBatch();
 
 		setScreen(new MainMenu(this));
 
@@ -116,6 +100,10 @@ public class PirateJoes extends Game {
 	public void dispose () {
 
 		batch.dispose();
+	}
+
+	public static SpriteBatch getBatch() {
+		return new SpriteBatch();
 	}
 
 

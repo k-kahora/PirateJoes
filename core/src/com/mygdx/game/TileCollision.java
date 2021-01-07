@@ -7,6 +7,14 @@ import java.util.ArrayList;
 
 public class TileCollision {
 
+    /*
+    This class takes an enitity type and calls the entitlys class appropate collider methods based on what
+    collision happened a collision happens when the Entity can intersect with any tile without a NONE ollision type
+    This also uses a static builder
+
+    A entity can only have one collision but the collision can utilize multiple maps
+     */
+
     private int x;
     private int y;
     private int x2;
@@ -26,23 +34,33 @@ public class TileCollision {
 
 
     private final Entity character;
-    private final ArrayList<ArrayList<TileData>> tileMap;
+    private final ArrayList<ArrayList<ArrayList<TileData>>> tileMap;
+
 
     public static class Builder<T extends Entity> {
 
 
         private T character;
-        private ArrayList<ArrayList<TileData>> tileMap;
+        private ArrayList<ArrayList<ArrayList<TileData>>> tileMap = new ArrayList<ArrayList<ArrayList<TileData>>>();
         private Rectangle rectangle;
-
 
 
         public Builder tileMap(ArrayList<ArrayList<TileData>> a) {
 
 
-            this.tileMap = a;
+            this.tileMap.add(a);
+
             return this;
         }
+
+        public Builder tileMap(ArrayList<ArrayList<TileData>> a, ArrayList<ArrayList<TileData>> b) {
+
+
+            this.tileMap.add(a);
+            this.tileMap.add(b);
+            return this;
+        }
+
 
         public Builder charecter(T a) {
 
@@ -104,6 +122,9 @@ public class TileCollision {
         int y = (int) (futureY) / TileData.TILE_HEIGHT;
 
 
+        for (int i = 0; i < tileMap.size(); ++i) {
+
+
         // up
         if (rectangle.getY() - futureY < 0) {
 
@@ -111,7 +132,7 @@ public class TileCollision {
 
 
             // topLEft
-            if (!tileMap.get(y2).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 System.out.println("COLLISION ");
 
@@ -121,7 +142,7 @@ public class TileCollision {
             }
 
             // topRight
-            if (!tileMap.get(y2).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 character.bottomCollision(x2, y2);
 
@@ -136,7 +157,7 @@ public class TileCollision {
 
 
             // topLEft
-            if (!tileMap.get(y).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 character.topCollision(x, y);
 
@@ -145,15 +166,17 @@ public class TileCollision {
             }
 
             // topRight
-            if (!tileMap.get(y).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 character.topCollision(x2, y);
                 return false;
             }
 
         }
+        }
 
         return true;
+
 
     }
 
@@ -169,13 +192,14 @@ public class TileCollision {
         int x = (int) (futureX) / TileData.TILE_WIDTH;
 
 
+        for (int i = 0; i < tileMap.size(); ++ i) {
 
         // right
         if (rectangle.getX() - futureX < 0) {
 
 
             // topRight
-            if (!tileMap.get(y2).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 character.leftCollision(x2, y2);
 
@@ -185,7 +209,7 @@ public class TileCollision {
 
             // bottomRight
 
-            if (!tileMap.get(y).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 character.leftCollision(x2, y);
                 return false;
@@ -197,9 +221,8 @@ public class TileCollision {
         else if (rectangle.getX() - futureX > 0) {
 
 
-
             // topRight
-            if (!tileMap.get(y2).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
 
                 character.rightCollision(x, y2);
 
@@ -209,12 +232,13 @@ public class TileCollision {
 
             // bottomRight
 
-            if (!tileMap.get(y).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
 
-                character.rightCollision(x,y);
+                character.rightCollision(x, y);
                 return false;
             }
 
+        }
         }
 
 

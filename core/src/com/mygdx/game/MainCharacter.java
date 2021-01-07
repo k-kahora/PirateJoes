@@ -37,7 +37,8 @@ public class MainCharacter extends Actor implements Entity{
     private static int debugBoxScale;
 
     private TileCollision collision;
-    private ArrayList<ArrayList<TileData>> collisionMap;
+    private ArrayList<ArrayList<ArrayList<TileData>>> collisionMap;
+
 
     private Animation<TextureRegion> leftWalk;
     private Animation<TextureRegion> rightIdle;
@@ -126,7 +127,7 @@ public class MainCharacter extends Actor implements Entity{
         xBeforeVector = getX();
         yBeforeVector = getY();
 
-        collisionMap = null;
+        collisionMap = new ArrayList<ArrayList<ArrayList<TileData>>>();
 
 
 
@@ -135,7 +136,7 @@ public class MainCharacter extends Actor implements Entity{
 
     public void addTileMap(ArrayList<ArrayList<TileData>> a) {
 
-        this.collisionMap = a;
+        this.collisionMap.add(a);
 
     }
 
@@ -322,30 +323,31 @@ public class MainCharacter extends Actor implements Entity{
         return false;
     }
 
+    // the reason this works with one collison map is because the poitioning of the map doesnt change.
 
     @Override
     public void bottomCollision(int x, int y) {
-        rectangle.setPosition(rectangle.getX(), collisionMap.get(y).get(x).getBottomEdge() - rectangle.getHeight());
+        rectangle.setPosition(rectangle.getX(), collisionMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
         velocity.y = 0;
     }
 
     @Override
     public void topCollision(int x, int y) {
-        rectangle.setPosition(rectangle.getX(), collisionMap.get(y).get(x).getTopEdge());
+        rectangle.setPosition(rectangle.getX(), collisionMap.get(0).get(y).get(x).getTopEdge());
         velocity.y = 0;
     }
 
     @Override
     public void rightCollision(int x, int y) {
 
-        rectangle.setPosition(collisionMap.get(y).get(x).getRightEdge(), rectangle.getY());
+        rectangle.setPosition(collisionMap.get(0).get(y).get(x).getRightEdge(), rectangle.getY());
         velocity.x = 0;
 
     }
 
     @Override
     public void leftCollision(int x, int y) {
-        rectangle.setPosition(collisionMap.get(y).get(x).getLeftEdge() - rectangle.getWidth(), rectangle.getY());
+        rectangle.setPosition(collisionMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), rectangle.getY());
         velocity.x = 0;
     }
 
@@ -429,7 +431,7 @@ public class MainCharacter extends Actor implements Entity{
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 4f ).texture(assetManager.manager.get(assetManager.bulletSprite))
+            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 1.2f ).texture(assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(collisionMap).build());
 
 

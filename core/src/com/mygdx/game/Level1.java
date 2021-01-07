@@ -16,36 +16,27 @@ import org.w3c.dom.css.Rect;
 
 import java.util.ArrayList;
 
-public class Level1 implements Screen {
+public class Level1 extends AbstractLevel {
 
-    private PirateJoes pirateJoes;
 
     MyAssetManager assetManager;
 
     TileEditor baseLayer;
     TileEditor secondLayer;
     TileCollision collider;
+    TileCollision wallCollider;
 
-    private OrthographicCamera camera;
     private Slime slime;
     private MainCharacter character;
 
-    private static FillViewport viewport;
-    public final static ShapeRenderer shapeRender = new ShapeRenderer();
 
-    private static final int cameraWidth;
-    private static final int cameraHeight;
-    private static final int worldUnits;
 
-    static {
-        cameraHeight = 17;
-        cameraWidth = 31;
-        worldUnits = 16;
-    }
+
+
 
 
     public Level1(PirateJoes pirateJoes) {
-        this.pirateJoes = pirateJoes;
+        super(pirateJoes);
     }
 
 
@@ -54,34 +45,31 @@ public class Level1 implements Screen {
     @Override
     public void show() {
 
-
-
         assetManager = new MyAssetManager();
 
         assetManager.load();
 
         assetManager.manager.finishLoading();
 
-        baseLayer = new TileEditor("android/assets/tileMaps/level1.txt", assetManager.manager.get(assetManager.tileMap) );
-        secondLayer = new TileEditor("android/assets/tileMaps/interact.txt", assetManager.manager.get(assetManager.secondTileMap));
+        baseLayer = new TileEditor("level1.txt", assetManager.manager.get(assetManager.tileMap) );
+        secondLayer = new TileEditor("interact.txt", assetManager.manager.get(assetManager.collisionMap));
 
-        camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
-        camera.translate((31 * 16)/2, (17*16)/2);
+
+
         //camera.translate(0,0,0);
 
-        viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
+
 
         slime = new Slime();
 
         character = new MainCharacter();
-        character.setPosition(0,0);
+        character.setPosition(32,32);
         // adss teh collision map
         character.addTileMap(secondLayer.getTileMap());
+        character.addTileMap(wallsMaker.getTileMap());
         Rectangle characterBoundingBox = character.getBoundingBox();
 
-
-        collider = new TileCollision.Builder().calcCorners(characterBoundingBox).tileMap(secondLayer.getTileMap()).charecter(character).build();
-
+        collider = new TileCollision.Builder().calcCorners(characterBoundingBox).tileMap(secondLayer.getTileMap(), wallsMaker.getTileMap()).charecter(character).build();
         // enables collision
         character.addCollider(collider);
 
@@ -93,66 +81,39 @@ public class Level1 implements Screen {
     @Override
     public void render(float delta) {
 
+
+
         // sets mouse cord relative to pixels
         PirateJoes.mouseCordinates.x = Gdx.input.getX();
         PirateJoes.mouseCordinates.y = Gdx.input.getY();
 
-        pirateJoes.batch.setProjectionMatrix(viewport.getCamera().combined);
+        getPirateJoe().batch.setProjectionMatrix(getViewport().getCamera().combined);
 
         // turns pixle cordinates to world cordinates
-        viewport.getCamera().unproject(PirateJoes.mouseCordinates);
+        getViewport().getCamera().unproject(PirateJoes.mouseCordinates);
 
 
-        pirateJoes.batch.begin();
+        getPirateJoe().batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        baseLayer.draw(pirateJoes.batch);
-        secondLayer.draw(pirateJoes.batch);
+        baseLayer.draw(getPirateJoe().batch);
+        secondLayer.draw(getPirateJoe().batch);
+        wallsMaker.draw(getPirateJoe().batch);
 //        slime.draw(pirateJoes.batch, 100);
         slime.act(Gdx.graphics.getDeltaTime());
 
-        character.draw(pirateJoes.batch, 0);
+        character.draw(getPirateJoe().batch, 0);
         character.act(Gdx.graphics.getDeltaTime());
 
-        pirateJoes.batch.end();
+        getPirateJoe().batch.end();
         character.drawDebugBox();
 
 
         //viewport.getCamera().position.set(character.getX(),character.getY(),0);
-        viewport.getCamera().update();
+        getViewport().getCamera().update();
+
+        super.render(delta);
 
 
     }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width,height);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-        shapeRender.dispose();
-    }
-
-    // Figure out cordinate system right now
-
-    public static FillViewport getViewport() {
-        return viewport;
-    }
-
 }

@@ -33,7 +33,7 @@ public class TileEditor {
 
 
         try {
-            file = new File(fileName);
+            file = new File(AbstractLevel.tileDir + fileName);
             fileReader = new Scanner(file);
         } catch (Exception exception) {
             System.out.println("BRUH");
@@ -143,6 +143,33 @@ public class TileEditor {
                     case("&"):
                         tile = Tile.BASKET_FULL;
                         break;
+
+
+                    case("1"):
+                        tile = Tile.LEFT_WALL;
+                        break;
+                    case("2"):
+                        tile = Tile.RIGHT_WALL;
+                        break;
+                    case("3"):
+                        tile = Tile.BOTTOM_WALL;
+                        break;
+                    case("4"):
+                        tile = Tile.TOP_WALL;
+                        break;
+                    case("5"):
+                        tile = Tile.TOP_RIGHT_WALL;
+                        break;
+                    case("6"):
+                        tile = Tile.TOP_LEFT_WALL;
+                        break;
+                    case("7"):
+                        tile = Tile.BOTTOM_LEFT_WALL;
+                        break;
+                    case("8"):
+                        tile = Tile.BOTTOM_RIGHT_WALL;
+                        break;
+
                     default:
                         tile = Tile.STONE;
                         System.out.println("ERROR");

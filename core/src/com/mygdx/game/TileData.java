@@ -52,6 +52,11 @@ public class TileData {
 
     }
 
+    // This makes the wall just this constructor
+    public TileData(TextureRegion atlas, int x, int y) {
+
+    }
+
     // scale deals with spacing
     public TileData(Tile tile, TextureAtlas atlas, int scale) {
         this(tile, atlas, 0,0);
