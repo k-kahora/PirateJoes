@@ -1,7 +1,9 @@
-package com.mygdx.game;
+package com.mygdx.game.Tiles;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.Enumerators.Collisions;
+import com.mygdx.game.FunctionalityClasses.Entity;
 
 import java.util.ArrayList;
 
@@ -15,45 +17,29 @@ public class TileCollision {
     A entity can only have one collision but the collision can utilize multiple maps
      */
 
-    private int x;
-    private int y;
-    private int x2;
-    private int y2;
-
-    private enum direction {
-
-        UP,
-        DOWN,
-        RIGHT,
-        LEFT;
-
-    }
-
-    private int count = 0;
     private final Rectangle rectangle;
 
 
-    private final Entity character;
-    private final ArrayList<ArrayList<ArrayList<TileData>>> tileMap;
+    private final com.mygdx.game.FunctionalityClasses.Entity character;
+    private final ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileMap;
 
 
     public static class Builder<T extends Entity> {
 
 
         private T character;
-        private ArrayList<ArrayList<ArrayList<TileData>>> tileMap = new ArrayList<ArrayList<ArrayList<TileData>>>();
+        private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileMap = new ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>>();
         private Rectangle rectangle;
 
 
-        public Builder tileMap(ArrayList<ArrayList<TileData>> a) {
-
+        public Builder tileMap(ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> a) {
 
             this.tileMap.add(a);
 
             return this;
         }
 
-        public Builder tileMap(ArrayList<ArrayList<TileData>> a, ArrayList<ArrayList<TileData>> b) {
+        public Builder tileMap(ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> a, ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> b) {
 
 
             this.tileMap.add(a);
@@ -116,10 +102,10 @@ public class TileCollision {
 
 
         // BUG WHERE x2 was always looking at a future tile for some reason
-        int x = (int) rectangle.getX() / TileData.TILE_WIDTH;
-        int x2 = (int) (rectangle.getWidth() + rectangle.getX() - 0.01) / TileData.TILE_WIDTH;
-        int y2 = (int) (rectangle.getHeight() + futureY) / TileData.TILE_HEIGHT;
-        int y = (int) (futureY) / TileData.TILE_HEIGHT;
+        int x = (int) rectangle.getX() / com.mygdx.game.Tiles.TileData.TILE_WIDTH;
+        int x2 = (int) (rectangle.getWidth() + rectangle.getX() - 0.01) / com.mygdx.game.Tiles.TileData.TILE_WIDTH;
+        int y2 = (int) (rectangle.getHeight() + futureY) / com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
+        int y = (int) (futureY) / com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
 
 
         for (int i = 0; i < tileMap.size(); ++i) {
@@ -132,7 +118,7 @@ public class TileCollision {
 
 
             // topLEft
-            if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 System.out.println("COLLISION ");
 
@@ -142,7 +128,7 @@ public class TileCollision {
             }
 
             // topRight
-            if (!tileMap.get(i).get(y2).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x2).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 character.bottomCollision(x2, y2);
 
@@ -157,7 +143,7 @@ public class TileCollision {
 
 
             // topLEft
-            if (!tileMap.get(i).get(y).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 character.topCollision(x, y);
 
@@ -166,7 +152,7 @@ public class TileCollision {
             }
 
             // topRight
-            if (!tileMap.get(i).get(y).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x2).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 character.topCollision(x2, y);
                 return false;
@@ -186,9 +172,9 @@ public class TileCollision {
         float futureX = 0;
         futureX = rectangle.getX() + velocity.x;
 
-        int x2 = (int) (rectangle.getWidth() + futureX) / TileData.TILE_WIDTH;
-        int y2 = (int) (rectangle.getHeight() + rectangle.getY()) / TileData.TILE_HEIGHT;
-        int y = (int) (rectangle.getY() / TileData.TILE_HEIGHT);
+        int x2 = (int) (rectangle.getWidth() + futureX) / com.mygdx.game.Tiles.TileData.TILE_WIDTH;
+        int y2 = (int) (rectangle.getHeight() + rectangle.getY()) / com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
+        int y = (int) (rectangle.getY() / com.mygdx.game.Tiles.TileData.TILE_HEIGHT);
         int x = (int) (futureX) / TileData.TILE_WIDTH;
 
 
@@ -199,7 +185,7 @@ public class TileCollision {
 
 
             // topRight
-            if (!tileMap.get(i).get(y2).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x2).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 character.leftCollision(x2, y2);
 
@@ -209,7 +195,7 @@ public class TileCollision {
 
             // bottomRight
 
-            if (!tileMap.get(i).get(y).get(x2).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y).get(x2).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 character.leftCollision(x2, y);
                 return false;
@@ -222,7 +208,7 @@ public class TileCollision {
 
 
             // topRight
-            if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(Collisions.NONE)) {
+            if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
 
                 character.rightCollision(x, y2);
 

@@ -1,13 +1,10 @@
 package com.mygdx.game;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.floor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -15,29 +12,27 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import org.w3c.dom.Text;
-import sun.jvmstat.perfdata.monitor.MonitorVersionException;
+import com.mygdx.game.FunctionalityClasses.Entity;
+import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.Tiles.TileCollision;
+import com.mygdx.game.Tiles.TileData;
 
-import javax.swing.text.View;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 
-public class MainCharacter extends Actor implements Entity{
+public class MainCharacter extends Actor implements Entity {
 
-    private MyAssetManager manager1 = new MyAssetManager();
+    private com.mygdx.game.FunctionalityClasses.MyAssetManager manager1 = new com.mygdx.game.FunctionalityClasses.MyAssetManager();
 
     private Rectangle rectangle;
     private static int debugBoxScale;
 
-    private TileCollision collision;
-    private ArrayList<ArrayList<ArrayList<TileData>>> collisionMap;
+    private com.mygdx.game.Tiles.TileCollision collision;
+    private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> collisionMap;
 
 
     private Animation<TextureRegion> leftWalk;
@@ -70,7 +65,7 @@ public class MainCharacter extends Actor implements Entity{
 
     float timeElapsed; // for animation
 
-    MyAssetManager assetManager;
+    com.mygdx.game.FunctionalityClasses.MyAssetManager assetManager;
 
     LinkedList<SanatizerBullet> bullets, removedBullets;
 
@@ -80,7 +75,7 @@ public class MainCharacter extends Actor implements Entity{
 
 
         assetManager = new MyAssetManager();
-        assetManager.load();
+        assetManager.loadCharecter();
         assetManager.manager.finishLoading();
 
         bullets = new LinkedList<>();
@@ -127,7 +122,7 @@ public class MainCharacter extends Actor implements Entity{
         xBeforeVector = getX();
         yBeforeVector = getY();
 
-        collisionMap = new ArrayList<ArrayList<ArrayList<TileData>>>();
+        collisionMap = new ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>>();
 
 
 
@@ -268,16 +263,28 @@ public class MainCharacter extends Actor implements Entity{
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
-        for (SanatizerBullet bullets : bullets) {
-            bullets.draw(batch,1);
-            bullets.drawDebugBox();
-            if (bullets.remove) {
-                removedBullets.add(bullets);
+        for (int i = 0; i < bullets.size(); ++i) {
+            bullets.get(i).draw(batch,0);
+            bullets.get(i).drawDebugBox();
+
+            if (i != 0) {
+                bulletCollision(bullets.get(i - 1), bullets.get(i));
             }
 
+            if (bullets.get(i).remove) {
+                removedBullets.add(bullets.get(0));
+            }
         }
-
         bullets.removeAll(removedBullets);
+
+    }
+
+    private void bulletCollision(SanatizerBullet previousBullet, SanatizerBullet bullet) {
+
+        if (Intersector.overlaps(previousBullet.getBoundingBox(), bullet.getBoundingBox())) {
+            removedBullets.add(previousBullet);
+            removedBullets.add(bullet);
+        }
 
     }
 
@@ -408,19 +415,13 @@ public class MainCharacter extends Actor implements Entity{
         this.collision = collision;
     }
 
-    public void addSanitizer() {
-
-
-
-    }
-
 //     called when the player cliks the right mouse
 //     Converts a vectore between the charecter and the mouse and adds a bullet to teh Queue and the removes them if they collide.
 //     The moment we start shotting the designated time we only can fire five bullets untile the timer runs out.
     private void shoot() {
 
-
-
+        velocity.x = 0;
+        velocity.y = 0;
 
         float rectangleMidX = (rectangle.getX() + rectangle.getWidth()/2);
         float rectangleMidY = (rectangle.getY() + rectangle.getHeight()/2);
@@ -431,7 +432,7 @@ public class MainCharacter extends Actor implements Entity{
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 1.2f ).texture(assetManager.manager.get(assetManager.bulletSprite))
+            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 3f ).texture(assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(collisionMap).build());
 
 
@@ -439,8 +440,6 @@ public class MainCharacter extends Actor implements Entity{
 
     // mutates the vector
     private void mouseCordinatesRelativeToActor(Vector2 vector, float vectorx, float vectory) {
-
-
 
         vector.x = PirateJoes.mouseCordinates.x - vectorx;
         vector.y = PirateJoes.mouseCordinates.y - vectory;

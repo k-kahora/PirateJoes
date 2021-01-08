@@ -1,32 +1,33 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import org.graalvm.compiler.asm.amd64.AMD64BaseAssembler;
-import org.w3c.dom.css.Rect;
+import com.mygdx.game.FunctionalityClasses.Entity;
+import com.mygdx.game.Tiles.TileCollision;
+import com.mygdx.game.Tiles.TileData;
 
 import java.util.ArrayList;
 
-public class SanatizerBullet extends Actor implements Entity{
+public class SanatizerBullet extends Actor implements Entity {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    private final TileCollision bulletColider;
-    private final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
+    private final com.mygdx.game.Tiles.TileCollision bulletColider;
+    private final ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
     private final Texture texture;
     private final float x,y,speed;
     public boolean remove;
     private Rectangle rectangle;
     private final Sprite sprite;
     private final Vector2 velocity;
+
+    private int numOfBounces;
 
     private SanatizerBullet(Builder builder) {
 
@@ -41,10 +42,10 @@ public class SanatizerBullet extends Actor implements Entity{
 
         sprite = new Sprite(texture);
         setPosition(x,y);
-
+        numOfBounces = 0;
 
         this.rectangle = new Rectangle(getX(), getY(), sprite.getWidth(), sprite.getHeight());
-        bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
+        bulletColider = new com.mygdx.game.Tiles.TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
 
     }
@@ -71,7 +72,7 @@ public class SanatizerBullet extends Actor implements Entity{
 
         private Texture texture;
         private TileCollision bulletColider;
-        private ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
+        private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
 
 
         public Builder(float x, float y, Vector2 velocity, float speed) {
@@ -132,7 +133,7 @@ public class SanatizerBullet extends Actor implements Entity{
     public void bottomCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
-
+        numOfBounces++;
 
 
     }
@@ -143,6 +144,7 @@ public class SanatizerBullet extends Actor implements Entity{
     public void topCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
+        numOfBounces++;
     }
 
     @Override
@@ -150,7 +152,7 @@ public class SanatizerBullet extends Actor implements Entity{
 
         velocity.x *= -1;
         rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), getY());
-
+        numOfBounces++;
 
 
     }
@@ -160,7 +162,7 @@ public class SanatizerBullet extends Actor implements Entity{
 
         velocity.x *= -1;
         rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), getY());
-
+        numOfBounces++;
     }
 
 
@@ -179,6 +181,11 @@ public class SanatizerBullet extends Actor implements Entity{
         }
 
         if (getY() > (16 * 16)|| getY() < 0) {
+            remove = true;
+        }
+
+        // only two bouces max
+        if (numOfBounces > 2) {
             remove = true;
         }
 

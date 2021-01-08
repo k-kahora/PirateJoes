@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.FunctionalityClasses;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;

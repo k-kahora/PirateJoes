@@ -1,18 +1,13 @@
-package com.mygdx.game;
+package com.mygdx.game.Tiles;
 
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import jdk.internal.module.SystemModuleFinders;
-import jdk.internal.net.http.RequestPublishers;
-import org.w3c.dom.Text;
+import com.mygdx.game.Enumerators.Tile;
+import com.mygdx.game.FunctionalityClasses.AbstractLevel;
+import com.mygdx.game.Tiles.TileData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class TileEditor {
@@ -23,8 +18,8 @@ public class TileEditor {
     private String commentSymbol;
     private Scanner fileReader;
     private File file;
-    private ArrayList<ArrayList<Tile>> tileMap;
-    private ArrayList<ArrayList<TileData>> tileMapData;
+    private ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>> tileMap;
+    private ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> tileMapData;
     private int startingPoint;
     private TextureAtlas atlas;
 
@@ -43,7 +38,7 @@ public class TileEditor {
         startingPoint = 0;
         commentSymbol = "/";
         this.atlas = atlas;
-        tileMap = new ArrayList<ArrayList<Tile>>();
+        tileMap = new ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>>();
 
         loadTiles();
 
@@ -78,9 +73,9 @@ public class TileEditor {
         return lines;
     }
 
-    private ArrayList<ArrayList<Tile>> loadTiles() {
+    private ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>> loadTiles() {
 
-        Tile tile = Tile.AIR;
+        com.mygdx.game.Enumerators.Tile tile = com.mygdx.game.Enumerators.Tile.AIR;
 
 
 
@@ -100,7 +95,7 @@ public class TileEditor {
         // initalizes the array withe emoty arrays
         for (int i = 0; i < arrayNum; ++i) {
 
-            tileMap.add(new ArrayList<Tile>());
+            tileMap.add(new ArrayList<com.mygdx.game.Enumerators.Tile>());
 
         }
 
@@ -126,48 +121,48 @@ public class TileEditor {
                 switch (delim) {
 
                     case ("#"):
-                        tile = Tile.GRASS;
+                        tile = com.mygdx.game.Enumerators.Tile.GRASS;
                         break;
                     case ("*"):
-                        tile = Tile.AIR;
+                        tile = com.mygdx.game.Enumerators.Tile.AIR;
                         break;
                     case ("@"):
-                        tile = Tile.STONE;
+                        tile = com.mygdx.game.Enumerators.Tile.STONE;
                         break;
                     case ("B"):
-                        tile = Tile.DOOR;
+                        tile = com.mygdx.game.Enumerators.Tile.DOOR;
                         break;
                     case ("0"):
-                        tile = Tile.INVISIBLE;
+                        tile = com.mygdx.game.Enumerators.Tile.INVISIBLE;
                         break;
                     case("&"):
-                        tile = Tile.BASKET_FULL;
+                        tile = com.mygdx.game.Enumerators.Tile.BASKET_FULL;
                         break;
 
 
                     case("1"):
-                        tile = Tile.LEFT_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.LEFT_WALL;
                         break;
                     case("2"):
-                        tile = Tile.RIGHT_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.RIGHT_WALL;
                         break;
                     case("3"):
-                        tile = Tile.BOTTOM_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.BOTTOM_WALL;
                         break;
                     case("4"):
-                        tile = Tile.TOP_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.TOP_WALL;
                         break;
                     case("5"):
-                        tile = Tile.TOP_RIGHT_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.TOP_RIGHT_WALL;
                         break;
                     case("6"):
-                        tile = Tile.TOP_LEFT_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.TOP_LEFT_WALL;
                         break;
                     case("7"):
-                        tile = Tile.BOTTOM_LEFT_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.BOTTOM_LEFT_WALL;
                         break;
                     case("8"):
-                        tile = Tile.BOTTOM_RIGHT_WALL;
+                        tile = com.mygdx.game.Enumerators.Tile.BOTTOM_RIGHT_WALL;
                         break;
 
                     default:
@@ -197,29 +192,29 @@ public class TileEditor {
     // using the tiledata class
 
 //    this also assigns tile data with the appropiate positon based on the static vars in the class
-    private ArrayList<ArrayList<TileData>> loadTileData() {
+    private ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> loadTileData() {
 
         int xPosition = 0;
         int yPosition = 0;
 
-        ArrayList<ArrayList<TileData>> tileDataMap = new ArrayList<ArrayList<TileData>>();
+        ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> tileDataMap = new ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>();
 
         // adds the arrays
         for (int i = 0; i < tileMap.size(); ++i) {
-            tileDataMap.add(new ArrayList<TileData>());
+            tileDataMap.add(new ArrayList<com.mygdx.game.Tiles.TileData>());
         }
 
         Collections.reverse(tileMap);
 
         for (int i = 0; i < tileMap.size(); ++i) {
 
-            yPosition += i == 0 ? 0 : TileData.TILE_HEIGHT;
+            yPosition += i == 0 ? 0 : com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
             xPosition = 0;
 
 
             for (int j = 0; j < tileMap.get(i).size(); ++j) {
-                tileDataMap.get(i).add(new TileData(tileMap.get(i).get(j), atlas, xPosition, yPosition));
-                xPosition += TileData.TILE_WIDTH;
+                tileDataMap.get(i).add(new com.mygdx.game.Tiles.TileData(tileMap.get(i).get(j), atlas, xPosition, yPosition));
+                xPosition += com.mygdx.game.Tiles.TileData.TILE_WIDTH;
             }
         }
 
@@ -238,15 +233,15 @@ public class TileEditor {
         int county = 0;
         int yEnumerate = 0;
 
-        ArrayList<ArrayList<TileData>> tilesToRender = tileMapData;
+        ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> tilesToRender = tileMapData;
 
 
 
-        for (ArrayList<TileData> array1 : tilesToRender) {
+        for (ArrayList<com.mygdx.game.Tiles.TileData> array1 : tilesToRender) {
             county += yEnumerate;
             countx = 0;
 
-            for (TileData data : array1) {
+            for (com.mygdx.game.Tiles.TileData data : array1) {
                 batch.draw(data.getTextureRegion(),countx,county);
                 countx += data.getTextureRegion().getRegionWidth();
                 yEnumerate = data.getTextureRegion().getRegionHeight();

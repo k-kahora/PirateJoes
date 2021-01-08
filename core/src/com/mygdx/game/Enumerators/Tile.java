@@ -1,6 +1,4 @@
-package com.mygdx.game;
-
-import com.sun.tools.javac.code.Attribute;
+package com.mygdx.game.Enumerators;
 
 import java.util.EnumSet;
 

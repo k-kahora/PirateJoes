@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.FunctionalityClasses;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
@@ -31,34 +31,41 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> collisionMap = new AssetDescriptor<TextureAtlas>("spriteSheets/collision_map.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
+    public AssetDescriptor<Texture> fluVirus = new AssetDescriptor<Texture>("spriteSheets/FluVirus.png", Texture.class);
 
     public AssetDescriptor<Texture> storeManager = new AssetDescriptor<Texture>("sprites/Manager.png", Texture.class);
 
     // adds to teh loading que
     public void load() {
 
+        loadCharecter();
+        loadEnemys();
+        loadGui();
+        loadTileMap();
 
-        // SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("my_ui.atlas");
+    }
 
-
-
-        manager.load(charecterAtlasLeft);
-        manager.load(skin);
+    public void loadCharecter() {
         manager.load(storeManager);
         manager.load(charecterAtlasRight);
         manager.load(charecterIdleRight);
         manager.load(charecterIdleLeft);
-        manager.load(slime);
+        manager.load(charecterAtlasLeft);
+        manager.load(bulletSprite);
+    }
+
+    public void loadGui() {
+        manager.load(skin);
+    }
+
+    public void loadTileMap() {
         manager.load(tileMap);
         manager.load(collisionMap);
-        manager.load(bulletSprite);
+    }
 
-        //manager.load(skinAtlas);
-
-        //manager.load(skin);
-
-
-
+    public void loadEnemys() {
+        manager.load(slime);
+        manager.load(fluVirus);
     }
 
     public void dispose() {

@@ -3,10 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.*;
 
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,8 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.FunctionalityClasses.MyAssetManager;
 
-public class MainMenu  implements Screen {
+public class MainMenu implements Screen {
 
     private static final float PPM = 16f;
 
@@ -27,25 +25,16 @@ public class MainMenu  implements Screen {
         this.pirateJoes = pirateJoes;
     }
 
-
-
-
-
-
-
     Button startButton;
     TextButton endButton;
     Table table;
 
     Skin mainMenuSkin;
 
-    MyAssetManager assetManager;
+    com.mygdx.game.FunctionalityClasses.MyAssetManager assetManager;
 
     Texture texture;
-    OrthographicCamera camera;
-
     Stage stage;
-
     ScreenViewport viewport;
 
 

@@ -1,11 +1,9 @@
-package com.mygdx.game;
+package com.mygdx.game.Tiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.game.Enumerators.Tile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TileData {
@@ -19,7 +17,7 @@ public class TileData {
     private int left;
     public static int TILE_WIDTH;
     public static int TILE_HEIGHT;
-    private Tile tile;
+    private com.mygdx.game.Enumerators.Tile tile;
     private boolean collisionLock;
 
     static {
@@ -30,14 +28,14 @@ public class TileData {
     }
 
     public TileData() {
-        this.tile = Tile.BASKET_FULL;
+        this.tile = com.mygdx.game.Enumerators.Tile.BASKET_FULL;
         this.bottom = 1;
 
 
 
     }
 
-    public TileData(Tile tile, TextureAtlas atlas, int x, int y) {
+    public TileData(com.mygdx.game.Enumerators.Tile tile, TextureAtlas atlas, int x, int y) {
 
         this.tile = tile;
         this.bottom = y;
@@ -58,7 +56,7 @@ public class TileData {
     }
 
     // scale deals with spacing
-    public TileData(Tile tile, TextureAtlas atlas, int scale) {
+    public TileData(com.mygdx.game.Enumerators.Tile tile, TextureAtlas atlas, int scale) {
         this(tile, atlas, 0,0);
         TILE_HEIGHT *= scale;
         TILE_WIDTH *= scale;

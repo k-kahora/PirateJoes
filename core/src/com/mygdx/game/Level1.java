@@ -1,77 +1,69 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
-import org.w3c.dom.css.Rect;
-
-import java.util.ArrayList;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.mygdx.game.FunctionalityClasses.AbstractLevel;
+import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.Tiles.TileCollision;
+import com.mygdx.game.Tiles.TileEditor;
+import com.mygdx.game.Viruses.FluVirus;
 
 public class Level1 extends AbstractLevel {
 
 
-    MyAssetManager assetManager;
-
-    TileEditor baseLayer;
-    TileEditor secondLayer;
-    TileCollision collider;
-    TileCollision wallCollider;
+    com.mygdx.game.Tiles.TileEditor baseLayer;
+    com.mygdx.game.Tiles.TileEditor secondLayer;
+    com.mygdx.game.Tiles.TileCollision collider;
+    com.mygdx.game.Tiles.TileCollision wallCollider;
 
     private Slime slime;
     private MainCharacter character;
-
-
-
-
-
-
+    private FluVirus fluVirus;
+    private final Group enemeyGroup;
 
     public Level1(PirateJoes pirateJoes) {
         super(pirateJoes);
+        enemeyGroup = new Group();
     }
-
-
-
 
     @Override
     public void show() {
 
-        assetManager = new MyAssetManager();
+        loadAssets();
 
-        assetManager.load();
-
-        assetManager.manager.finishLoading();
-
-        baseLayer = new TileEditor("level1.txt", assetManager.manager.get(assetManager.tileMap) );
-        secondLayer = new TileEditor("interact.txt", assetManager.manager.get(assetManager.collisionMap));
+        baseLayer = new com.mygdx.game.Tiles.TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap) );
+        secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
 
 
 
-        //camera.translate(0,0,0);
-
-
-
-        slime = new Slime();
 
         character = new MainCharacter();
         character.setPosition(32,32);
         // adss teh collision map
         character.addTileMap(secondLayer.getTileMap());
-        character.addTileMap(wallsMaker.getTileMap());
+        character.addTileMap(getWalls().getTileMap());
         Rectangle characterBoundingBox = character.getBoundingBox();
 
-        collider = new TileCollision.Builder().calcCorners(characterBoundingBox).tileMap(secondLayer.getTileMap(), wallsMaker.getTileMap()).charecter(character).build();
+        collider = new TileCollision.Builder().calcCorners(characterBoundingBox).tileMap(secondLayer.getTileMap(), getWalls().getTileMap()).charecter(character).build();
         // enables collision
         character.addCollider(collider);
+
+
+        for (int i = 0; i < 6; ++i ) {
+
+            enemeyGroup.addActor(new FluVirus());
+
+        }
+
+        for (int i = 0; i < 6; ++i) {
+
+            int x = i * 16;
+
+            enemeyGroup.getChild(i).setPosition(x , 32);
+
+        }
 
 
 
@@ -98,11 +90,11 @@ public class Level1 extends AbstractLevel {
 
         baseLayer.draw(getPirateJoe().batch);
         secondLayer.draw(getPirateJoe().batch);
-        wallsMaker.draw(getPirateJoe().batch);
+        getWalls().draw(getPirateJoe().batch);
 //        slime.draw(pirateJoes.batch, 100);
-        slime.act(Gdx.graphics.getDeltaTime());
 
         character.draw(getPirateJoe().batch, 0);
+        enemeyGroup.draw(getPirateJoe().batch, 0);
         character.act(Gdx.graphics.getDeltaTime());
 
         getPirateJoe().batch.end();
@@ -112,8 +104,28 @@ public class Level1 extends AbstractLevel {
         //viewport.getCamera().position.set(character.getX(),character.getY(),0);
         getViewport().getCamera().update();
 
-        super.render(delta);
 
+
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
 
     }
 }

@@ -1,31 +1,33 @@
-package com.mygdx.game;
+package com.mygdx.game.FunctionalityClasses;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.PirateJoes;
+import com.mygdx.game.Tiles.TileEditor;
 
 /*
 Skeltal implementaion for all levels implemnts screen and Level all Actual levels must extend this class
+
+Must implement remaining methods of screen
+
+
+
+
  */
 
-public class AbstractLevel implements Level, Screen {
+public abstract class AbstractLevel implements Level, Screen {
 
     private PirateJoes pirateJoes;
+
 
     public final static String tileDir;
 
     MyAssetManager assetManager;
 
     private OrthographicCamera camera;
-    public final TileEditor wallsMaker;
+    private TileEditor wallsMaker;
 
     private static FillViewport viewport;
     public final static ShapeRenderer shapeRender;
@@ -49,41 +51,20 @@ public class AbstractLevel implements Level, Screen {
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
 
-        assetManager = new MyAssetManager();
-        assetManager.load();
-        assetManager.manager.finishLoading();
 
-        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.collisionMap));
+
 
     }
 
-    public static FillViewport getViewport() {
+    public final static FillViewport getViewport() {
         return viewport;
     }
 
-    public PirateJoes getPirateJoe() {
+    public final PirateJoes getPirateJoe() {
         return pirateJoes;
     }
 
-    @Override
-    public void levelDrawBorder() {
 
-        for (int i = 0; i < 17; i ++) {
-            for (int j = 0; j < 31; ++j) {
-
-            }
-        }
-
-    }
-
-    @Override
-    public void show() {
-
-    }
-
-    @Override
-    public void render(float delta) {
-    }
 
     @Override
     public void resize(int width, int height) {
@@ -91,22 +72,22 @@ public class AbstractLevel implements Level, Screen {
     }
 
     @Override
-    public void pause() {
+    public final void loadAssets() {
+
+        assetManager = new MyAssetManager();
+        assetManager.loadTileMap();
+        assetManager.manager.finishLoading();
+
+        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.collisionMap));
 
     }
 
-    @Override
-    public void resume() {
-
+    public TileEditor getWalls() {
+        return wallsMaker;
     }
 
-    @Override
-    public void hide() {
-
+    public MyAssetManager getAssetManager() {
+        return assetManager;
     }
 
-    @Override
-    public void dispose() {
-
-    }
 }
