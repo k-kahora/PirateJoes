@@ -15,6 +15,10 @@ public interface Entity {
 
     boolean collisionLogic();
 
+    public float getX();
+
+    public float getY();
+
 
     void bottomCollision(int x, int y);
     void topCollision(int x, int y);

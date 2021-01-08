@@ -10,10 +10,9 @@ public abstract class AbstractEnemy extends Actor implements Enemy {
 
 
     private SpriteBatch sprite;
-    public final MyAssetManager assetManager;
+    public  MyAssetManager assetManager = new MyAssetManager();;
 
     public AbstractEnemy() {
-        assetManager = new MyAssetManager();
         assetManager.loadEnemys();
         assetManager.manager.finishLoading();
     }

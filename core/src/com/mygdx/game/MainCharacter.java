@@ -290,7 +290,7 @@ public class MainCharacter extends Actor implements Entity {
 
     public void drawDebugBox() {
 
-
+/*
         Level1.shapeRender.setProjectionMatrix(Level1.getViewport().getCamera().combined);
         Level1.shapeRender.setColor(Color.RED);
 
@@ -302,6 +302,8 @@ public class MainCharacter extends Actor implements Entity {
         }
         Level1.shapeRender.end();
 
+
+ */
         rectangle.x = getX() + debugBoxScale;
         rectangle.y = getY() + debugBoxScale;
         rectangle.width = getWidth() - (2 * debugBoxScale);
@@ -309,6 +311,8 @@ public class MainCharacter extends Actor implements Entity {
 
 
         //System.out.println(getWidth());
+
+
 
     }
 

@@ -4,4 +4,8 @@ public interface Enemy {
 
     void loadFiles();
 
+    boolean attack();
+
+    void updateDetection();
+
 }

@@ -13,10 +13,10 @@ import com.mygdx.game.Viruses.FluVirus;
 public class Level1 extends AbstractLevel {
 
 
-    com.mygdx.game.Tiles.TileEditor baseLayer;
-    com.mygdx.game.Tiles.TileEditor secondLayer;
-    com.mygdx.game.Tiles.TileCollision collider;
-    com.mygdx.game.Tiles.TileCollision wallCollider;
+    TileEditor baseLayer;
+    TileEditor secondLayer;
+    TileCollision collider;
+    TileCollision wallCollider;
 
     private Slime slime;
     private MainCharacter character;
@@ -51,19 +51,9 @@ public class Level1 extends AbstractLevel {
         character.addCollider(collider);
 
 
-        for (int i = 0; i < 6; ++i ) {
+        enemeyGroup.addActor(new FluVirus.Builder(character).build());
 
-            enemeyGroup.addActor(new FluVirus());
-
-        }
-
-        for (int i = 0; i < 6; ++i) {
-
-            int x = i * 16;
-
-            enemeyGroup.getChild(i).setPosition(x , 32);
-
-        }
+        enemeyGroup.getChild(0).setPosition(100,100);
 
 
 
@@ -99,6 +89,8 @@ public class Level1 extends AbstractLevel {
 
         getPirateJoe().batch.end();
         character.drawDebugBox();
+
+        enemeyGroup.act(delta);
 
 
         //viewport.getCamera().position.set(character.getX(),character.getY(),0);

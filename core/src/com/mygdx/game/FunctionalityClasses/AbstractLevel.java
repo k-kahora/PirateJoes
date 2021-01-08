@@ -30,7 +30,6 @@ public abstract class AbstractLevel implements Level, Screen {
     private TileEditor wallsMaker;
 
     private static FillViewport viewport;
-    public final static ShapeRenderer shapeRender;
 
     public static final int cameraWidth;
     public static final int cameraHeight;
@@ -40,7 +39,6 @@ public abstract class AbstractLevel implements Level, Screen {
         cameraHeight = 17;
         cameraWidth = 31;
         worldUnits = 16;
-        shapeRender = new ShapeRenderer();
         tileDir = "android/assets/tileMaps/";
     }
 
