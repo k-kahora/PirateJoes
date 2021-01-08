@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mygdx.game.FunctionalityClasses.Entity;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -18,11 +19,11 @@ public class SanatizerBullet extends Actor implements Entity {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    private final com.mygdx.game.Tiles.TileCollision bulletColider;
+    private TileCollision bulletColider;
     private final ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
-    private final Texture texture;
     private final float x,y,speed;
     public boolean remove;
+    private final boolean canCollide;
     private Rectangle rectangle;
     private final Sprite sprite;
     private final Vector2 velocity;
@@ -31,21 +32,23 @@ public class SanatizerBullet extends Actor implements Entity {
 
     private SanatizerBullet(Builder builder) {
 
-        this.texture = builder.texture;
+        this.sprite = builder.sprite;
         this.x = builder.x;
         this.y = builder.y;
         this.speed = builder.speed;
         this.velocity = builder.velocity;
         this.remove = false;
         this.tileDataMap = builder.tileDataMap;
+        this.rectangle = builder.rectangle;
+        this.canCollide = builder.canCollide;
 
-
-        sprite = new Sprite(texture);
         setPosition(x,y);
-        numOfBounces = 0;
 
-        this.rectangle = new Rectangle(getX(), getY(), sprite.getWidth(), sprite.getHeight());
-        bulletColider = new com.mygdx.game.Tiles.TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
+        if (canCollide) {
+            this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
+        }
+
+
 
 
     }
@@ -68,34 +71,30 @@ public class SanatizerBullet extends Actor implements Entity {
 
         private final float x,y, speed;
         private final Vector2 velocity;
-
-
-        private Texture texture;
+        private final Rectangle rectangle;
+        private boolean canCollide;
+        private Sprite sprite;
         private TileCollision bulletColider;
         private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
 
 
-        public Builder(float x, float y, Vector2 velocity, float speed) {
+        public Builder(float x, float y, Vector2 velocity, float speed, Texture texture) {
+
 
             this.x = x;
             this.y = y;
             this.speed = speed;
             this.velocity = velocity.scl(speed);
+            this.sprite = new Sprite(texture);
+            this.rectangle = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
 
 
         }
-
-        public Builder texture(Texture a) {
-
-            this.texture = a;
-            return this;
-
-        }
-
 
 
         public Builder initCollision(ArrayList<ArrayList<ArrayList<TileData>>> a) {
 
+            this.canCollide = true;
             this.tileDataMap = a;
             return this;
 
@@ -195,7 +194,9 @@ public class SanatizerBullet extends Actor implements Entity {
 
 
 
-        collisionLogic();
+        if (canCollide)
+            collisionLogic();
+
         moveBy(velocity.x, velocity.y);
 
     }
@@ -208,7 +209,7 @@ public class SanatizerBullet extends Actor implements Entity {
 
     // dispose is kinda like unload it unloads everything that uses that texture
     private void dispose() {
-        texture.dispose();
+        sprite.getTexture().dispose();
     }
 
 

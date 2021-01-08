@@ -14,6 +14,7 @@ public abstract class AbstractEnemy extends Actor implements Enemy {
 
     public AbstractEnemy() {
         assetManager.loadEnemys();
+        assetManager.loadCharecter();
         assetManager.manager.finishLoading();
     }
 

@@ -436,7 +436,7 @@ public class MainCharacter extends Actor implements Entity {
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 3f ).texture(assetManager.manager.get(assetManager.bulletSprite))
+            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 3f ,assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(collisionMap).build());
 
 

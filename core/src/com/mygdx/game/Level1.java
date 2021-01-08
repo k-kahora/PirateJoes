@@ -52,10 +52,14 @@ public class Level1 extends AbstractLevel {
 
 
         enemeyGroup.addActor(new FluVirus.Builder(character).build());
+        enemeyGroup.addActor(new FluVirus.Builder(character).build());
+        enemeyGroup.addActor(new FluVirus.Builder(character).build());
+        enemeyGroup.addActor(new FluVirus.Builder(character).build());
 
-        enemeyGroup.getChild(0).setPosition(100,100);
-
-
+        enemeyGroup.getChild(0).setPosition(160,100);
+        enemeyGroup.getChild(1).setPosition(110,100);
+        enemeyGroup.getChild(2).setPosition(130,100);
+        enemeyGroup.getChild(3).setPosition(120,100);
 
 
     }

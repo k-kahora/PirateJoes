@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class TileData {
 
-    private Map<String ,TextureRegion> textures;
     private TextureRegion textureRegion;
     private TextureAtlas atlas;
     private int bottom;
@@ -18,7 +17,6 @@ public class TileData {
     public static int TILE_WIDTH;
     public static int TILE_HEIGHT;
     private com.mygdx.game.Enumerators.Tile tile;
-    private boolean collisionLock;
 
     static {
 
@@ -28,21 +26,20 @@ public class TileData {
     }
 
     public TileData() {
-        this.tile = com.mygdx.game.Enumerators.Tile.BASKET_FULL;
+        this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
 
 
 
     }
 
-    public TileData(com.mygdx.game.Enumerators.Tile tile, TextureAtlas atlas, int x, int y) {
+    public TileData(Tile tile, TextureAtlas atlas, int x, int y) {
 
         this.tile = tile;
         this.bottom = y;
         this.top = y + TILE_HEIGHT;
         this.right = x + TILE_WIDTH;
         this.left = x;
-        this.collisionLock = false;
 
         this.atlas = atlas;
         textureRegion = atlas.findRegion(tile.getAtlasReference());
@@ -51,9 +48,6 @@ public class TileData {
     }
 
     // This makes the wall just this constructor
-    public TileData(TextureRegion atlas, int x, int y) {
-
-    }
 
     // scale deals with spacing
     public TileData(com.mygdx.game.Enumerators.Tile tile, TextureAtlas atlas, int scale) {
