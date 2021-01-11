@@ -4,27 +4,28 @@ import static java.lang.Math.abs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.mygdx.game.FunctionalityClasses.Entity;
+import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.Levels.PirateJoes;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.utils.SteeringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class MainCharacter extends Actor implements Entity {
+public class MainCharacter extends Actor implements EntityLocation {
 
     private com.mygdx.game.FunctionalityClasses.MyAssetManager manager1 = new com.mygdx.game.FunctionalityClasses.MyAssetManager();
 
@@ -40,7 +41,7 @@ public class MainCharacter extends Actor implements Entity {
     private Animation<TextureRegion> leftIdle;
     private Animation<TextureRegion> rightWalk;
 
-    Vector2 direction, velocity;
+    Vector2 direction, velocity, position;
 
 
     float friction, maxSpeed, acceleration;
@@ -111,6 +112,7 @@ public class MainCharacter extends Actor implements Entity {
 
         direction = new Vector2();
         velocity = new Vector2();
+        position = new Vector2();
 
 
         debugBoxScale = 4;
@@ -153,7 +155,8 @@ public class MainCharacter extends Actor implements Entity {
 
         yBeforeVector = getY();
         xBeforeVector = getX();
-
+        position.x = getX();
+        position.y = getY();
 
 
 
@@ -317,6 +320,11 @@ public class MainCharacter extends Actor implements Entity {
     }
 
     @Override
+    public void setBoundingBox(float x, float y, float width, float height) {
+
+    }
+
+    @Override
     public Vector2 getVelocity() {
         return velocity;
     }
@@ -430,7 +438,7 @@ public class MainCharacter extends Actor implements Entity {
         float rectangleMidX = (rectangle.getX() + rectangle.getWidth()/2);
         float rectangleMidY = (rectangle.getY() + rectangle.getHeight()/2);
 
-        Vector2 bulletVellocity = new Vector2(PirateJoes.mouseCordinates.x, PirateJoes.mouseCordinates.y);
+        Vector2 bulletVellocity = new Vector2(com.mygdx.game.Levels.PirateJoes.mouseCordinates.x, com.mygdx.game.Levels.PirateJoes.mouseCordinates.y);
 
         // converts vector to appropiate angle
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
@@ -445,11 +453,41 @@ public class MainCharacter extends Actor implements Entity {
     // mutates the vector
     private void mouseCordinatesRelativeToActor(Vector2 vector, float vectorx, float vectory) {
 
-        vector.x = PirateJoes.mouseCordinates.x - vectorx;
+        vector.x = com.mygdx.game.Levels.PirateJoes.mouseCordinates.x - vectorx;
         vector.y = PirateJoes.mouseCordinates.y - vectory;
 
     }
 
+    public Vector2 getPosition() {
+
+        return position;
+
+    }
+
+    @Override
+    public float getOrientation() {
+        return 0;
+    }
+
+    @Override
+    public void setOrientation(float orientation) {
+
+    }
+
+    @Override
+    public float vectorToAngle(Vector2 vector) {
+        return SteeringUtils.vectorToAngle(vector);
+    }
+
+    @Override
+    public Vector2 angleToVector(Vector2 outVector, float angle) {
+        return SteeringUtils.angleToVector(outVector, angle);
+    }
+
+    @Override
+    public Location<Vector2> newLocation() {
+        return null;
+    }
 
 
 }

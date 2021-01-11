@@ -28,7 +28,7 @@ public class TileCollision {
 
 
         private T character;
-        private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileMap = new ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>>();
+        private ArrayList<ArrayList<ArrayList<TileData>>> tileMap = new ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>>();
         private Rectangle rectangle;
 
 
@@ -119,8 +119,6 @@ public class TileCollision {
 
             // topLEft
             if (!tileMap.get(i).get(y2).get(x).getTile().isCollideable().contains(com.mygdx.game.Enumerators.Collisions.NONE)) {
-
-                System.out.println("COLLISION ");
 
 
                 character.bottomCollision(x, y2);

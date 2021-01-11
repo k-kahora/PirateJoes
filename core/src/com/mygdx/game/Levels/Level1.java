@@ -1,14 +1,20 @@
-package com.mygdx.game;
+package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.steer.Steerable;
+import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.mygdx.game.FunctionalityClasses.AbstractLevel;
-import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.MainCharacter;
+import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
+import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.FluVirus;
+
+import java.util.ArrayList;
 
 public class Level1 extends AbstractLevel {
 
@@ -36,14 +42,16 @@ public class Level1 extends AbstractLevel {
         baseLayer = new com.mygdx.game.Tiles.TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap) );
         secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
 
-
-
-
+        ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps = new ArrayList<ArrayList<ArrayList<TileData>>>();
         character = new MainCharacter();
         character.setPosition(32,32);
         // adss teh collision map
-        character.addTileMap(secondLayer.getTileMap());
-        character.addTileMap(getWalls().getTileMap());
+        collisonMaps.add(secondLayer.getTileMap());
+        collisonMaps.add(getWalls().getTileMap());
+
+        character.addTileMap(collisonMaps.get(0));
+        character.addTileMap(collisonMaps.get(1));
+
         Rectangle characterBoundingBox = character.getBoundingBox();
 
         collider = new TileCollision.Builder().calcCorners(characterBoundingBox).tileMap(secondLayer.getTileMap(), getWalls().getTileMap()).charecter(character).build();
@@ -51,15 +59,16 @@ public class Level1 extends AbstractLevel {
         character.addCollider(collider);
 
 
-        enemeyGroup.addActor(new FluVirus.Builder(character).build());
-        enemeyGroup.addActor(new FluVirus.Builder(character).build());
-        enemeyGroup.addActor(new FluVirus.Builder(character).build());
-        enemeyGroup.addActor(new FluVirus.Builder(character).build());
+
+
+        enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+
 
         enemeyGroup.getChild(0).setPosition(160,100);
-        enemeyGroup.getChild(1).setPosition(110,100);
-        enemeyGroup.getChild(2).setPosition(130,100);
-        enemeyGroup.getChild(3).setPosition(120,100);
+
+        // cast to a sterable
+        Arrive<Vector2> arrive = new Arrive<Vector2>((Steerable<Vector2>) enemeyGroup.getChild(0));
+
 
 
     }

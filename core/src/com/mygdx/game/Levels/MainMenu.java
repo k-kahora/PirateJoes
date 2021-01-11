@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.*;
 
@@ -14,12 +14,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.Levels.Level1;
+import com.mygdx.game.Levels.PirateJoes;
 
 public class MainMenu implements Screen {
 
     private static final float PPM = 16f;
 
-    PirateJoes pirateJoes;
+    com.mygdx.game.Levels.PirateJoes pirateJoes;
 
     public MainMenu (PirateJoes pirateJoes) {
         this.pirateJoes = pirateJoes;

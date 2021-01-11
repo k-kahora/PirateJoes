@@ -3,8 +3,7 @@ package com.mygdx.game.Tiles;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.mygdx.game.Enumerators.Tile;
-import com.mygdx.game.FunctionalityClasses.AbstractLevel;
-import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.Levels.AbstractLevel;
 
 import java.io.File;
 import java.io.FileNotFoundException;

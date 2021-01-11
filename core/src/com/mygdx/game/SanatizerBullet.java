@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -61,6 +62,11 @@ public class SanatizerBullet extends Actor implements Entity {
 
     @Override
     public void drawDebugBox() {
+
+    }
+
+    @Override
+    public void setBoundingBox(float x, float y, float width, float height) {
 
     }
 
@@ -129,6 +135,13 @@ public class SanatizerBullet extends Actor implements Entity {
     }
 
     @Override
+    public Vector2 getPosition() {
+        return null;
+    }
+
+
+
+    @Override
     public void bottomCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
@@ -174,14 +187,6 @@ public class SanatizerBullet extends Actor implements Entity {
         rectangle.x = getX();
         rectangle.y = getY();
 
-
-        if (getX() > (16 * 30) || getX() < 0) {
-            remove = true;
-        }
-
-        if (getY() > (16 * 16)|| getY() < 0) {
-            remove = true;
-        }
 
         // only two bouces max
         if (numOfBounces > 2) {

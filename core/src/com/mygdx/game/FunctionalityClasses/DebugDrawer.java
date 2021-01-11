@@ -21,4 +21,14 @@ public class DebugDrawer {
         debugRenderer.end();
         Gdx.gl.glLineWidth(1);
     }
+    public static void DrawDebugRectangle(float x, float y, float width, float height, Color color, Matrix4 projectionMatrix) {
+
+        debugRenderer.setProjectionMatrix(projectionMatrix);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        debugRenderer.setColor(color);
+        debugRenderer.rect(x,y,width,height);
+        debugRenderer.end();
+        Gdx.gl.glLineWidth(1);
+
+    }
 }

@@ -1,59 +1,102 @@
 package com.mygdx.game.Viruses;
 
+import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.mygdx.game.FunctionalityClasses.DebugDrawer;
-import com.mygdx.game.FunctionalityClasses.Entity;
-import com.mygdx.game.FunctionalityClasses.Level;
-import com.mygdx.game.Level1;
+import com.mygdx.game.FunctionalityClasses.EntityLocation;
+import com.mygdx.game.Levels.Level;
+import com.mygdx.game.Levels.Level1;
 import com.mygdx.game.SanatizerBullet;
-import sun.awt.image.ImageWatched;
+import com.mygdx.game.Tiles.TileCollision;
+import com.mygdx.game.Tiles.TileData;
 
-import javax.swing.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
-public class FluVirus extends AbstractEnemy{
+public class FluVirus extends AbstractEnemy {
 
     private final Texture texture;
     private final Sprite sprite;
     private final Vector2 detectionLine;
-    private final Entity target;
+    private final EntityLocation target;
     private final Queue<SanatizerBullet> virusBullets;
+    private final TileCollision fluVirusTileCollider;
+    private final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
+
+    private boolean canColide;
 
     public float timeElapsed = 0;
 
 
     private FluVirus(Builder builder) {
-        super();
+
+        super(builder.target, builder.level);
         this.detectionLine = builder.detectionLine;
         this.target = builder.target;
         this.virusBullets = builder.virusBullets;
+        this.canColide = builder.canCollide;
+        this.fluVirusTileColliderMap = builder.fluVirusTileColliderMap;
         texture = assetManager.manager.get(assetManager.fluVirus);
         this.sprite = new Sprite(texture);
+        this.position = new Vector2(getX(), getY());
+
+
+        // accel has to be greater than maxSpeed
+        maxSpeed = 32f;
+        maxLinearAcceleration = 128f;
+
+
+        steeringBehavior = new Arrive<Vector2>(this,target).setDecelerationRadius(800f).setArrivalTolerance(80f);
+
+        steeringBehavior.setEnabled(true);
         setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
+        setBoundingBox(getX(), getY(), getWidth(), getHeight());
+
+        velocity = new Vector2();
+
+
+        if (canColide) {
+            fluVirusTileCollider = new TileCollision.Builder<>().charecter(this).calcCorners(getBoundingBox())
+            .tileMap(fluVirusTileColliderMap.get(0), fluVirusTileColliderMap.get(1)).build();
+        } else {
+            fluVirusTileCollider = null;
+        }
 
     }
 
+
+
+
     public static class Builder {
 
-        private final Entity target;
+        private final EntityLocation target;
         private final Queue<SanatizerBullet> virusBullets;
         private final Vector2 detectionLine;
+        private final Level level;
 
-        public Builder(Entity target) {
+        private ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
+        private boolean canCollide;
+
+        public Builder(EntityLocation target, Level level) {
 
             this.target = target;
             this.virusBullets = new LinkedList<>();
+            this.level = level;
             detectionLine = new Vector2();
 
+        }
+
+        public Builder collisionInit(ArrayList<ArrayList<ArrayList<TileData>>> a) {
+
+            fluVirusTileColliderMap = a;
+            canCollide = true;
+            return this;
         }
 
         public FluVirus build() {
@@ -76,6 +119,7 @@ public class FluVirus extends AbstractEnemy{
             shot.draw(batch,0);
             shot.act(timeElapsed);
         }
+        //drawDebugBox();
 
     }
 
@@ -84,28 +128,32 @@ public class FluVirus extends AbstractEnemy{
 
         timeElapsed += delta;
 
-        System.out.println(delta);
 
         detectionLine.x = target.getX() - getX();
         detectionLine.y = target.getY() - getY();
 
-        moveBy(0.2f,0.1f);
+
+        update(delta);
+
+        if (canColide)
+            collisionLogic();
+
+
+        //velocity.mulAdd(steeringOutput.linear, delta);
+
+        //moveBy(velocity.x, velocity.y);
 
         // for debugging
         // drawDetectionLine();
 
         if (timeElapsed > 2f) {
-            virusBullets.add(new SanatizerBullet.Builder(getX(), getY(), detectionLine, 2f,assetManager.manager.get(assetManager.bulletSprite)).build());
+            virusBullets.add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(detectionLine.x, detectionLine.y), 2f,assetManager.manager.get(assetManager.bulletSprite)).build());
             timeElapsed = 0;
         }
 
     }
 
-    private void drawDetectionLine() {
 
-        DebugDrawer.DrawDebugLine(new Vector2(target.getX(), target.getY()),new Vector2(getX() + getWidth()/2, getY() + getWidth()/2),10,Color.PINK, Level1.getViewport().getCamera().combined);
-
-    }
 
     @Override
     protected void positionChanged() {
@@ -113,12 +161,45 @@ public class FluVirus extends AbstractEnemy{
     }
 
     @Override
-    public boolean attack() {
-        return false;
+    public void leftCollision(int x, int y) {
+
+        velocity.x = 0;
+        setPosition(fluVirusTileColliderMap.get(0).get(y).get(x).getLeftEdge() - getWidth(), getY());
+
+    }
+
+    // stupid bug I goot fix where I have to subtract 0.1f to get it out of the tile
+    @Override
+    public void bottomCollision(int x, int y) {
+        velocity.y = 0;
+        setPosition(getX(), fluVirusTileColliderMap.get(0).get(y).get(x).getBottomEdge() - getHeight() - 0.1f);
+
     }
 
     @Override
-    public void updateDetection() {
+    public void topCollision(int x, int y) {
+        velocity.y = 0;
+        setPosition(getX(), fluVirusTileColliderMap.get(0).get(y).get(x).getTopEdge());
 
     }
+
+    @Override
+    public void rightCollision(int x,int y) {
+        velocity.x = 0;
+        setPosition(fluVirusTileColliderMap.get(0).get(y).get(x).getRightEdge(), getY());
+
+    }
+
+    @Override
+    public boolean collisionLogic() {
+
+        fluVirusTileCollider.tileHorizontal(velocity);
+        fluVirusTileCollider.tileVertical(velocity);
+
+
+
+
+        return true;
+    }
+
 }

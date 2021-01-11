@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.*;
 
@@ -6,11 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-
-import com.badlogic.gdx.utils.Base64Coder;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import java.nio.channels.spi.SelectorProvider;
 
 
 public class PirateJoes extends Game {
