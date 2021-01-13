@@ -16,12 +16,12 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
-public class SanatizerBullet extends Actor implements Entity {
+public class SanatizerBullet extends AbstractBullet  {
 
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     private TileCollision bulletColider;
-    private final ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
+
     private final float x,y,speed;
     public boolean remove;
     private final boolean canCollide;
@@ -29,17 +29,18 @@ public class SanatizerBullet extends Actor implements Entity {
     private final Sprite sprite;
     private final Vector2 velocity;
 
-    private int numOfBounces;
+
 
     private SanatizerBullet(Builder builder) {
 
+        super(builder.tileDataMap);
         this.sprite = builder.sprite;
         this.x = builder.x;
         this.y = builder.y;
         this.speed = builder.speed;
         this.velocity = builder.velocity;
         this.remove = false;
-        this.tileDataMap = builder.tileDataMap;
+        //this.tileDataMap = builder.tileDataMap;
         this.rectangle = builder.rectangle;
         this.canCollide = builder.canCollide;
 
@@ -48,6 +49,8 @@ public class SanatizerBullet extends Actor implements Entity {
         if (canCollide) {
             this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
         }
+
+
 
 
 
@@ -135,17 +138,10 @@ public class SanatizerBullet extends Actor implements Entity {
     }
 
     @Override
-    public Vector2 getPosition() {
-        return null;
-    }
-
-
-
-    @Override
     public void bottomCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
-        numOfBounces++;
+        addNumOfBounces();
 
 
     }
@@ -156,7 +152,7 @@ public class SanatizerBullet extends Actor implements Entity {
     public void topCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
-        numOfBounces++;
+        addNumOfBounces();
     }
 
     @Override
@@ -164,7 +160,7 @@ public class SanatizerBullet extends Actor implements Entity {
 
         velocity.x *= -1;
         rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), getY());
-        numOfBounces++;
+        addNumOfBounces();
 
 
     }
@@ -174,8 +170,17 @@ public class SanatizerBullet extends Actor implements Entity {
 
         velocity.x *= -1;
         rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), getY());
-        numOfBounces++;
+        addNumOfBounces();
     }
+
+    @Override
+    public Vector2 getPosition() {
+        return null;
+    }
+
+
+
+
 
 
     @Override
@@ -189,7 +194,7 @@ public class SanatizerBullet extends Actor implements Entity {
 
 
         // only two bouces max
-        if (numOfBounces > 2) {
+        if (getNumOfBounces() > 2) {
             remove = true;
         }
 

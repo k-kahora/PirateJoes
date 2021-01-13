@@ -1,7 +1,10 @@
 package com.mygdx.game.Viruses;
 
+import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
+import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,7 +15,7 @@ import com.mygdx.game.FunctionalityClasses.*;
 import com.mygdx.game.Levels.Level;
 import com.mygdx.game.utils.SteeringUtils;
 
-public abstract class AbstractEnemy extends Actor implements EntitySteerable {
+public abstract class AbstractEnemy extends Actor implements EntitySteerable, Telegraph {
 
 
     private SpriteBatch sprite;
@@ -33,7 +36,12 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable {
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
 
+
     }
+
+    public abstract boolean handleMessage(Telegram telegram);
+
+    public abstract boolean initRayCollision();
 
     // must be supered by extended classes to set a boundingBox;
     @Override
@@ -54,7 +62,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable {
     float maxSpeed;
     float maxLinearAcceleration;
     boolean independentFacing;
-    SteeringBehavior<Vector2> steeringBehavior;
+    PrioritySteering<Vector2> steeringBehavior;
 
     static final SteeringAcceleration<Vector2> steeringOutput =
             new SteeringAcceleration<Vector2>(new Vector2());
@@ -93,6 +101,10 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable {
                 setMaxLinearSpeed(maxSpeed / (float) Math.sqrt(currentSpeedSquared));
             }
         }
+    }
+
+    public Level getLevel() {
+        return level;
     }
 
     @Override
@@ -225,9 +237,23 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable {
     }
 
 
+    @Override
+    public void bottomCollision(int x, int y) {
 
+    }
 
+    @Override
+    public void topCollision(int x, int y) {
 
+    }
 
+    @Override
+    public void rightCollision(int x, int y) {
 
+    }
+
+    @Override
+    public void leftCollision(int x, int y) {
+
+    }
 }

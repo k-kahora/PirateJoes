@@ -1,6 +1,9 @@
 package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ai.msg.MessageDispatcher;
+import com.badlogic.gdx.ai.msg.MessageManager;
+import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -35,6 +38,8 @@ public abstract class AbstractLevel implements Level, Screen {
     public static final int cameraHeight;
     public static final int worldUnits;
 
+    private MessageDispatcher aiDispatcher;
+
     static {
         cameraHeight = 17;
         cameraWidth = 31;
@@ -48,10 +53,15 @@ public abstract class AbstractLevel implements Level, Screen {
         camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
+        aiDispatcher = new MessageDispatcher();
 
 
+    }
 
+    public abstract void initMessages();
 
+    public MessageDispatcher getMessageDispatcherAI() {
+        return aiDispatcher;
     }
 
     @Override

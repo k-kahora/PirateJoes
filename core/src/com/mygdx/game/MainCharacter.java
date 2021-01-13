@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.cbrt;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -408,6 +409,7 @@ public class MainCharacter extends Actor implements EntityLocation {
            shoot();
 
         }
+
 
     }
 

@@ -1,6 +1,8 @@
 package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.msg.MessageManager;
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,6 +15,7 @@ import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.FluVirus;
+import com.mygdx.game.utils.Messages;
 
 import java.util.ArrayList;
 
@@ -64,10 +67,14 @@ public class Level1 extends AbstractLevel {
         enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
 
 
+
         enemeyGroup.getChild(0).setPosition(160,100);
 
+
         // cast to a sterable
-        Arrive<Vector2> arrive = new Arrive<Vector2>((Steerable<Vector2>) enemeyGroup.getChild(0));
+        // calls this so all Flu viruses have enabled AI
+        initMessages();
+
 
 
 
@@ -76,6 +83,9 @@ public class Level1 extends AbstractLevel {
     @Override
     public void render(float delta) {
 
+        // when the char presses space
+
+        getMessageDispatcherAI().dispatchMessage(Messages.CHASE);
 
 
         // sets mouse cord relative to pixels
@@ -113,6 +123,15 @@ public class Level1 extends AbstractLevel {
 
 
     }
+
+    @Override
+    public void initMessages() {
+
+        // adds the flue virus as a listener
+        getMessageDispatcherAI().addListener((Telegraph) enemeyGroup.getChild(0 ), Messages.CHASE);
+
+    }
+
 
     @Override
     public void pause() {
