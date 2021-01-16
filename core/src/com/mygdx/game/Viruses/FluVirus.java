@@ -2,30 +2,14 @@ package com.mygdx.game.Viruses;
 
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
-import com.badlogic.gdx.ai.steer.behaviors.Arrive;
-import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
-import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
-import com.badlogic.gdx.ai.steer.behaviors.RaycastObstacleAvoidance;
-import com.badlogic.gdx.ai.steer.utils.RayConfiguration;
-import com.badlogic.gdx.ai.steer.utils.rays.CentralRayWithWhiskersConfiguration;
-import com.badlogic.gdx.ai.steer.utils.rays.SingleRayConfiguration;
-import com.badlogic.gdx.ai.utils.Collision;
-import com.badlogic.gdx.ai.utils.Ray;
-import com.badlogic.gdx.ai.utils.RaycastCollisionDetector;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.RayCastCallback;
-import com.mygdx.game.Enumerators.Tile;
-import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.Level;
-import com.mygdx.game.Levels.Level1;
 import com.mygdx.game.SanatizerBullet;
-import com.mygdx.game.Tiles.RayCollisionDetection;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.Messages;
@@ -43,9 +27,10 @@ public class FluVirus extends AbstractEnemy  {
     private final Queue<SanatizerBullet> virusBullets;
     private final TileCollision fluVirusTileCollider;
     private final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
-    private final RaycastObstacleAvoidance<Vector2> obstacleBehavior;
+    //private final RaycastObstacleAvoidance<Vector2> obstacleBehavior;
     private final SteeringBehavior<Vector2> chase;
     private final Vector2 getDetectionLine;
+
 
     private boolean canColide;
 
@@ -63,20 +48,24 @@ public class FluVirus extends AbstractEnemy  {
         texture = assetManager.manager.get(assetManager.fluVirus);
         this.sprite = new Sprite(texture);
         this.position = new Vector2(getX(), getY());
-        steeringBehavior = new PrioritySteering<>(this, 10f);
+        steeringBehavior = new PrioritySteering<>(this);
 
-        obstacleBehavior = new RaycastObstacleAvoidance<>(this, new CentralRayWithWhiskersConfiguration<>(this, 20f,30f,0.8f));
+       // obstacleBehavior = new RaycastObstacleAvoidance<>(this, new CentralRayWithWhiskersConfiguration<>(this, 40f,20f,0.5f));
+
+
+        chase = new Arrive<Vector2>(this,target).setDecelerationRadius(800f).setArrivalTolerance(40f);
+
         initRayCollision();
 
         // accel has to be greater than maxSpeed
         maxSpeed = 32f;
         maxLinearAcceleration = 128f;
         this.getDetectionLine = new Vector2();
-        obstacleBehavior.setDistanceFromBoundary(10f);
+//        obstacleBehavior.setDistanceFromBoundary(0f);
 
-        chase = new Arrive<Vector2>(this,target).setDecelerationRadius(800f).setArrivalTolerance(40f);
 
-        steeringBehavior.add(obstacleBehavior);
+
+        //steeringBehavior.add(obstacleBehavior);
         steeringBehavior.add(chase);
 
         setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
@@ -141,12 +130,10 @@ public class FluVirus extends AbstractEnemy  {
     @Override
     public boolean initRayCollision() {
 
-        RaycastCollisionDetector<Vector2> collisionDetector = obstacleBehavior.getRaycastCollisionDetector();
+       // RaycastCollisionDetector<Vector2> collisionDetector = obstacleBehavior.getRaycastCollisionDetector();
 
+       // obstacleBehavior.setRaycastCollisionDetector(new RayCollisionDetection<Vector2>(fluVirusTileColliderMap.get(0), chase));
 
-        obstacleBehavior.setRaycastCollisionDetector(collisionDetector);
-
-        obstacleBehavior.setRaycastCollisionDetector(new RayCollisionDetection(fluVirusTileColliderMap.get(0)));
 
         return false;
 
@@ -169,7 +156,7 @@ public class FluVirus extends AbstractEnemy  {
     @Override
     public void act(float delta) {
 
-        obstacleBehavior.getRayConfiguration().updateRays();
+        //obstacleBehavior.setRaycastCollisionDetector(new RayCollisionDetection(fluVirusTileColliderMap.get(0), chase, obstacleBehavior.getRayConfiguration().updateRays()));
 
         timeElapsed += delta;
 
@@ -205,7 +192,8 @@ public class FluVirus extends AbstractEnemy  {
         sprite.setPosition(getX(), getY());
     }
 
-    /*
+
+
 
     @Override
     public void leftCollision(int x, int y) {
@@ -241,7 +229,9 @@ public class FluVirus extends AbstractEnemy  {
 
     }
 
-     */
+
+
+
 
     @Override
     public boolean handleMessage(Telegram msg) {
@@ -256,6 +246,7 @@ public class FluVirus extends AbstractEnemy  {
 
     }
 
+    /*
     @Override
     public void drawDebugBox() {
         for (Ray r : obstacleBehavior.getRayConfiguration().updateRays()) {
@@ -264,6 +255,8 @@ public class FluVirus extends AbstractEnemy  {
         }
 
     }
+
+     */
 
 
 

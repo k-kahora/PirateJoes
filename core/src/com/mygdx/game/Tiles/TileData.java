@@ -3,8 +3,7 @@ package com.mygdx.game.Tiles;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Enumerators.Tile;
-
-import java.util.Map;
+import com.mygdx.game.utils.Pair;
 
 public class TileData {
 
@@ -16,7 +15,8 @@ public class TileData {
     private int left;
     public static int TILE_WIDTH;
     public static int TILE_HEIGHT;
-    private com.mygdx.game.Enumerators.Tile tile;
+    private Tile tile;
+    public final int INDEX;
 
     static {
 
@@ -28,12 +28,12 @@ public class TileData {
     public TileData() {
         this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
-
+        this.INDEX = 0;
 
 
     }
 
-    public TileData(Tile tile, TextureAtlas atlas, int x, int y) {
+    public TileData(Tile tile, TextureAtlas atlas, int x, int y, int index) {
 
         this.tile = tile;
         this.bottom = y;
@@ -44,6 +44,9 @@ public class TileData {
         this.atlas = atlas;
         textureRegion = atlas.findRegion(tile.getAtlasReference());
 
+        this.INDEX = index;
+        System.out.println(INDEX);
+
 
     }
 
@@ -51,7 +54,7 @@ public class TileData {
 
     // scale deals with spacing
     public TileData(com.mygdx.game.Enumerators.Tile tile, TextureAtlas atlas, int scale) {
-        this(tile, atlas, 0,0);
+        this(tile, atlas, 0,0, 0);
         TILE_HEIGHT *= scale;
         TILE_WIDTH *= scale;
     }
@@ -94,5 +97,9 @@ public class TileData {
     }
 
     // returns true if teh tiles are at the same position
+
+
+
+
 
 }

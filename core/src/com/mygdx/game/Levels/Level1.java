@@ -3,12 +3,14 @@ package com.mygdx.game.Levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegraph;
+import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.MainCharacter;
 import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
@@ -44,7 +46,7 @@ public class Level1 extends AbstractLevel {
 
         baseLayer = new com.mygdx.game.Tiles.TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap) );
         secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
-
+        secondLayer.addLevel(this);
         ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps = new ArrayList<ArrayList<ArrayList<TileData>>>();
         character = new MainCharacter();
         character.setPosition(32,32);
@@ -74,6 +76,7 @@ public class Level1 extends AbstractLevel {
         // cast to a sterable
         // calls this so all Flu viruses have enabled AI
         initMessages();
+
 
 
 
@@ -151,5 +154,24 @@ public class Level1 extends AbstractLevel {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public int getIndex(TileData node) {
+        return node.INDEX;
+    }
+
+    @Override
+    public int getNodeCount() {
+
+        int a = secondLayer.getTileMap().get(0).size();
+        int b = secondLayer.getTileMap().size();
+
+        return a * b;
+    }
+
+    @Override
+    public Array<Connection<TileData>> getConnections(TileData fromNode) {
+        return null;
     }
 }

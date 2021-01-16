@@ -1,15 +1,21 @@
 package com.mygdx.game.Tiles;
 
+import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
+import com.badlogic.gdx.ai.steer.behaviors.FollowFlowField;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Levels.AbstractLevel;
+import com.mygdx.game.Levels.Level;
+import com.mygdx.game.utils.Pair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class TileEditor {
+public class TileEditor  {
 
 
   
@@ -21,6 +27,13 @@ public class TileEditor {
     private ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> tileMapData;
     private int startingPoint;
     private TextureAtlas atlas;
+    private Level level;
+    private List<TileData> uniqueIndex;
+
+    public void addLevel(Level level) {
+
+        this.level = level;
+    }
 
 
     public TileEditor(String fileName, TextureAtlas atlas) {
@@ -195,6 +208,7 @@ public class TileEditor {
 
         int xPosition = 0;
         int yPosition = 0;
+        int index = 0;
 
         ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> tileDataMap = new ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>();
 
@@ -211,11 +225,21 @@ public class TileEditor {
             xPosition = 0;
 
 
+
             for (int j = 0; j < tileMap.get(i).size(); ++j) {
-                tileDataMap.get(i).add(new com.mygdx.game.Tiles.TileData(tileMap.get(i).get(j), atlas, xPosition, yPosition));
+                tileDataMap.get(i).add(new com.mygdx.game.Tiles.TileData(tileMap.get(i).get(j), atlas, xPosition, yPosition, index++));
                 xPosition += com.mygdx.game.Tiles.TileData.TILE_WIDTH;
+
+                //System.out.println(tileDataMap.get(i).get(j).INDEX);
+
+
             }
         }
+
+
+
+
+        // delete
 
 
 

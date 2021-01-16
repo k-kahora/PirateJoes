@@ -4,10 +4,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 
 /*
@@ -59,6 +62,11 @@ public abstract class AbstractLevel implements Level, Screen {
     }
 
     public abstract void initMessages();
+
+    // level must implemt these
+    public abstract int getIndex(TileData node);
+    public abstract int getNodeCount();
+    public abstract Array<Connection<TileData>> getConnections(TileData fromNode);
 
     public MessageDispatcher getMessageDispatcherAI() {
         return aiDispatcher;

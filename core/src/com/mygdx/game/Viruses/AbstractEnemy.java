@@ -4,6 +4,7 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
+import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
@@ -94,6 +95,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         }
 
         // makes sure the linear speed never exceed the maxSpeed
+        /*
         if (anyAccerlaeration) {
             velocity = getLinearVelocity();
             float currentSpeedSquared = velocity.len2();
@@ -101,6 +103,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
                 setMaxLinearSpeed(maxSpeed / (float) Math.sqrt(currentSpeedSquared));
             }
         }
+
+         */
     }
 
     public Level getLevel() {
