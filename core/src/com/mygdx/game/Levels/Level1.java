@@ -17,6 +17,7 @@ import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.FluVirus;
+import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
 
 import java.util.ArrayList;
@@ -78,7 +79,8 @@ public class Level1 extends AbstractLevel {
         initMessages();
 
 
-
+        // adds teh connections
+        GraphMaker.createGraph(secondLayer.getTileMap());
 
 
     }
@@ -170,8 +172,9 @@ public class Level1 extends AbstractLevel {
         return a * b;
     }
 
+
     @Override
     public Array<Connection<TileData>> getConnections(TileData fromNode) {
-        return null;
+        return fromNode.getConnectionArray();
     }
 }

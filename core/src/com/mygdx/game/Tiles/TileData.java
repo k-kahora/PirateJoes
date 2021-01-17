@@ -1,7 +1,9 @@
 package com.mygdx.game.Tiles;
 
+import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.utils.Pair;
 
@@ -16,7 +18,9 @@ public class TileData {
     public static int TILE_WIDTH;
     public static int TILE_HEIGHT;
     private Tile tile;
+    private Array<Connection<TileData>> connectionArray = new Array<>();
     public final int INDEX;
+    private final Pair<Integer, Integer> position;
 
     static {
 
@@ -29,6 +33,7 @@ public class TileData {
         this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
         this.INDEX = 0;
+        this.position = new Pair<>(0,0);
 
 
     }
@@ -45,7 +50,9 @@ public class TileData {
         textureRegion = atlas.findRegion(tile.getAtlasReference());
 
         this.INDEX = index;
-        System.out.println(INDEX);
+        //System.out.println(INDEX);
+
+        this.position = new Pair<>(x,y);
 
 
     }
@@ -99,7 +106,20 @@ public class TileData {
     // returns true if teh tiles are at the same position
 
 
+    @Override
+    public String toString() {
+        return tile + " index: " + INDEX;
+    }
 
+    public void createConnections(TileData toTile, float cost) {
+         connectionArray.add(new TileConnection(toTile, this,cost));
+    }
 
+    public Array<Connection<TileData>> getConnectionArray() {
+        return connectionArray;
+    }
 
+    public Pair getIndex() {
+        return position;
+    }
 }

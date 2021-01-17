@@ -66,7 +66,8 @@ public abstract class AbstractLevel implements Level, Screen {
     // level must implemt these
     public abstract int getIndex(TileData node);
     public abstract int getNodeCount();
-    public abstract Array<Connection<TileData>> getConnections(TileData fromNode);
+
+
 
     public MessageDispatcher getMessageDispatcherAI() {
         return aiDispatcher;
