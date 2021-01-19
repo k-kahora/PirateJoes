@@ -18,9 +18,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
+import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.PirateJoes;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.utils.Messages;
 import com.mygdx.game.utils.SteeringUtils;
 
 import java.util.ArrayList;
@@ -408,6 +410,10 @@ public class MainCharacter extends Actor implements EntityLocation {
             }
            shoot();
 
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+             AbstractLevel.getMessageDispatcherAI().dispatchMessage(Messages.CHASE);
         }
 
 

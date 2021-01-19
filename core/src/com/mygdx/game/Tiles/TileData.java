@@ -1,11 +1,15 @@
 package com.mygdx.game.Tiles;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.utils.Pair;
+
+// 9000 means the tile is not indexed
 
 public class TileData {
 
@@ -19,7 +23,7 @@ public class TileData {
     public static int TILE_HEIGHT;
     private Tile tile;
     private Array<Connection<TileData>> connectionArray = new Array<>();
-    public final int INDEX;
+    public int INDEX = 9000;
     private final Pair<Integer, Integer> position;
 
     static {
@@ -32,13 +36,13 @@ public class TileData {
     public TileData() {
         this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
-        this.INDEX = 0;
+        this.INDEX = 9000;
         this.position = new Pair<>(0,0);
 
 
     }
 
-    public TileData(Tile tile, TextureAtlas atlas, int x, int y, int index) {
+    public TileData(Tile tile, TextureAtlas atlas, int x, int y, boolean isWalls) {
 
         this.tile = tile;
         this.bottom = y;
@@ -49,7 +53,15 @@ public class TileData {
         this.atlas = atlas;
         textureRegion = atlas.findRegion(tile.getAtlasReference());
 
-        this.INDEX = index;
+
+
+        // id there collidbale then add them to the INDEXER
+        if (!isWalls) {
+            //System.out.println(TileData.Indexer.getIndex());
+            //System.out.println(tile);
+            this.INDEX = tile != Tile.NULL ? TileData.Indexer.getIndex() : 9000;
+        }
+
         //System.out.println(INDEX);
 
         this.position = new Pair<>(x,y);
@@ -61,7 +73,7 @@ public class TileData {
 
     // scale deals with spacing
     public TileData(com.mygdx.game.Enumerators.Tile tile, TextureAtlas atlas, int scale) {
-        this(tile, atlas, 0,0, 0);
+        this(tile, atlas, 0,0, true);
         TILE_HEIGHT *= scale;
         TILE_WIDTH *= scale;
     }
@@ -121,5 +133,20 @@ public class TileData {
 
     public Pair getIndex() {
         return position;
+    }
+
+    private static class Indexer {
+
+        private static int index = 0;
+
+        public static int getIndex() {
+
+            return ++index;
+        }
+
+    }
+
+    public void setTextureRegion() {
+        textureRegion = new TextureRegion(new Texture(Gdx.files.internal("test_tile.png")));
     }
 }

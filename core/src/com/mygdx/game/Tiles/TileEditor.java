@@ -29,15 +29,14 @@ public class TileEditor  {
     private TextureAtlas atlas;
     private Level level;
     private List<TileData> uniqueIndex;
+    private boolean isWalls;
 
     public void addLevel(Level level) {
 
         this.level = level;
     }
 
-
-    public TileEditor(String fileName, TextureAtlas atlas) {
-
+    public TileEditor(String fileName, TextureAtlas atlas, boolean isWalls) {
 
         try {
             file = new File(AbstractLevel.tileDir + fileName);
@@ -51,9 +50,17 @@ public class TileEditor  {
         commentSymbol = "/";
         this.atlas = atlas;
         tileMap = new ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>>();
-
+        this.isWalls = isWalls;
         loadTiles();
 
+
+    }
+
+
+
+    public TileEditor(String fileName, TextureAtlas atlas) {
+
+       this(fileName, atlas, false);
 
     }
 
@@ -150,8 +157,9 @@ public class TileEditor  {
                     case("&"):
                         tile = com.mygdx.game.Enumerators.Tile.BASKET_FULL;
                         break;
-
-
+                    case("?"):
+                        tile = Tile.NULL;
+                        break;
                     case("1"):
                         tile = com.mygdx.game.Enumerators.Tile.LEFT_WALL;
                         break;
@@ -219,6 +227,7 @@ public class TileEditor  {
 
         Collections.reverse(tileMap);
 
+
         for (int i = 0; i < tileMap.size(); ++i) {
 
             yPosition += i == 0 ? 0 : com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
@@ -227,10 +236,11 @@ public class TileEditor  {
 
 
             for (int j = 0; j < tileMap.get(i).size(); ++j) {
-                tileDataMap.get(i).add(new com.mygdx.game.Tiles.TileData(tileMap.get(i).get(j), atlas, xPosition, yPosition, index++));
-                xPosition += com.mygdx.game.Tiles.TileData.TILE_WIDTH;
+                tileDataMap.get(i).add(new TileData(tileMap.get(i).get(j), atlas, xPosition, yPosition, isWalls));
+                xPosition += TileData.TILE_WIDTH;
 
-                //System.out.println(tileDataMap.get(i).get(j).INDEX);
+
+//                System.out.println(tileDataMap.get(i).get(j).INDEX);
 
 
             }

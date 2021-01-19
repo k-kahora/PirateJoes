@@ -20,7 +20,9 @@ public enum Tile {
     TOP_RIGHT_WALL("collision_tile8"),
     TOP_LEFT_WALL("collision_tile9"),
     BOTTOM_LEFT_WALL("collision_tile10"),
-    BOTTOM_RIGHT_WALL("collision_tile11");
+    BOTTOM_RIGHT_WALL("collision_tile11"),
+
+    NULL();
 
 
     private String atlasReference;
@@ -28,8 +30,11 @@ public enum Tile {
     private boolean interact;
     private EnumSet<Collisions> set;
 
-
-
+    private Tile() {
+        this.atlasReference = "collision_tile2";
+        this.set = EnumSet.of(Collisions.NONE);
+        this.interact = false;
+    }
 
     private Tile(String atlasReference, EnumSet<Collisions> set, boolean interact) {
         this.atlasReference = atlasReference;

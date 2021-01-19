@@ -30,6 +30,8 @@ public class Level1 extends AbstractLevel {
     TileCollision collider;
     TileCollision wallCollider;
 
+    Array<TileData> collisionTiles;
+
     private Slime slime;
     private MainCharacter character;
     private FluVirus fluVirus;
@@ -44,8 +46,7 @@ public class Level1 extends AbstractLevel {
     public void show() {
 
         loadAssets();
-
-        baseLayer = new com.mygdx.game.Tiles.TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap) );
+        baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
         secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
         secondLayer.addLevel(this);
         ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps = new ArrayList<ArrayList<ArrayList<TileData>>>();
@@ -64,14 +65,11 @@ public class Level1 extends AbstractLevel {
         // enables collision
         character.addCollider(collider);
 
-
+        collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
 
         enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
-
-
-
-        enemeyGroup.getChild(0).setPosition(160,100);
+        enemeyGroup.getChild(0).setPosition(32, 32);
 
 
         // cast to a sterable
@@ -80,7 +78,11 @@ public class Level1 extends AbstractLevel {
 
 
         // adds teh connections
-        GraphMaker.createGraph(secondLayer.getTileMap());
+
+
+        System.out.println(secondLayer.getTileMap().get(8).get(8).getConnectionArray());
+
+        //System.out.println(getNodeCount());
 
 
     }
@@ -90,7 +92,7 @@ public class Level1 extends AbstractLevel {
 
         // when the char presses space
 
-        getMessageDispatcherAI().dispatchMessage(Messages.CHASE);
+
 
 
         // sets mouse cord relative to pixels
@@ -119,6 +121,7 @@ public class Level1 extends AbstractLevel {
         character.drawDebugBox();
 
         enemeyGroup.act(delta);
+
 
 
         //viewport.getCamera().position.set(character.getX(),character.getY(),0);
@@ -163,13 +166,12 @@ public class Level1 extends AbstractLevel {
         return node.INDEX;
     }
 
+
+    // get node count returns the size of the collison map excluding null tiles for easier A* implementation
     @Override
     public int getNodeCount() {
 
-        int a = secondLayer.getTileMap().get(0).size();
-        int b = secondLayer.getTileMap().size();
-
-        return a * b;
+        return collisionTiles.size;
     }
 
 

@@ -41,7 +41,7 @@ public abstract class AbstractLevel implements Level, Screen {
     public static final int cameraHeight;
     public static final int worldUnits;
 
-    private MessageDispatcher aiDispatcher;
+    private static MessageDispatcher aiDispatcher;
 
     static {
         cameraHeight = 17;
@@ -69,7 +69,7 @@ public abstract class AbstractLevel implements Level, Screen {
 
 
 
-    public MessageDispatcher getMessageDispatcherAI() {
+    public static MessageDispatcher getMessageDispatcherAI() {
         return aiDispatcher;
     }
 
@@ -96,7 +96,7 @@ public abstract class AbstractLevel implements Level, Screen {
         assetManager.loadTileMap();
         assetManager.manager.finishLoading();
 
-        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.collisionMap));
+        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.collisionMap), true);
 
     }
 

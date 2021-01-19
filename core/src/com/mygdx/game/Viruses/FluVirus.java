@@ -6,9 +6,11 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
+import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.Level;
@@ -19,6 +21,7 @@ import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
 import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
+import com.mygdx.game.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -37,6 +40,10 @@ public class FluVirus extends AbstractEnemy  {
     private final IndexedAStarPathFinder<TileData> chase;
     private final TilePath resultPath;
     private final Vector2 getDetectionLine;
+    private static final HeuristicTile her = new HeuristicTile();
+    private final Arrive<Vector2> arrive;
+
+    private boolean drawPath;
 
 
     private boolean canColide;
@@ -57,7 +64,9 @@ public class FluVirus extends AbstractEnemy  {
         this.sprite = new Sprite(texture);
         this.position = new Vector2(getX(), getY());
         steeringBehavior = new PrioritySteering<>(this);
-
+        drawPath = false;
+        arrive = new Arrive<>(this);
+        steeringBehavior.add(arrive);
        // obstacleBehavior = new RaycastObstacleAvoidance<>(this, new CentralRayWithWhiskersConfiguration<>(this, 40f,20f,0.5f));
 
 
@@ -157,7 +166,7 @@ public class FluVirus extends AbstractEnemy  {
             shot.draw(batch,0);
             shot.act(timeElapsed);
         }
-        drawDebugBox();
+        //drawDebugBox();
 
     }
 
@@ -169,18 +178,17 @@ public class FluVirus extends AbstractEnemy  {
         timeElapsed += delta;
 
 
-        detectionLine.x = target.getX() - getX();
-        detectionLine.y = target.getY() - getY();
 
-/*
-        update(delta);
 
-        if (canColide)
-            collisionLogic();
 
-*?
 
- */
+        resultPath.clear();
+
+
+
+
+
+
         //velocity.mulAdd(steeringOutput.linear, delta);
 
         //moveBy(velocity.x, velocity.y);
@@ -188,10 +196,13 @@ public class FluVirus extends AbstractEnemy  {
         // for debugging
         // drawDetectionLine();
 
+        /*
         if (timeElapsed > 2f) {
             virusBullets.add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(detectionLine.x, detectionLine.y), 2f,assetManager.manager.get(assetManager.bulletSprite)).build());
             timeElapsed = 0;
         }
+
+         */
 
 
 
@@ -200,16 +211,54 @@ public class FluVirus extends AbstractEnemy  {
 
 
 
-        int endX = (int)target.getX() / 16;
-        int endY = (int)target.getY() / 16;
+        int endX = calcMiddleTarget().getIndexi();
+        int endY = calcMiddleTarget().getIndexj();
 
         TileData startNode = fluVirusTileColliderMap.get(0).get(StartY).get(StartX);
         TileData endNode = fluVirusTileColliderMap.get(0).get(endY).get(endX);
 
-        System.out.println(startNode + " " + endNode);
+        //System.out.println(fluVirusTileColliderMap.get(0).get(endY).get(endX));
 
         // resultPath is empty and gets mutated by this function
-        System.out.println(chase.searchNodePath(startNode, endNode, new HeuristicTile(), resultPath));
+        chase.searchNodePath(startNode, endNode, her, resultPath);
+
+
+
+
+        if (drawPath) {
+
+
+            for (TileData d : resultPath.getArray()) {
+
+            d.setTextureRegion();
+
+
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private Pair calcMiddleTarget() {
+
+        Rectangle rect = target.getBoundingBox();
+
+        int x = (int)(rect.getX() / 16);
+        int y = (int)(rect.getY() / 16);
+
+        return new Pair(x,y);
+
 
 
     }
@@ -267,7 +316,7 @@ public class FluVirus extends AbstractEnemy  {
 
         switch (msg.message) {
             case (Messages.CHASE):
-
+                drawPath = true;
                 return true;
             default:
                 return false;
