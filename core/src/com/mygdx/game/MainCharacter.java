@@ -77,7 +77,6 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     public MainCharacter() {
 
-
         assetManager = new MyAssetManager();
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
@@ -98,7 +97,6 @@ public class MainCharacter extends Actor implements EntityLocation {
         textureidleRight = assetManager.manager.get(assetManager.charecterIdleRight);
         textureidleLeft = assetManager.manager.get(assetManager.charecterIdleLeft);
 
-
         leftWalk = new Animation<TextureRegion>(1/12f, textureLeft.getRegions());
         rightIdle = new Animation<TextureRegion>(1/12f,textureidleRight.getRegions());
         leftIdle = new Animation<TextureRegion>(1/12f,textureidleLeft.getRegions());
@@ -117,9 +115,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         velocity = new Vector2();
         position = new Vector2();
 
-
         debugBoxScale = 4;
-
 
         rectangle = new Rectangle(getX() + debugBoxScale,getY(), sprite.getWidth(), sprite.getHeight());
        setBounds(rectangle.getWidth(), getY(), sprite.getWidth(), sprite.getHeight());
@@ -128,9 +124,6 @@ public class MainCharacter extends Actor implements EntityLocation {
         yBeforeVector = getY();
 
         collisionMap = new ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>>();
-
-
-
 
     }
 
@@ -152,17 +145,12 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     //velocity = direction.scl(maxSpeed);
 
-
-
         timeElapsed += delta;
 
         yBeforeVector = getY();
         xBeforeVector = getX();
         position.x = getX();
         position.y = getY();
-
-
-
 
         keys();
 
@@ -453,7 +441,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
 
             bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 3f ,assetManager.manager.get(assetManager.bulletSprite))
-                    .initCollision(collisionMap).build());
+                    .initCollision(collisionMap).maxBounces(2).build());
 
 
     }

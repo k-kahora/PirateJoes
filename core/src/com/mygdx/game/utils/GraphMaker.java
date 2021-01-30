@@ -1,11 +1,14 @@
 package com.mygdx.game.utils;
 
 import com.badlogic.gdx.ai.pfa.GraphPath;
+import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Collisions;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Tiles.TileConnection;
 import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.Tiles.TilePath;
 import sun.awt.image.ImageWatched;
 
 import java.util.ArrayList;
@@ -78,5 +81,33 @@ public final class GraphMaker {
         return listOfNodes;
 
     }
+
+    public static LinePath parsePath(TilePath graphPath) {
+
+        Array<Vector2> wayPoints = new Array<>();
+
+        for (TileData tile : graphPath.getArray()) {
+
+            wayPoints.add(convertIndexToPoint(tile.getIndex()));
+
+        }
+
+        return new LinePath(wayPoints);
+
+
+
+    }
+
+    public static Vector2 convertIndexToPoint(Pair pair) {
+
+
+        float x = (float)pair.getIndexi();
+        float y = (float)pair.getIndexj();
+
+        return new Vector2(x,y);
+
+
+    }
+
 
 }

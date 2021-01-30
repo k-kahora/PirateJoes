@@ -1,6 +1,6 @@
 package com.mygdx.game.utils;
 
-public class Pair<K extends Integer, V extends Integer> {
+public class Pair<K extends Number, V extends Number> {
 
     private final K indexi;
     private final V indexj;

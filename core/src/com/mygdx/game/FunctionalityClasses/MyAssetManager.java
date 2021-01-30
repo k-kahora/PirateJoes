@@ -21,7 +21,7 @@ public class MyAssetManager {
 
     public AssetManager manager = new AssetManager();   // dont make static for android
 
-    public AssetDescriptor<Skin> skin = new AssetDescriptor<Skin>("my_ui.json", Skin.class);
+    public AssetDescriptor<Skin> skin = new AssetDescriptor<Skin>("gameUI/home_screen_ui.json", Skin.class);
 
     public AssetDescriptor<TextureAtlas> charecterAtlasLeft = new AssetDescriptor<TextureAtlas>("spriteSheets/managerLeft.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> charecterAtlasRight = new AssetDescriptor<TextureAtlas>("spriteSheets/managerRight.atlas", TextureAtlas.class);
@@ -32,6 +32,7 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> collisionMap = new AssetDescriptor<TextureAtlas>("spriteSheets/collision_map.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
     public AssetDescriptor<Texture> fluVirus = new AssetDescriptor<Texture>("spriteSheets/FluVirus.png", Texture.class);
+    public AssetDescriptor<Texture> startScreen = new AssetDescriptor<Texture>("sprites/homescreen.png", Texture.class);
 
     public AssetDescriptor<Texture> storeManager = new AssetDescriptor<Texture>("sprites/Manager.png", Texture.class);
 
@@ -56,6 +57,7 @@ public class MyAssetManager {
 
     public void loadGui() {
         manager.load(skin);
+        manager.load(startScreen);
     }
 
     public void loadTileMap() {
@@ -70,7 +72,6 @@ public class MyAssetManager {
 
     public void dispose() {
         manager.dispose();
-
     }
 
 

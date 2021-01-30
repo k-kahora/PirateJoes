@@ -23,35 +23,106 @@ public class SanatizerBullet extends AbstractBullet  {
     private TileCollision bulletColider;
 
     private final float x,y,speed;
-    public boolean remove;
-    private final boolean canCollide;
+    public boolean remove, outOfBounds;
+    private final boolean canCollide, testBullet;
     private Rectangle rectangle;
     private final Sprite sprite;
     private final Vector2 velocity;
-
+    private final int maxBounces;
+    private final int mapIndex;
 
 
     private SanatizerBullet(Builder builder) {
 
         super(builder.tileDataMap);
+        this.mapIndex = builder.mapIndex;
         this.sprite = builder.sprite;
         this.x = builder.x;
         this.y = builder.y;
+        this.maxBounces = builder.maxBounces;
         this.speed = builder.speed;
         this.velocity = builder.velocity;
         this.remove = false;
         //this.tileDataMap = builder.tileDataMap;
         this.rectangle = builder.rectangle;
         this.canCollide = builder.canCollide;
+        this.testBullet = builder.testBullet;
 
         setPosition(x,y);
+        this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
-        if (canCollide) {
-            this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
+
+
+
+
+
+
+
+
+    }
+
+
+
+    // x and y are the players x and y
+
+    public static class Builder {
+
+
+        private final float x,y, speed;
+        private final Vector2 velocity;
+        private final Rectangle rectangle;
+        private boolean canCollide;
+        private Sprite sprite;
+        private TileCollision bulletColider;
+        private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
+        private int maxBounces;
+        private int mapIndex;
+        private boolean testBullet;
+
+
+        public Builder(float x, float y, Vector2 velocity, float speed, Texture texture) {
+
+
+            this.x = x;
+            this.y = y;
+            this.speed = speed;
+            this.velocity = velocity.scl(speed);
+            this.sprite = new Sprite(texture);
+            this.rectangle = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
+            this.mapIndex = -1;
+
+
         }
 
 
+        public Builder initCollision(ArrayList<ArrayList<ArrayList<TileData>>> a) {
 
+            this.canCollide = true;
+            this.tileDataMap = a;
+            return this;
+
+        }
+
+        public Builder maxBounces(int a) {
+            this.maxBounces = a;
+            return this;
+        }
+
+        public Builder whichMap(int index) {
+            this.mapIndex = index;
+            return this;
+        }
+
+        public Builder testBullet(boolean a) {
+
+            testBullet = a;
+            return this;
+
+        }
+
+        public SanatizerBullet build() {
+            return new SanatizerBullet(this);
+        }
 
 
 
@@ -70,50 +141,6 @@ public class SanatizerBullet extends AbstractBullet  {
 
     @Override
     public void setBoundingBox(float x, float y, float width, float height) {
-
-    }
-
-    // x and y are the players x and y
-
-    public static class Builder {
-
-
-        private final float x,y, speed;
-        private final Vector2 velocity;
-        private final Rectangle rectangle;
-        private boolean canCollide;
-        private Sprite sprite;
-        private TileCollision bulletColider;
-        private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> tileDataMap;
-
-
-        public Builder(float x, float y, Vector2 velocity, float speed, Texture texture) {
-
-
-            this.x = x;
-            this.y = y;
-            this.speed = speed;
-            this.velocity = velocity.scl(speed);
-            this.sprite = new Sprite(texture);
-            this.rectangle = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
-
-
-        }
-
-
-        public Builder initCollision(ArrayList<ArrayList<ArrayList<TileData>>> a) {
-
-            this.canCollide = true;
-            this.tileDataMap = a;
-            return this;
-
-        }
-
-        public SanatizerBullet build() {
-            return new SanatizerBullet(this);
-        }
-
-
 
     }
 
@@ -181,7 +208,18 @@ public class SanatizerBullet extends AbstractBullet  {
 
 
 
+    private boolean isOutOfBounds() {
 
+        if (rectangle.x < 16 || rectangle.x > 16 * 30) {
+            outOfBounds = true;
+            return true;
+        }
+        if (rectangle.y < 16 || rectangle.y > 16 * 16) {
+            outOfBounds = true;
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void act(float delta) {
@@ -194,9 +232,11 @@ public class SanatizerBullet extends AbstractBullet  {
 
 
         // only two bouces max
-        if (getNumOfBounces() > 2) {
+        if (getNumOfBounces() > maxBounces) {
             remove = true;
         }
+
+
 
         velocity.nor();
 
@@ -225,6 +265,10 @@ public class SanatizerBullet extends AbstractBullet  {
 
     public Vector2 getVeloicty() {
         return velocity;
+    }
+
+    public boolean getOutOfBounds() {
+        return outOfBounds;
     }
 
 }

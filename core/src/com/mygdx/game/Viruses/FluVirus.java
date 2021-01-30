@@ -1,22 +1,19 @@
 package com.mygdx.game.Viruses;
 
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
-import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.Level;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.HeuristicTile;
-import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
 import com.mygdx.game.utils.GraphMaker;
@@ -24,8 +21,6 @@ import com.mygdx.game.utils.Messages;
 import com.mygdx.game.utils.Pair;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class FluVirus extends AbstractEnemy  {
 
@@ -33,18 +28,23 @@ public class FluVirus extends AbstractEnemy  {
     private final Sprite sprite;
     private final Vector2 detectionLine;
     private final EntityLocation target;
-    private final Queue<SanatizerBullet> virusBullets;
-    private final TileCollision fluVirusTileCollider;
-    private final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
-    //private final RaycastObstacleAvoidance<Vector2> obstacleBehavior;
-    private final IndexedAStarPathFinder<TileData> chase;
-    private final TilePath resultPath;
+
+    //private final TileCollision fluVirusTileCollider;
+
+
     private final Vector2 getDetectionLine;
     private static final HeuristicTile her = new HeuristicTile();
-    private final Arrive<Vector2> arrive;
 
+    private FollowPath<Vector2,LinePath.LinePathParam> followPath;
+    private Seek<Vector2> seek;
+    private final IndexedAStarPathFinder<TileData> chase;
+    private final TilePath resultPath;
     private boolean drawPath;
 
+    private int StartX = 0;
+    private int StartY = 0;
+    private int endX = 0;
+    private int endY = 0;
 
     private boolean canColide;
 
@@ -55,28 +55,29 @@ public class FluVirus extends AbstractEnemy  {
 
         super(builder.target, builder.level);
         this.resultPath = new TilePath();
+        this.seek = new Seek<>(this, builder.target);
         this.detectionLine = builder.detectionLine;
         this.target = builder.target;
-        this.virusBullets = builder.virusBullets;
+
         this.canColide = builder.canCollide;
-        this.fluVirusTileColliderMap = builder.fluVirusTileColliderMap;
         texture = assetManager.manager.get(assetManager.fluVirus);
         this.sprite = new Sprite(texture);
         this.position = new Vector2(getX(), getY());
         steeringBehavior = new PrioritySteering<>(this);
         drawPath = false;
-        arrive = new Arrive<>(this);
-        steeringBehavior.add(arrive);
+
        // obstacleBehavior = new RaycastObstacleAvoidance<>(this, new CentralRayWithWhiskersConfiguration<>(this, 40f,20f,0.5f));
 
 
 
+        //followPath.setEnabled(true);
 
-        initRayCollision();
+
+        //initRayCollision();
 
         // accel has to be greater than maxSpeed
-        maxSpeed = 32f;
-        maxLinearAcceleration = 128f;
+        maxSpeed = 400f;
+        maxLinearAcceleration = 60f;
         this.getDetectionLine = new Vector2();
 //        obstacleBehavior.setDistanceFromBoundary(0f);
 
@@ -91,14 +92,11 @@ public class FluVirus extends AbstractEnemy  {
         velocity = new Vector2();
 
 
-        if (canColide) {
-            fluVirusTileCollider = new TileCollision.Builder<>().charecter(this).calcCorners(getBoundingBox())
-            .tileMap(fluVirusTileColliderMap.get(0), fluVirusTileColliderMap.get(1)).build();
-        } else {
-            fluVirusTileCollider = null;
-        }
 
-        steeringBehavior.setEnabled(true);
+        this.followPath = new FollowPath(this, defaultPath, 5f).setArrivalTolerance(0.01f).setDecelerationRadius(60f);
+        followPath.setArriveEnabled(true);
+        //steeringBehavior.add(followPath);
+        //steeringBehavior.setEnabled(true);
 
 
 
@@ -110,7 +108,6 @@ public class FluVirus extends AbstractEnemy  {
     public static class Builder {
 
         private final EntityLocation target;
-        private final Queue<SanatizerBullet> virusBullets;
         private final Vector2 detectionLine;
         private final Level level;
 
@@ -120,7 +117,6 @@ public class FluVirus extends AbstractEnemy  {
         public Builder(EntityLocation target, Level level) {
 
             this.target = target;
-            this.virusBullets = new LinkedList<>();
             this.level = level;
             detectionLine = new Vector2();
 
@@ -130,6 +126,11 @@ public class FluVirus extends AbstractEnemy  {
 
             fluVirusTileColliderMap = a;
             canCollide = true;
+            return this;
+        }
+
+        public Builder detectionCircle(Circle a) {
+
             return this;
         }
 
@@ -161,11 +162,16 @@ public class FluVirus extends AbstractEnemy  {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
-        for (SanatizerBullet shot : virusBullets
-             ) {
-            shot.draw(batch,0);
-            shot.act(timeElapsed);
-        }
+
+            for (SanatizerBullet shot : virusBullets
+            ) {
+                shot.draw(batch,0);
+                if (shot.remove) {
+                    removeBullets.add(shot);
+                }
+                shot.act(timeElapsed);
+            }
+            virusBullets.removeAll(removeBullets);
         //drawDebugBox();
 
     }
@@ -177,10 +183,8 @@ public class FluVirus extends AbstractEnemy  {
 
         timeElapsed += delta;
 
-
-
-
-
+        detectionLine.x = target.getX() - getX();
+        detectionLine.y = target.getY() - getY();
 
         resultPath.clear();
 
@@ -196,13 +200,7 @@ public class FluVirus extends AbstractEnemy  {
         // for debugging
         // drawDetectionLine();
 
-        /*
-        if (timeElapsed > 2f) {
-            virusBullets.add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(detectionLine.x, detectionLine.y), 2f,assetManager.manager.get(assetManager.bulletSprite)).build());
-            timeElapsed = 0;
-        }
 
-         */
 
 
 
@@ -211,30 +209,31 @@ public class FluVirus extends AbstractEnemy  {
 
 
 
-        int endX = calcMiddleTarget().getIndexi();
-        int endY = calcMiddleTarget().getIndexj();
+        int endX = (int)calcMiddleTarget().getIndexi();
+        int endY = (int)calcMiddleTarget().getIndexj();
 
         TileData startNode = fluVirusTileColliderMap.get(0).get(StartY).get(StartX);
         TileData endNode = fluVirusTileColliderMap.get(0).get(endY).get(endX);
 
-        //System.out.println(fluVirusTileColliderMap.get(0).get(endY).get(endX));
-
-        // resultPath is empty and gets mutated by this function
         chase.searchNodePath(startNode, endNode, her, resultPath);
 
 
 
 
-        if (drawPath) {
 
 
-            for (TileData d : resultPath.getArray()) {
-
-            d.setTextureRegion();
 
 
-            }
+        //System.out.println(fluVirusTileColliderMap.get(0).get(endY).get(endX));
 
+        // resultPath is empty and gets mutated by this function
+        ;
+
+
+
+        if (resultPath.getCount() > 2) {
+            LinePath path = GraphMaker.parsePath(resultPath);
+            followPath.setPath(path);
         }
 
 
@@ -243,12 +242,25 @@ public class FluVirus extends AbstractEnemy  {
 
 
 
+           // update(delta);
 
 
 
 
 
-    }
+        if (drawPath) {
+
+            followPath.calculateSteering(steeringOutput);
+            applySteering(delta);
+
+        }
+
+
+
+
+
+        }
+
 
     private Pair calcMiddleTarget() {
 
@@ -341,8 +353,8 @@ public class FluVirus extends AbstractEnemy  {
     @Override
     public boolean collisionLogic() {
 
-        fluVirusTileCollider.tileHorizontal(velocity);
-        fluVirusTileCollider.tileVertical(velocity);
+        //fluVirusTileCollider.tileHorizontal(velocity);
+        //fluVirusTileCollider.tileVertical(velocity);
 
 
 

@@ -24,7 +24,7 @@ public class TileData {
     private Tile tile;
     private Array<Connection<TileData>> connectionArray = new Array<>();
     public int INDEX = 9000;
-    private final Pair<Integer, Integer> position;
+    private final Pair<Float, Float> position;
 
     static {
 
@@ -36,8 +36,8 @@ public class TileData {
     public TileData() {
         this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
-        this.INDEX = 9000;
-        this.position = new Pair<>(0,0);
+        this.INDEX = 0;
+        this.position = new Pair<>(0f,0f);
 
 
     }
@@ -59,12 +59,12 @@ public class TileData {
         if (!isWalls) {
             //System.out.println(TileData.Indexer.getIndex());
             //System.out.println(tile);
-            this.INDEX = tile != Tile.NULL ? TileData.Indexer.getIndex() : 9000;
+            this.INDEX = tile != Tile.NULL ? TileData.Indexer.getIndex() : 0;
         }
 
         //System.out.println(INDEX);
 
-        this.position = new Pair<>(x,y);
+        this.position = new Pair<>((float)x,(float)y);
 
 
     }

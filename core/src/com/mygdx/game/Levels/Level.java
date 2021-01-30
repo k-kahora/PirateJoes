@@ -4,11 +4,13 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Tiles.TileData;
 
+import java.util.ArrayList;
+
 public interface Level extends IndexedGraph<TileData> {
 
 
     public void loadAssets();
 
-    public Viewport getViewport();
 
+    public ArrayList<ArrayList<ArrayList<TileData>>> getCollisionMap();
 }

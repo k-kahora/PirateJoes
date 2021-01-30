@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MainCharacter;
 import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
@@ -36,10 +37,12 @@ public class Level1 extends AbstractLevel {
     private MainCharacter character;
     private FluVirus fluVirus;
     private final Group enemeyGroup;
+    private final ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps;
 
     public Level1(PirateJoes pirateJoes) {
         super(pirateJoes);
         enemeyGroup = new Group();
+        collisonMaps = new ArrayList<ArrayList<ArrayList<TileData>>>();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class Level1 extends AbstractLevel {
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
         secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
         secondLayer.addLevel(this);
-        ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps = new ArrayList<ArrayList<ArrayList<TileData>>>();
+
         character = new MainCharacter();
         character.setPosition(32,32);
         // adss teh collision map
@@ -67,9 +70,12 @@ public class Level1 extends AbstractLevel {
 
         collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
-
+        character.setPosition(200,200);
         enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+
         enemeyGroup.getChild(0).setPosition(32, 32);
+        enemeyGroup.getChild(1).setPosition(12, 32);
 
 
         // cast to a sterable
@@ -80,7 +86,8 @@ public class Level1 extends AbstractLevel {
         // adds teh connections
 
 
-        System.out.println(secondLayer.getTileMap().get(8).get(8).getConnectionArray());
+
+
 
         //System.out.println(getNodeCount());
 
@@ -137,6 +144,7 @@ public class Level1 extends AbstractLevel {
 
         // adds the flue virus as a listener
         getMessageDispatcherAI().addListener((Telegraph) enemeyGroup.getChild(0 ), Messages.CHASE);
+        getMessageDispatcherAI().addListener((Telegraph) enemeyGroup.getChild(1 ), Messages.CHASE);
 
     }
 
@@ -179,4 +187,11 @@ public class Level1 extends AbstractLevel {
     public Array<Connection<TileData>> getConnections(TileData fromNode) {
         return fromNode.getConnectionArray();
     }
+
+    @Override
+    public ArrayList<ArrayList<ArrayList<TileData>>> getCollisionMap() {
+        return collisonMaps;
+    }
+
+
 }

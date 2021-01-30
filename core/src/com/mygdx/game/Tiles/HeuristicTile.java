@@ -11,13 +11,13 @@ public class HeuristicTile implements Heuristic<TileData> {
     @Override
     public float estimate(TileData node, TileData endNode) {
 
-        float startX = node.getIndex().getIndexi();
-        float startY = node.getIndex().getIndexj();
+        float startX = (float)node.getIndex().getIndexi();
+        float startY = (float)node.getIndex().getIndexj();
 
-        float endX = endNode.getIndex().getIndexi();
-        float endy = endNode.getIndex().getIndexj();
+        float endX = (float)endNode.getIndex().getIndexi();
+        float endy = (float)endNode.getIndex().getIndexj();
 
-        return Math.abs(startX - endX) + Math.abs(startY - endy);
+        return (float)Math.sqrt((Math.pow(startX - endX, 2f) + Math.pow(startY - endy, 2f)));
 
 
     }

@@ -3,18 +3,24 @@ package com.mygdx.game.Viruses;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
-import com.badlogic.gdx.ai.steer.SteeringBehavior;
-import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
+import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.FunctionalityClasses.*;
 import com.mygdx.game.Levels.Level;
+import com.mygdx.game.Levels.Level1;
+import com.mygdx.game.SanatizerBullet;
+import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.SteeringUtils;
+
+import java.util.*;
 
 public abstract class AbstractEnemy extends Actor implements EntitySteerable, Telegraph {
 
@@ -25,17 +31,33 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     public  MyAssetManager assetManager = new MyAssetManager();
     Entity target;
     Vector2 velocity;
+    final Deque<SanatizerBullet> virusBullets;
+    final List<SanatizerBullet> removeBullets;
+    final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
+    final Circle detectionCircle;
+
+    public final LinePath<Vector2> defaultPath;
+    Array<Vector2> wayPoints = new Array<>(2);
+
     private Level level;
 
 
 
     public AbstractEnemy(Entity target, Level currentLevel) {
         this.target = target;
+        this.detectionCircle = new Circle();
         this.boundingBox = new Rectangle();
         this.level = currentLevel;
+        this.wayPoints.add(new Vector2(20, 20));
+        this.wayPoints.add(new Vector2(target.getX(), target.getY()));
+        //System.out.println(wayPoints.get(0) + " " + wayPoints.get(1));
+        this.defaultPath = new LinePath<>(wayPoints, true);
+        this.virusBullets = new LinkedList<>();
+        this.fluVirusTileColliderMap = currentLevel.getCollisionMap();
         assetManager.loadEnemys();
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
+        this.removeBullets = new LinkedList<>();
 
 
     }
@@ -64,6 +86,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     float maxLinearAcceleration;
     boolean independentFacing;
     PrioritySteering<Vector2> steeringBehavior;
+    private float linearSpeedThreshold;
 
     static final SteeringAcceleration<Vector2> steeringOutput =
             new SteeringAcceleration<Vector2>(new Vector2());
@@ -111,6 +134,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         return level;
     }
 
+
+
     @Override
     public Vector2 getLinearVelocity() {
         return velocity;
@@ -138,12 +163,12 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     @Override
     public float getZeroLinearSpeedThreshold() {
-        return 0;
+        return linearSpeedThreshold;
     }
 
     @Override
     public void setZeroLinearSpeedThreshold(float value) {
-
+        this.linearSpeedThreshold = value;
     }
 
     @Override
@@ -180,7 +205,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     @Override
     public float getMaxAngularAcceleration() {
-        return 0;
+        return 10f;
     }
 
     @Override
@@ -227,7 +252,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     @Override
     public void drawDebugBox() {
-        DebugDrawer.DrawDebugRectangle(getX(), getY(), getWidth(), getHeight(), Color.PURPLE, level.getViewport().getCamera().combined);
+        DebugDrawer.DrawDebugRectangle(getX(), getY(), getWidth(), getHeight(), Color.PURPLE, Level1.getViewport().getCamera().combined);
     }
 
     @Override
@@ -259,5 +284,15 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     @Override
     public void leftCollision(int x, int y) {
 
+    }
+
+
+    public void shoot(Vector2 direction, float velocity) {
+        virusBullets.add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(direction.x, direction.y), velocity,assetManager.manager.get(assetManager.bulletSprite)).maxBounces(2).initCollision(fluVirusTileColliderMap).build());
+    }
+
+
+    public Circle getDetectionCircle() {
+        return detectionCircle;
     }
 }

@@ -25,7 +25,7 @@ Must implement remaining methods of screen
 
 public abstract class AbstractLevel implements Level, Screen {
 
-    private PirateJoes pirateJoes;
+    private static PirateJoes pirateJoes;
 
 
     public final static String tileDir;
@@ -73,12 +73,12 @@ public abstract class AbstractLevel implements Level, Screen {
         return aiDispatcher;
     }
 
-    @Override
-    public Viewport getViewport() {
+
+    public static Viewport getViewport() {
         return viewport;
     }
 
-    public final PirateJoes getPirateJoe() {
+    public static final PirateJoes getPirateJoe() {
         return pirateJoes;
     }
 
@@ -107,5 +107,7 @@ public abstract class AbstractLevel implements Level, Screen {
     public MyAssetManager getAssetManager() {
         return assetManager;
     }
+
+
 
 }
