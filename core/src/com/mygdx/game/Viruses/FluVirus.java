@@ -5,8 +5,7 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -29,8 +28,10 @@ public class FluVirus extends AbstractEnemy  {
     private final Vector2 detectionLine;
     private final EntityLocation target;
 
-    //private final TileCollision fluVirusTileCollider;
+    private TextureAtlas splashAtlas;
+    private Animation<TextureRegion> splash;
 
+    //private final TileCollision fluVirusTileCollider;
 
     private final Vector2 getDetectionLine;
     private static final HeuristicTile her = new HeuristicTile();
@@ -66,6 +67,9 @@ public class FluVirus extends AbstractEnemy  {
         steeringBehavior = new PrioritySteering<>(this);
         drawPath = false;
 
+        this.splashAtlas = assetManager.manager.get(assetManager.splashBullet);
+
+
        // obstacleBehavior = new RaycastObstacleAvoidance<>(this, new CentralRayWithWhiskersConfiguration<>(this, 40f,20f,0.5f));
 
 
@@ -93,7 +97,7 @@ public class FluVirus extends AbstractEnemy  {
 
 
 
-        this.followPath = new FollowPath(this, defaultPath, 5f).setArrivalTolerance(0.01f).setDecelerationRadius(60f);
+        this.followPath = new FollowPath(this, defaultPath, 1f).setArrivalTolerance(0.01f).setDecelerationRadius(100f);
         followPath.setArriveEnabled(true);
         //steeringBehavior.add(followPath);
         //steeringBehavior.setEnabled(true);
@@ -193,6 +197,7 @@ public class FluVirus extends AbstractEnemy  {
 
 
 
+
         //velocity.mulAdd(steeringOutput.linear, delta);
 
         //moveBy(velocity.x, velocity.y);
@@ -216,13 +221,6 @@ public class FluVirus extends AbstractEnemy  {
         TileData endNode = fluVirusTileColliderMap.get(0).get(endY).get(endX);
 
         chase.searchNodePath(startNode, endNode, her, resultPath);
-
-
-
-
-
-
-
 
         //System.out.println(fluVirusTileColliderMap.get(0).get(endY).get(endX));
 

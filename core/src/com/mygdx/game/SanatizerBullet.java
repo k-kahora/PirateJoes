@@ -1,20 +1,19 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.mygdx.game.FunctionalityClasses.Entity;
+import com.mygdx.game.Particles.BulletSplash;
+import com.mygdx.game.Particles.ParticleManager;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class SanatizerBullet extends AbstractBullet  {
 
@@ -22,6 +21,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
     private TileCollision bulletColider;
 
+    private boolean collided = false;
     private final float x,y,speed;
     public boolean remove, outOfBounds;
     private final boolean canCollide, testBullet;
@@ -31,12 +31,22 @@ public class SanatizerBullet extends AbstractBullet  {
     private final int maxBounces;
     private final int mapIndex;
 
+    private float timeElapsed;
+
+    private Animation<TextureRegion> splash;
+    private TextureAtlas atlas;
+    private boolean collsionAnimation = false;
+    private Deque<BulletSplash> wallCollsions;
+    private Sprite test;
 
     private SanatizerBullet(Builder builder) {
 
         super(builder.tileDataMap);
+        this.wallCollsions = new LinkedList<>();
         this.mapIndex = builder.mapIndex;
         this.sprite = builder.sprite;
+        this.test = new Sprite(new Texture(Gdx.files.internal("test_tile.png")));
+        test.setPosition(200,200);
         this.x = builder.x;
         this.y = builder.y;
         this.maxBounces = builder.maxBounces;
@@ -47,16 +57,11 @@ public class SanatizerBullet extends AbstractBullet  {
         this.rectangle = builder.rectangle;
         this.canCollide = builder.canCollide;
         this.testBullet = builder.testBullet;
+        this.atlas = builder.atlas;
+        this.splash = builder.bulletExplosionAnimation;
 
         setPosition(x,y);
         this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
-
-
-
-
-
-
-
 
 
     }
@@ -78,6 +83,8 @@ public class SanatizerBullet extends AbstractBullet  {
         private int maxBounces;
         private int mapIndex;
         private boolean testBullet;
+        private TextureAtlas atlas;
+        private Animation<TextureRegion> bulletExplosionAnimation;
 
 
         public Builder(float x, float y, Vector2 velocity, float speed, Texture texture) {
@@ -90,6 +97,8 @@ public class SanatizerBullet extends AbstractBullet  {
             this.sprite = new Sprite(texture);
             this.rectangle = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
             this.mapIndex = -1;
+
+
 
 
         }
@@ -120,12 +129,15 @@ public class SanatizerBullet extends AbstractBullet  {
 
         }
 
+        public Builder explosionAnimation(TextureAtlas atlas) {
+            this.atlas = atlas;
+            this.bulletExplosionAnimation = new Animation<TextureRegion>(1/60f, atlas.getRegions());
+            return this;
+        }
+
         public SanatizerBullet build() {
             return new SanatizerBullet(this);
         }
-
-
-
     }
 
 
@@ -144,9 +156,12 @@ public class SanatizerBullet extends AbstractBullet  {
 
     }
 
+    // loops over every active sprite collsion animation sets the region and animates the collsion
     @Override
     public void draw(Batch batch, float parentAlpha) {
+
         sprite.draw(batch);
+
     }
 
     public Vector2 getVelocity() {
@@ -168,9 +183,8 @@ public class SanatizerBullet extends AbstractBullet  {
     public void bottomCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
+        ParticleManager.splashBullets.add(new BulletSplash(atlas,180,0, getX() + getWidth() / 2, getY()));
         addNumOfBounces();
-
-
     }
 
 
@@ -179,6 +193,8 @@ public class SanatizerBullet extends AbstractBullet  {
     public void topCollision(int x, int y) {
         velocity.y *= -1;
         rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
+        ParticleManager.splashBullets.add(new BulletSplash(atlas,0,0, getX() + getWidth() / 2, getY()));
+
         addNumOfBounces();
     }
 
@@ -187,6 +203,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
         velocity.x *= -1;
         rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), getY());
+        ParticleManager.splashBullets.add(new BulletSplash(atlas,-90,0, getX() + getWidth() / 2, getY()));
         addNumOfBounces();
 
 
@@ -197,6 +214,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
         velocity.x *= -1;
         rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), getY());
+        ParticleManager.splashBullets.add(new BulletSplash(atlas,90,0, getX() + getWidth() / 2, getY()));
         addNumOfBounces();
     }
 
@@ -230,6 +248,8 @@ public class SanatizerBullet extends AbstractBullet  {
         rectangle.x = getX();
         rectangle.y = getY();
 
+        timeElapsed += delta;
+
 
         // only two bouces max
         if (getNumOfBounces() > maxBounces) {
@@ -247,7 +267,14 @@ public class SanatizerBullet extends AbstractBullet  {
         if (canCollide)
             collisionLogic();
 
+
+        for (BulletSplash spruh : wallCollsions) {
+        }
+
+
         moveBy(velocity.x, velocity.y);
+
+
 
     }
 
@@ -270,5 +297,18 @@ public class SanatizerBullet extends AbstractBullet  {
     public boolean getOutOfBounds() {
         return outOfBounds;
     }
+
+    public Deque<BulletSplash> getSplashAnimation() {
+        return wallCollsions;
+    }
+
+    public boolean collided() {
+        return collided;
+    }
+
+    public void resetCollision() {
+        collided = false;
+    }
+
 
 }

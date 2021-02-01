@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.cbrt;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -16,6 +15,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.mygdx.game.Particles.BulletSplash;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
 import com.mygdx.game.Levels.AbstractLevel;
@@ -26,6 +26,7 @@ import com.mygdx.game.utils.Messages;
 import com.mygdx.game.utils.SteeringUtils;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 
 public class MainCharacter extends Actor implements EntityLocation {
@@ -38,11 +39,12 @@ public class MainCharacter extends Actor implements EntityLocation {
     private com.mygdx.game.Tiles.TileCollision collision;
     private ArrayList<ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>>> collisionMap;
 
-
     private Animation<TextureRegion> leftWalk;
     private Animation<TextureRegion> rightIdle;
     private Animation<TextureRegion> leftIdle;
     private Animation<TextureRegion> rightWalk;
+
+    private final Deque<BulletSplash> splashAnimations;
 
     Vector2 direction, velocity, position;
 
@@ -58,7 +60,6 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     public float xBeforeVector;
     public float yBeforeVector;
-
 
     Sprite sprite;
 
@@ -80,6 +81,8 @@ public class MainCharacter extends Actor implements EntityLocation {
         assetManager = new MyAssetManager();
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
+
+        splashAnimations = new LinkedList<>();
 
         bullets = new LinkedList<>();
         numTimesFired = 0;
@@ -175,6 +178,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
 
 
+
         if (!direction.equals(new Vector2())) {
 
             //velocity.x += 0.1f;
@@ -259,7 +263,11 @@ public class MainCharacter extends Actor implements EntityLocation {
         sprite.draw(batch);
         for (int i = 0; i < bullets.size(); ++i) {
             bullets.get(i).draw(batch,0);
-            bullets.get(i).drawDebugBox();
+
+            if (bullets.get(i).collided()) {
+                splashAnimations.addAll(bullets.get(i).getSplashAnimation());
+                bullets.get(i).resetCollision();
+            }
 
             if (i != 0) {
                 bulletCollision(bullets.get(i - 1), bullets.get(i));
@@ -270,6 +278,12 @@ public class MainCharacter extends Actor implements EntityLocation {
             }
         }
         bullets.removeAll(removedBullets);
+
+        for (BulletSplash splash : splashAnimations) {
+
+            splash.draw(batch);
+
+        }
 
     }
 
@@ -441,7 +455,8 @@ public class MainCharacter extends Actor implements EntityLocation {
 
 
             bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 3f ,assetManager.manager.get(assetManager.bulletSprite))
-                    .initCollision(collisionMap).maxBounces(2).build());
+                    .initCollision(collisionMap).maxBounces(10)
+                    .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
 
     }

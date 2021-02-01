@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MainCharacter;
+import com.mygdx.game.Particles.BulletSplash;
+import com.mygdx.game.Particles.ParticleManager;
 import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
@@ -38,6 +40,8 @@ public class Level1 extends AbstractLevel {
     private FluVirus fluVirus;
     private final Group enemeyGroup;
     private final ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps;
+
+    private float timeElapsed = 0;
 
     public Level1(PirateJoes pirateJoes) {
         super(pirateJoes);
@@ -83,6 +87,8 @@ public class Level1 extends AbstractLevel {
         initMessages();
 
 
+
+
         // adds teh connections
 
 
@@ -98,6 +104,7 @@ public class Level1 extends AbstractLevel {
     public void render(float delta) {
 
         // when the char presses space
+       timeElapsed += delta;
 
 
 
@@ -124,10 +131,20 @@ public class Level1 extends AbstractLevel {
         enemeyGroup.draw(getPirateJoe().batch, 0);
         character.act(Gdx.graphics.getDeltaTime());
 
+        for (BulletSplash a : ParticleManager.splashBullets) {
+            if (!a.isDone()) {
+                a.update(delta);
+                a.draw(getPirateJoe().batch);
+            }
+
+        }
+
         getPirateJoe().batch.end();
         character.drawDebugBox();
 
         enemeyGroup.act(delta);
+
+
 
 
 
