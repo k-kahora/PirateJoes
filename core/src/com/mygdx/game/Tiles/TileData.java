@@ -5,9 +5,11 @@ import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.utils.Pair;
+import org.w3c.dom.css.Rect;
 
 // 9000 means the tile is not indexed
 
@@ -25,6 +27,9 @@ public class TileData {
     private Array<Connection<TileData>> connectionArray = new Array<>();
     public int INDEX = 9000;
     private final Pair<Float, Float> position;
+    private final boolean isWalls;
+
+    private final Rectangle box;
 
     static {
 
@@ -38,12 +43,14 @@ public class TileData {
         this.bottom = 1;
         this.INDEX = 0;
         this.position = new Pair<>(0f,0f);
-
+        this.box = new Rectangle(0,0,16,16);
+        this.isWalls = false;
 
     }
 
     public TileData(Tile tile, TextureAtlas atlas, int x, int y, boolean isWalls) {
 
+        this.isWalls = isWalls;
         this.tile = tile;
         this.bottom = y;
         this.top = y + TILE_HEIGHT;
@@ -65,6 +72,7 @@ public class TileData {
         //System.out.println(INDEX);
 
         this.position = new Pair<>((float)x,(float)y);
+        this.box = new Rectangle(x * 16, y * 16, 16, 16);
 
 
     }
@@ -137,11 +145,11 @@ public class TileData {
 
     private static class Indexer {
 
-        private static int index = 0;
+        private static int index = 0; // not sure why I have to make -1 to work but other wise its an error :\
 
         public static int getIndex() {
 
-            return ++index;
+            return index++;
         }
 
     }

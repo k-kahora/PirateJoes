@@ -34,7 +34,7 @@ public class MyAssetManager {
     public AssetDescriptor<Texture> fluVirus = new AssetDescriptor<Texture>("spriteSheets/FluVirus.png", Texture.class);
     public AssetDescriptor<Texture> startScreen = new AssetDescriptor<Texture>("sprites/homescreen.png", Texture.class);
     public AssetDescriptor<TextureAtlas> splashBullet = new AssetDescriptor<TextureAtlas>("spriteSheets/bulletCollisionBubble.atlas", TextureAtlas.class);
-
+    public AssetDescriptor<TextureAtlas> slimeBlows = new AssetDescriptor<TextureAtlas>("spriteSheets/slimeBlow.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> storeManager = new AssetDescriptor<Texture>("sprites/Manager.png", Texture.class);
 
     // adds to teh loading que
@@ -71,6 +71,7 @@ public class MyAssetManager {
         manager.load(slime);
         manager.load(fluVirus);
         manager.load(splashBullet);
+        manager.load(slimeBlows);
     }
 
     public void dispose() {

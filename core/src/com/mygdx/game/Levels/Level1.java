@@ -2,6 +2,7 @@ package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.msg.MessageManager;
+import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.steer.Steerable;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -25,6 +27,12 @@ import com.mygdx.game.utils.Messages;
 
 import java.util.ArrayList;
 
+/*
+abstract level is a skeltal implemntaion for all levels
+all levels must extend AbstractLevel
+Core functionality is kept in Abstract Level
+ */
+
 public class Level1 extends AbstractLevel {
 
 
@@ -34,18 +42,17 @@ public class Level1 extends AbstractLevel {
     TileCollision wallCollider;
 
     Array<TileData> collisionTiles;
+    Array<FluVirus> groupOfViruses;
 
     private Slime slime;
     private MainCharacter character;
     private FluVirus fluVirus;
-    private final Group enemeyGroup;
     private final ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps;
 
     private float timeElapsed = 0;
 
     public Level1(PirateJoes pirateJoes) {
         super(pirateJoes);
-        enemeyGroup = new Group();
         collisonMaps = new ArrayList<ArrayList<ArrayList<TileData>>>();
     }
 
@@ -56,6 +63,8 @@ public class Level1 extends AbstractLevel {
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
         secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
         secondLayer.addLevel(this);
+
+        groupOfViruses = new Array<>();
 
         character = new MainCharacter();
         character.setPosition(32,32);
@@ -75,11 +84,11 @@ public class Level1 extends AbstractLevel {
         collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
         character.setPosition(200,200);
-        enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
-        enemeyGroup.addActor(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        groupOfViruses.add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        groupOfViruses.add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
 
-        enemeyGroup.getChild(0).setPosition(32, 32);
-        enemeyGroup.getChild(1).setPosition(12, 32);
+        groupOfViruses.get(0).setPosition(32, 32);
+        groupOfViruses.get(1).setPosition(12, 32);
 
 
         // cast to a sterable
@@ -106,9 +115,6 @@ public class Level1 extends AbstractLevel {
         // when the char presses space
        timeElapsed += delta;
 
-
-
-
         // sets mouse cord relative to pixels
         PirateJoes.mouseCordinates.x = Gdx.input.getX();
         PirateJoes.mouseCordinates.y = Gdx.input.getY();
@@ -117,7 +123,6 @@ public class Level1 extends AbstractLevel {
 
         // turns pixle cordinates to world cordinates
         getViewport().getCamera().unproject(PirateJoes.mouseCordinates);
-
 
         getPirateJoe().batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -128,7 +133,7 @@ public class Level1 extends AbstractLevel {
 //        slime.draw(pirateJoes.batch, 100);
 
         character.draw(getPirateJoe().batch, 0);
-        enemeyGroup.draw(getPirateJoe().batch, 0);
+
         character.act(Gdx.graphics.getDeltaTime());
 
         for (BulletSplash a : ParticleManager.splashBullets) {
@@ -139,10 +144,18 @@ public class Level1 extends AbstractLevel {
 
         }
 
+        for (FluVirus a : groupOfViruses) {
+
+            if (!a.isDead()) {
+                a.act(delta);
+                a.draw(getPirateJoe().batch, 0);
+            }
+
+        }
+
         getPirateJoe().batch.end();
         character.drawDebugBox();
 
-        enemeyGroup.act(delta);
 
 
 
@@ -160,8 +173,10 @@ public class Level1 extends AbstractLevel {
     public void initMessages() {
 
         // adds the flue virus as a listener
-        getMessageDispatcherAI().addListener((Telegraph) enemeyGroup.getChild(0 ), Messages.CHASE);
-        getMessageDispatcherAI().addListener((Telegraph) enemeyGroup.getChild(1 ), Messages.CHASE);
+        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(0 ), Messages.CHASE);
+        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(1 ), Messages.CHASE);
+        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(0 ), Messages.DETONATING);
+        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(1 ), Messages.DETONATING);
 
     }
 
@@ -199,6 +214,25 @@ public class Level1 extends AbstractLevel {
         return collisionTiles.size;
     }
 
+    @Override
+    public boolean handleMessage(Telegram msg) {
+        switch (msg.message) {
+
+            case (Messages.FINISH):
+
+
+                return true;
+
+            default:{
+
+                return false;
+
+            }
+        }
+
+    }
+
+
 
     @Override
     public Array<Connection<TileData>> getConnections(TileData fromNode) {
@@ -209,6 +243,18 @@ public class Level1 extends AbstractLevel {
     public ArrayList<ArrayList<ArrayList<TileData>>> getCollisionMap() {
         return collisonMaps;
     }
+
+    public ArrayList<FluVirus> getEnemeyGroup() {
+        ArrayList<FluVirus> steers = new ArrayList<>();
+        for (Actor a : groupOfViruses) {
+
+            steers.add((FluVirus)a);
+
+        }
+
+        return steers;
+    }
+
 
 
 }

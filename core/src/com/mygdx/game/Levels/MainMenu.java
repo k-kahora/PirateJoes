@@ -2,10 +2,13 @@ package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.*;
 
+import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -147,6 +150,11 @@ public class MainMenu extends AbstractLevel{
     }
 
     @Override
+    public ArrayList<? extends Steerable<Vector2>> getEnemeyGroup() {
+        return null;
+    }
+
+    @Override
     public Array<Connection<TileData>> getConnections(TileData fromNode) {
         return null;
     }
@@ -164,5 +172,10 @@ public class MainMenu extends AbstractLevel{
     @Override
     public int getNodeCount() {
         return 0;
+    }
+
+    @Override
+    public boolean handleMessage(Telegram msg) {
+        return false;
     }
 }

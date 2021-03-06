@@ -26,6 +26,8 @@ public class BulletSplash extends Sprite {
     }
 
 
+    // this taakes a pos based on collision and adjust the particle accordingly
+    //
     private void mutatePos(int pos) {
 
         rotate(pos);
@@ -36,7 +38,7 @@ public class BulletSplash extends Sprite {
                 setPosition(x - animation.getKeyFrame(0).getRegionWidth() / 4,y - 15);
                 break;
             case (90) :
-                setPosition(x + 15, y - 15);
+                setPosition(x + 15, y - 20);
                 break;
             case (-90) :
                 setPosition(x - 15, y + 20);

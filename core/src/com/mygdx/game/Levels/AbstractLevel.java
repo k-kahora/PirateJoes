@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
@@ -18,12 +19,15 @@ Skeltal implementaion for all levels implemnts screen and Level all Actual level
 
 Must implement remaining methods of screen
 
+When a level implements abstract level the level mustr call the super contrcuto to work properly
+tjis conatins the view ports assets and camera as well as all of screens interface
+Impe,emting level is very important for path finding as it alows the level to be turned into a connection graph
 
 
 
  */
 
-public abstract class AbstractLevel implements Level, Screen {
+public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private static PirateJoes pirateJoes;
 
@@ -42,6 +46,7 @@ public abstract class AbstractLevel implements Level, Screen {
     public static final int worldUnits;
 
     private static MessageDispatcher aiDispatcher;
+    private static MessageDispatcher messageToLevel;
 
     static {
         cameraHeight = 17;
@@ -72,6 +77,8 @@ public abstract class AbstractLevel implements Level, Screen {
     public static MessageDispatcher getMessageDispatcherAI() {
         return aiDispatcher;
     }
+
+    public static MessageDispatcher getMessageToLevel() { return messageToLevel; }
 
 
     public static Viewport getViewport() {
@@ -108,6 +115,7 @@ public abstract class AbstractLevel implements Level, Screen {
         return assetManager;
     }
 
+    public abstract boolean handleMessage(Telegram msg);
 
 
 }

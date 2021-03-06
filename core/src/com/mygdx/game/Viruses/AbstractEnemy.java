@@ -3,6 +3,7 @@ package com.mygdx.game.Viruses;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
+import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
 import com.badlogic.gdx.ai.utils.Location;
@@ -24,7 +25,6 @@ import java.util.*;
 
 public abstract class AbstractEnemy extends Actor implements EntitySteerable, Telegraph {
 
-
     private SpriteBatch sprite;
     private boolean tagged;
     private Rectangle boundingBox;
@@ -35,6 +35,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     final List<SanatizerBullet> removeBullets;
     final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
     final Circle detectionCircle;
+    final BlendedSteering<Vector2> blendedSteering;
 
     public final LinePath<Vector2> defaultPath;
     Array<Vector2> wayPoints = new Array<>(2);
@@ -57,6 +58,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         assetManager.loadEnemys();
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
+        blendedSteering = new BlendedSteering<>(this);
         this.removeBullets = new LinkedList<>();
 
 
@@ -85,7 +87,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     float maxSpeed;
     float maxLinearAcceleration;
     boolean independentFacing;
-    PrioritySteering<Vector2> steeringBehavior;
+
     private float linearSpeedThreshold;
 
     static final SteeringAcceleration<Vector2> steeringOutput =
@@ -98,8 +100,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
             setBoundingBox(getX(), getY(), getWidth(), getHeight());
 
         }
-        if (steeringBehavior != null) {
-            steeringBehavior.calculateSteering(steeringOutput);
+        if (blendedSteering != null) {
+            blendedSteering.calculateSteering(steeringOutput);
             applySteering(delta);
         }
     }

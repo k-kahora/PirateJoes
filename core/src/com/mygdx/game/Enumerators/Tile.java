@@ -24,7 +24,6 @@ public enum Tile {
 
     NULL();
 
-
     private String atlasReference;
     //private Collisions collide;
     private boolean interact;
@@ -59,7 +58,5 @@ public enum Tile {
     public boolean isInteractable() {
         return interact;
     }
-
-
 
 }

@@ -415,7 +415,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-             AbstractLevel.getMessageDispatcherAI().dispatchMessage(Messages.CHASE);
+                 AbstractLevel.getMessageDispatcherAI().dispatchMessage(Messages.CHASE);
         }
 
 

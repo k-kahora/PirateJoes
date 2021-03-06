@@ -9,6 +9,7 @@ import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Tiles.TileConnection;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
+import org.graalvm.compiler.hotspot.phases.LoadJavaMirrorWithKlassPhase;
 import sun.awt.image.ImageWatched;
 
 import java.util.ArrayList;
@@ -27,11 +28,18 @@ public final class GraphMaker {
 
     public static Array<TileData> createGraph(ArrayList<ArrayList<TileData>> graphMap) {
 
+
+
         Array<TileData> listOfNodes = new Array<>();
         TileData above = null;
         TileData below = null;
         TileData right = null;
         TileData left = null;
+
+        TileData upperRight = null;
+        TileData upperLeft = null;
+        TileData lowerRight = null;
+        TileData lowerLeft = null;
 
 
         for (int i = 1; i < graphMap.size() - 1; ++i) {
@@ -52,6 +60,14 @@ public final class GraphMaker {
                     left = graphMap.get(i).get(j - 1);
 
 
+                    upperLeft = graphMap.get(i - 1).get(j - 1);
+                    upperRight = graphMap.get(i - 1).get(j + 1);
+
+                    lowerLeft = graphMap.get(i + 1).get(j - 1);
+                    lowerRight = graphMap.get(i + 1).get(j + 1);
+
+
+
                 if (tileData.getTile().equals(Tile.INVISIBLE)) {
 
 
@@ -63,6 +79,16 @@ public final class GraphMaker {
                         tileData.createConnections(right, 1);
                     if (left != null && left.getTile() == Tile.INVISIBLE )
                         tileData.createConnections(left, 1);
+
+
+                    if (upperLeft != null && upperLeft.getTile() == Tile.INVISIBLE )
+                        tileData.createConnections(upperLeft, 1);
+                    if (upperRight != null && upperRight.getTile() == Tile.INVISIBLE )
+                        tileData.createConnections(upperRight, 1);
+                    if (lowerLeft != null && lowerLeft.getTile() == Tile.INVISIBLE )
+                        tileData.createConnections(lowerLeft, 1);
+                    if (lowerRight != null && lowerRight.getTile() == Tile.INVISIBLE )
+                        tileData.createConnections(lowerRight, 1);
 
 
                 }
@@ -77,7 +103,7 @@ public final class GraphMaker {
 
         }
 
-        //System.out.println(listOfConnections);
+        System.out.println(listOfNodes.size);
         return listOfNodes;
 
     }
