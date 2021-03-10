@@ -9,9 +9,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
+import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.Level;
+import com.mygdx.game.Particles.ParticleManager;
+import com.mygdx.game.Particles.SlimeSploshion;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.HeuristicTile;
 import com.mygdx.game.Tiles.LineOfSight;
@@ -31,7 +34,6 @@ this enemey will attempt to hunt down the player and if hes within a certain rad
 
 public class FluVirus extends AbstractEnemy  {
 
-    private final Texture texture;
     private final Sprite sprite;
     private final Vector2 detectionLine;
     private final EntityLocation target;
@@ -77,12 +79,12 @@ public class FluVirus extends AbstractEnemy  {
 
 
         this.canColide = builder.canCollide;
-        texture = assetManager.manager.get(assetManager.fluVirus);
+
 
         slimeMoves = new Animation<TextureRegion>(1/12f, assetManager.manager.get(assetManager.slime).getRegions());
         slimeBlows = new Animation<TextureRegion>(1/12f, assetManager.manager.get(assetManager.slimeBlows).getRegions());
 
-        this.sprite = new Sprite(texture);
+        this.sprite = new Sprite(slimeBlows.getKeyFrame(0));
         this.position = new Vector2(getX(), getY());
 
 
@@ -166,6 +168,8 @@ public class FluVirus extends AbstractEnemy  {
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
 
+       // DebugDrawer.DrawDebugRectangle(getBoundingBox().x, getBoundingBox().y, getBoundingBox().getWidth(),getBoundingBox().height, Color.PURPLE, AbstractLevel.viewport.getCamera().combined);
+
         //drawDebugBox();
 
     }
@@ -201,10 +205,11 @@ public class FluVirus extends AbstractEnemy  {
             fuseTime += delta;
             sprite.setRegion(slimeBlows.getKeyFrame(fuseTime, false));
 
-            if (timeElapsed > 10f) {
+            if (fuseTime > 2.5f) {
 
                 dead = true;
                 fuseTime = 0;
+                ParticleManager.slimeBlowingUp.add(new SlimeSploshion(assetManager.manager.get(assetManager.slimeSploshion),fuseTime,getX() + getWidth()/2, getY() + getHeight()/2));
 
             }
 
@@ -258,12 +263,10 @@ public class FluVirus extends AbstractEnemy  {
 
     }
 
-    private void detonating(float timeElapsed) {
+    public void benShot() {
 
-        if (timeElapsed > fuseTime) {
-            timeElapsed = 0;
-        }
-
+        fuse = true;
+        drawPath = false;
     }
 
     @Override
@@ -311,6 +314,7 @@ public class FluVirus extends AbstractEnemy  {
                 return true;
             case (Messages.DETONATING) :
                 fuse = true;
+                drawPath = false;
                 return true;
             default:
                 return false;
@@ -349,5 +353,6 @@ public class FluVirus extends AbstractEnemy  {
         return dead;
 
     }
+
 
 }

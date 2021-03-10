@@ -172,9 +172,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
 
 
-        for (SanatizerBullet bullets : bullets) {
-            bullets.act(Gdx.graphics.getDeltaTime());
-        }
+
 
 
 
@@ -261,6 +259,7 @@ public class MainCharacter extends Actor implements EntityLocation {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
+        /*
         for (int i = 0; i < bullets.size(); ++i) {
             bullets.get(i).draw(batch,0);
 
@@ -284,17 +283,12 @@ public class MainCharacter extends Actor implements EntityLocation {
             splash.draw(batch);
 
         }
+        */
+
 
     }
 
-    private void bulletCollision(SanatizerBullet previousBullet, SanatizerBullet bullet) {
 
-        if (Intersector.overlaps(previousBullet.getBoundingBox(), bullet.getBoundingBox())) {
-            removedBullets.add(previousBullet);
-            removedBullets.add(bullet);
-        }
-
-    }
 
     public void drawDebugBox() {
 
@@ -454,7 +448,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 3f ,assetManager.manager.get(assetManager.bulletSprite))
+            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 2.2f ,assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(collisionMap).maxBounces(10)
                     .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
@@ -498,6 +492,12 @@ public class MainCharacter extends Actor implements EntityLocation {
     @Override
     public Location<Vector2> newLocation() {
         return null;
+    }
+
+    public LinkedList<SanatizerBullet> getBullets() {
+
+        return bullets;
+
     }
 
 

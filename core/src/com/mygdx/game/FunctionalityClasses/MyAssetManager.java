@@ -33,7 +33,10 @@ public class MyAssetManager {
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
     public AssetDescriptor<Texture> fluVirus = new AssetDescriptor<Texture>("spriteSheets/FluVirus.png", Texture.class);
     public AssetDescriptor<Texture> startScreen = new AssetDescriptor<Texture>("sprites/homescreen.png", Texture.class);
+
     public AssetDescriptor<TextureAtlas> splashBullet = new AssetDescriptor<TextureAtlas>("spriteSheets/bulletCollisionBubble.atlas", TextureAtlas.class);
+    public AssetDescriptor<TextureAtlas> slimeSploshion = new AssetDescriptor<>("spriteSheets/slimeDetonation.atlas", TextureAtlas.class);
+
     public AssetDescriptor<TextureAtlas> slimeBlows = new AssetDescriptor<TextureAtlas>("spriteSheets/slimeBlow.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> storeManager = new AssetDescriptor<Texture>("sprites/Manager.png", Texture.class);
 
@@ -72,6 +75,7 @@ public class MyAssetManager {
         manager.load(fluVirus);
         manager.load(splashBullet);
         manager.load(slimeBlows);
+        manager.load(slimeSploshion);
     }
 
     public void dispose() {

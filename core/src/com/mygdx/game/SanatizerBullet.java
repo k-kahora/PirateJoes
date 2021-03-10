@@ -268,10 +268,6 @@ public class SanatizerBullet extends AbstractBullet  {
             collisionLogic();
 
 
-        for (BulletSplash spruh : wallCollsions) {
-        }
-
-
         moveBy(velocity.x, velocity.y);
 
 

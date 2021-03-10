@@ -21,6 +21,7 @@ import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
+import com.mygdx.game.Viruses.Enemy;
 import com.mygdx.game.Viruses.FluVirus;
 import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
@@ -42,10 +43,9 @@ public class Level1 extends AbstractLevel {
     TileCollision wallCollider;
 
     Array<TileData> collisionTiles;
-    Array<FluVirus> groupOfViruses;
 
     private Slime slime;
-    private MainCharacter character;
+
     private FluVirus fluVirus;
     private final ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps;
 
@@ -59,36 +59,33 @@ public class Level1 extends AbstractLevel {
     @Override
     public void show() {
 
-        loadAssets();
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
         secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
         secondLayer.addLevel(this);
 
-        groupOfViruses = new Array<>();
 
-        character = new MainCharacter();
-        character.setPosition(32,32);
-        // adss teh collision map
+
+        // adss teh collision map for this level
         collisonMaps.add(secondLayer.getTileMap());
-        collisonMaps.add(getWalls().getTileMap());
 
+        // need this for every level so its clear what the charecter can interact with
         character.addTileMap(collisonMaps.get(0));
-        character.addTileMap(collisonMaps.get(1));
+
 
         Rectangle characterBoundingBox = character.getBoundingBox();
 
         collider = new TileCollision.Builder().calcCorners(characterBoundingBox).tileMap(secondLayer.getTileMap(), getWalls().getTileMap()).charecter(character).build();
-        // enables collision
+        // enables collision for this particular level want to add an abstract method that takes a collider and does all the work
         character.addCollider(collider);
 
         collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
         character.setPosition(200,200);
-        groupOfViruses.add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
-        groupOfViruses.add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
 
-        groupOfViruses.get(0).setPosition(32, 32);
-        groupOfViruses.get(1).setPosition(12, 32);
+        getFluViruses().get(0).setPosition(32, 32);
+        getFluViruses().get(1).setPosition(400, 32);
 
 
         // cast to a sterable
@@ -112,6 +109,8 @@ public class Level1 extends AbstractLevel {
     @Override
     public void render(float delta) {
 
+
+
         // when the char presses space
        timeElapsed += delta;
 
@@ -132,26 +131,12 @@ public class Level1 extends AbstractLevel {
         getWalls().draw(getPirateJoe().batch);
 //        slime.draw(pirateJoes.batch, 100);
 
-        character.draw(getPirateJoe().batch, 0);
 
-        character.act(Gdx.graphics.getDeltaTime());
 
-        for (BulletSplash a : ParticleManager.splashBullets) {
-            if (!a.isDone()) {
-                a.update(delta);
-                a.draw(getPirateJoe().batch);
-            }
 
-        }
 
-        for (FluVirus a : groupOfViruses) {
 
-            if (!a.isDead()) {
-                a.act(delta);
-                a.draw(getPirateJoe().batch, 0);
-            }
-
-        }
+        update(delta);
 
         getPirateJoe().batch.end();
         character.drawDebugBox();
@@ -173,10 +158,10 @@ public class Level1 extends AbstractLevel {
     public void initMessages() {
 
         // adds the flue virus as a listener
-        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(0 ), Messages.CHASE);
-        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(1 ), Messages.CHASE);
-        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(0 ), Messages.DETONATING);
-        getMessageDispatcherAI().addListener((Telegraph) groupOfViruses.get(1 ), Messages.DETONATING);
+        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(0 ), Messages.CHASE);
+        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(1 ), Messages.CHASE);
+        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(0 ), Messages.DETONATING);
+        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(1 ), Messages.DETONATING);
 
     }
 
@@ -246,7 +231,7 @@ public class Level1 extends AbstractLevel {
 
     public ArrayList<FluVirus> getEnemeyGroup() {
         ArrayList<FluVirus> steers = new ArrayList<>();
-        for (Actor a : groupOfViruses) {
+        for (FluVirus a : getFluViruses()) {
 
             steers.add((FluVirus)a);
 
