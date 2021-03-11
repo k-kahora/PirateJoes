@@ -10,6 +10,7 @@ import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,6 +21,7 @@ import com.mygdx.game.Levels.Level1;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.SteeringUtils;
+import sun.awt.image.ImageWatched;
 
 import java.util.*;
 
@@ -104,6 +106,9 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
             blendedSteering.calculateSteering(steeringOutput);
             applySteering(delta);
         }
+
+
+
     }
 
     @Override
@@ -297,4 +302,28 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     public Circle getDetectionCircle() {
         return detectionCircle;
     }
+
+    public LinkedList<SanatizerBullet> isHit(LinkedList<SanatizerBullet> bullets) {
+
+        LinkedList<SanatizerBullet> remove = new LinkedList<>()
+;
+        for (SanatizerBullet s : bullets) {
+
+            if (Intersector.overlaps(getBoundingBox(), s.getBoundingBox())) {
+
+                tagged = true;
+                remove.add(s);
+
+
+            }
+
+        }
+
+        return remove;
+
+    }
+
+    public abstract boolean isDead();
+    public abstract void setDetonationToInstant();
+    public abstract void setDeath();
 }

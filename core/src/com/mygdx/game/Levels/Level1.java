@@ -21,6 +21,7 @@ import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
+import com.mygdx.game.Viruses.AbstractEnemy;
 import com.mygdx.game.Viruses.Enemy;
 import com.mygdx.game.Viruses.FluVirus;
 import com.mygdx.game.utils.GraphMaker;
@@ -83,9 +84,13 @@ public class Level1 extends AbstractLevel {
         character.setPosition(200,200);
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
 
         getFluViruses().get(0).setPosition(32, 32);
         getFluViruses().get(1).setPosition(400, 32);
+        getFluViruses().get(2).setPosition(50, 32);
+        getFluViruses().get(3).setPosition(200, 32);
 
 
         // cast to a sterable
@@ -229,11 +234,11 @@ public class Level1 extends AbstractLevel {
         return collisonMaps;
     }
 
-    public ArrayList<FluVirus> getEnemeyGroup() {
-        ArrayList<FluVirus> steers = new ArrayList<>();
-        for (FluVirus a : getFluViruses()) {
+    public ArrayList<AbstractEnemy> getEnemeyGroup() {
+        ArrayList<AbstractEnemy> steers = new ArrayList<>();
+        for (AbstractEnemy a : getFluViruses()) {
 
-            steers.add((FluVirus)a);
+            steers.add(a);
 
         }
 

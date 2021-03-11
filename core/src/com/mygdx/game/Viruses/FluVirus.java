@@ -57,6 +57,7 @@ public class FluVirus extends AbstractEnemy  {
     private final float radiusDetection = 40f;
     private boolean fuse;
     private boolean dead;
+    private boolean instantDetonation = false;
     private float fuseTime = 0f;
 
 
@@ -127,11 +128,16 @@ public class FluVirus extends AbstractEnemy  {
 
         }
 
-        public Builder collisionInit(ArrayList<ArrayList<ArrayList<TileData>>> a) {
 
+        public Builder collisionInit(ArrayList<ArrayList<ArrayList<TileData>>> a) {
+/*
             fluVirusTileColliderMap = a;
-            canCollide = true;
+            canCollide = false;
             return this;
+            */
+
+            return this;
+
         }
 
         public Builder detectionCircle(Circle a) {
@@ -187,12 +193,13 @@ public class FluVirus extends AbstractEnemy  {
         //moveBy(velocity.x, velocity.y);
 
 
+        if (isTagged())
+            benShot();
 
 //        when the target is in range begin detonatiion
         // when out of reange reset fuse
         if (new Vector2(target.getX() - getX(), target.getY() - getY()).len() < radiusDetection) {
-            drawPath = false;
-            fuse = true;
+            benShot();
 
 
         } else {
@@ -205,7 +212,7 @@ public class FluVirus extends AbstractEnemy  {
             fuseTime += delta;
             sprite.setRegion(slimeBlows.getKeyFrame(fuseTime, false));
 
-            if (fuseTime > 2.5f) {
+            if (slimeBlows.isAnimationFinished(fuseTime) || instantDetonation) {
 
                 dead = true;
                 fuseTime = 0;
@@ -277,31 +284,25 @@ public class FluVirus extends AbstractEnemy  {
     @Override
     public void leftCollision(int x, int y) {
 
-        velocity.x = 0;
-        setPosition(fluVirusTileColliderMap.get(0).get(y).get(x).getLeftEdge() - getWidth(), getY());
+
 
     }
     // stupid bug I goot fix where I have to subtract 0.1f to get it out of the tile
     @Override
     public void bottomCollision(int x, int y) {
-        velocity.y = 0;
-        velocity.x = 1f;
-        setPosition(getX(), fluVirusTileColliderMap.get(0).get(y).get(x).getBottomEdge() - getHeight() - 0.1f);
+
 
     }
 
     @Override
     public void topCollision(int x, int y) {
-        velocity.y = 0;
-        velocity.x = 1f;
-        setPosition(getX(), fluVirusTileColliderMap.get(0).get(y).get(x).getTopEdge());
+
 
     }
 
     @Override
     public void rightCollision(int x,int y) {
-        velocity.x = 0;
-        setPosition(fluVirusTileColliderMap.get(0).get(y).get(x).getRightEdge(), getY());
+
 
     }
 
@@ -351,6 +352,16 @@ public class FluVirus extends AbstractEnemy  {
     public boolean isDead () {
 
         return dead;
+
+    }
+
+    public void setDeath() {
+        dead = true;
+    }
+
+    public void setDetonationToInstant() {
+
+        instantDetonation = true;
 
     }
 

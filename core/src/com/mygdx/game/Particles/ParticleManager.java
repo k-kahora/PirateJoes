@@ -1,7 +1,11 @@
 package com.mygdx.game.Particles;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Viruses.AbstractEnemy;
 
+
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,13 +27,13 @@ public class ParticleManager {
 
         }
     }
-    public static void updateSlimeSploshions (SpriteBatch batch, float delta) {
+    public static void updateSlimeSploshions (SpriteBatch batch, float delta,  Array<AbstractEnemy> abstractEnemies) {
 
 
         for (SlimeSploshion splash : ParticleManager.slimeBlowingUp) {
 
             if (!splash.isDone()) {
-                splash.update(delta);
+                splash.update(delta, abstractEnemies);
                 splash.draw(batch);
             }
 

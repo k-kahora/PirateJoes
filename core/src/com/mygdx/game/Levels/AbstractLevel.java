@@ -19,11 +19,13 @@ import com.mygdx.game.Particles.ParticleManager;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
+import com.mygdx.game.Viruses.AbstractEnemy;
 import com.mygdx.game.Viruses.Enemy;
 import com.mygdx.game.Viruses.FluVirus;
 import com.mygdx.game.utils.Messages;
 import sun.awt.image.ImageWatched;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /*
@@ -51,7 +53,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private OrthographicCamera camera;
     private TileEditor wallsMaker;
 
-    private Array<FluVirus> groupOfViruses;
+    private Array<AbstractEnemy> groupOfViruses;
+    private Array<AbstractEnemy> killedViruses;
+
     public final MainCharacter character;
 
     public static FillViewport viewport;
@@ -87,6 +91,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
 
         groupOfViruses = new Array<>();
+        killedViruses = new Array<>();
+
         character = new MainCharacter();
         character.setPosition(32,32);
 
@@ -156,15 +162,20 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         character.act(Gdx.graphics.getDeltaTime());
 
 
-        for (FluVirus a : groupOfViruses) {
+        for (AbstractEnemy a : groupOfViruses) {
 
-            if (!a.isDead()) {
-                a.act(delta);
-                a.draw(getPirateJoe().batch, 0);
-            }
+            a.act(delta);
+            a.draw(getPirateJoe().batch, 0);
+            removedBullets.addAll(a.isHit(bullets));
+
+
+
+            if (a.isDead())
+                killedViruses.add(a);
 
         }
 
+        groupOfViruses.removeAll(killedViruses, false);
 
         for (int i = 0; i < bullets.size(); ++i) {
 
@@ -191,11 +202,11 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
 
         ParticleManager.updateBulletSplashes(getPirateJoe().batch, delta);
-        ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta);
+        ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta, groupOfViruses);
 
     }
 
-    public Array<FluVirus> getFluViruses() {
+    public Array<AbstractEnemy> getFluViruses() {
 
         return groupOfViruses;
 
@@ -207,17 +218,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
             removedBullets.add(previousBullet);
             removedBullets.add(bullet);
         }
-
-
-        for (FluVirus a : groupOfViruses) {
-
-            if (Intersector.overlaps(bullet.getBoundingBox(), a.getBoundingBox())) {
-                removedBullets.add(bullet);
-                a.benShot();
-            }
-
-        }
-
 
     }
 
