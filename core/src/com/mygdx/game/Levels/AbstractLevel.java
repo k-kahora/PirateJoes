@@ -175,6 +175,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         }
 
+
+
         groupOfViruses.removeAll(killedViruses, false);
 
         for (int i = 0; i < bullets.size(); ++i) {
@@ -202,7 +204,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
 
         ParticleManager.updateBulletSplashes(getPirateJoe().batch, delta);
-        ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta, groupOfViruses);
+        ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta, groupOfViruses, character);
 
     }
 

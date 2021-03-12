@@ -156,17 +156,12 @@ public class FluVirus extends AbstractEnemy  {
     }
 
 
-    @Override
-    public boolean initRayCollision() {
 
        // RaycastCollisionDetector<Vector2> collisionDetector = obstacleBehavior.getRaycastCollisionDetector();
 
        // obstacleBehavior.setRaycastCollisionDetector(new RayCollisionDetection<Vector2>(fluVirusTileColliderMap.get(0), chase));
 
 
-        return false;
-
-    }
 
 
 

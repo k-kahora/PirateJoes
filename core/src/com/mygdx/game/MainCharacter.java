@@ -61,6 +61,8 @@ public class MainCharacter extends Actor implements EntityLocation {
     public float xBeforeVector;
     public float yBeforeVector;
 
+    private Vector2 centerPosition = new Vector2();
+
     Sprite sprite;
 
     TextureAtlas textureRight;
@@ -154,6 +156,9 @@ public class MainCharacter extends Actor implements EntityLocation {
         xBeforeVector = getX();
         position.x = getX();
         position.y = getY();
+
+        centerPosition.x = getX() + getWidth() / 2;
+        centerPosition.y = getY() + getHeight() / 2;
 
         keys();
 
@@ -448,7 +453,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 2.2f ,assetManager.manager.get(assetManager.bulletSprite))
+            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 4f ,assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(collisionMap).maxBounces(10)
                     .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
@@ -497,6 +502,12 @@ public class MainCharacter extends Actor implements EntityLocation {
     public LinkedList<SanatizerBullet> getBullets() {
 
         return bullets;
+
+    }
+
+    public Vector2 getCenterPosition() {
+
+        return centerPosition;
 
     }
 

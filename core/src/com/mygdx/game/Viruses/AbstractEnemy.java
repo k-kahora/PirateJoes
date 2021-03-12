@@ -66,9 +66,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     }
 
-    public abstract boolean handleMessage(Telegram telegram);
 
-    public abstract boolean initRayCollision();
+
 
     // must be supered by extended classes to set a boundingBox;
     @Override
@@ -326,4 +325,5 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     public abstract boolean isDead();
     public abstract void setDetonationToInstant();
     public abstract void setDeath();
+    public abstract boolean handleMessage(Telegram telegram);
 }
