@@ -20,6 +20,9 @@ import com.mygdx.game.utils.SteeringUtils;
 import org.w3c.dom.css.Rect;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class WanderVirus extends AbstractEnemy{
 
@@ -28,7 +31,13 @@ public class WanderVirus extends AbstractEnemy{
     private final Seek<Vector2> seekPoint;
     private final EntityLocation target;
     private boolean seeking = false;
-    private float timeElapsed = 0;
+    private boolean canShoot = false;
+
+    private Queue<SanatizerBullet> testBullets = new LinkedList<>();
+    private SanatizerBullet a = null;
+    private ArrayList<SanatizerBullet> removedBullets = new ArrayList<>();
+
+    private float timeElapsed = 0, timeElapsed2 = 0;
 
     private Vector2 shotLine = new Vector2();
 
@@ -107,24 +116,77 @@ public class WanderVirus extends AbstractEnemy{
             wander.calculateSteering(steeringOutput);
         //}
 
-
         shotLine.x = target.getX() - getX();
         shotLine.y = target.getY() - getY();
 
-        System.out.println(target.getPosition() + " Heres the target");
-
         timeElapsed += delta;
+        timeElapsed2 += delta;
 
-        if (timeElapsed > 3f) {
+        if (timeElapsed > 0.2f) {
 
-            getVirusBullets().add( new SanatizerBullet.Builder(getX(), getY(), new Vector2(shotLine.x, shotLine.y), 2.1f ,assetManager.manager.get(assetManager.bulletSprite))
-                    .initCollision(tileDataMap).maxBounces(1)
-                    .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+            testBullets.add( new SanatizerBullet.Builder(getX(), getY(), new Vector2(shotLine.x, shotLine.y), 15f ,assetManager.manager.get(assetManager.bulletSprite))
+                    .initCollision(tileDataMap).maxBounces(0)
+                    .build());
 
             timeElapsed = 0;
 
 
         }
+
+
+
+
+
+        if (testBullets.peek() != null) {
+
+            a = testBullets.element();
+
+            if (a.remove) {
+
+
+                canShoot = false;
+
+            }
+
+            else if (new Vector2(a.getX() - target.getX(), a.getY() - target.getY()).len() < 15f) {
+
+
+
+                canShoot = true;
+
+                a.playerHit = true;
+
+            }
+
+
+
+        }
+
+        System.out.println(canShoot);
+
+        if (canShoot) {
+
+            // add random time elapsed
+            if (timeElapsed2 > 0.8) {
+
+                getVirusBullets().add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(shotLine.x, shotLine.y), 2.1f, assetManager.manager.get(assetManager.bulletSprite))
+                        .initCollision(tileDataMap).maxBounces(1)
+                        .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+
+                timeElapsed2 = 0;
+            }
+
+
+
+        }
+
+        if (a.remove || a.playerHit) {
+
+            removedBullets.add(a);
+
+        }
+
+
 
 
 
@@ -205,6 +267,18 @@ public class WanderVirus extends AbstractEnemy{
     @Override
     public void draw(Batch batch, float parentAlpha) {
         spr.draw(batch);
+
+        for (SanatizerBullet a : testBullets) {
+
+            //a.draw(batch,1);
+            a.act(1f);
+
+
+
+        }
+
+        testBullets.removeAll(removedBullets);
+
     }
 
     @Override

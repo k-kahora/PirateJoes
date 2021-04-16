@@ -23,7 +23,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
     private boolean collided = false;
     private final float x,y,speed;
-    public boolean remove, outOfBounds;
+    public boolean remove, outOfBounds, playerHit = false;
     private final boolean canCollide, testBullet;
     private Rectangle rectangle;
     private final Sprite sprite;
@@ -183,6 +183,7 @@ public class SanatizerBullet extends AbstractBullet  {
     public void bottomCollision(int x, int y) {
         velocity.y *= -1;
         //rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
+        if (atlas != null)
         ParticleManager.splashBullets.add(new BulletSplash(atlas,180,0, getX() + getWidth() / 2, getY()));
         addNumOfBounces();
     }
@@ -193,6 +194,8 @@ public class SanatizerBullet extends AbstractBullet  {
     public void topCollision(int x, int y) {
         velocity.y *= -1;
         //rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
+
+        if (atlas != null)
         ParticleManager.splashBullets.add(new BulletSplash(atlas,0,0, getX() + getWidth() / 2, getY()));
 
         addNumOfBounces();
@@ -203,6 +206,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
         velocity.x *= -1;
         //rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), getY());
+        if (atlas != null)
         ParticleManager.splashBullets.add(new BulletSplash(atlas,-90,0, getX() + getWidth() / 2, getY()));
         addNumOfBounces();
 
@@ -214,6 +218,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
         velocity.x *= -1;
         //rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), getY());
+        if (atlas != null)
         ParticleManager.splashBullets.add(new BulletSplash(atlas,90,0, getX() + getWidth() / 2, getY()));
         addNumOfBounces();
     }
