@@ -90,7 +90,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         numTimesFired = 0;
         removedBullets = new LinkedList<>();
 
-        maxSpeed = 2.5f;
+        maxSpeed = 1f;
         friction = 0.05f;
         acceleration = 0.04f;
 
@@ -453,7 +453,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 4f ,assetManager.manager.get(assetManager.bulletSprite))
+            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 2.1f ,assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(collisionMap).maxBounces(10)
                     .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 

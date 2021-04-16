@@ -1,34 +1,215 @@
 package com.mygdx.game.Viruses;
 
+import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.steer.behaviors.*;
+import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.FunctionalityClasses.Entity;
+import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.Level;
+import com.mygdx.game.SanatizerBullet;
+import com.mygdx.game.Tiles.TileCollision;
+import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.utils.SteeringUtils;
+import org.w3c.dom.css.Rect;
+
+import java.util.ArrayList;
 
 public class WanderVirus extends AbstractEnemy{
 
+    private final Sprite spr;
+    private final Wander<Vector2> wander;
+    private final Seek<Vector2> seekPoint;
+    private final EntityLocation target;
+    private boolean seeking = false;
+    private float timeElapsed = 0;
+
+    private Vector2 shotLine = new Vector2();
+
+    private final Rectangle rectangle;
+
+    public final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
+
+    private final TileCollision tileCollider;
+    private final BoundingPoint local;
+
+    private Arrive<Vector2> seek;
 
     private WanderVirus(Builder builder) {
         super(builder.target, builder.currentLevel);
+        this.spr = new Sprite(assetManager.manager.get(assetManager.fluVirus));
+        setBounds(getX(), getY(), spr.getWidth(), spr.getHeight());
+        //this.seek = new Arrive<Vector2>(this,(Location)builder.target).setTimeToTarget(1f).setArrivalTolerance(2f).setDecelerationRadius(80f).setEnabled(true);
+
+        this.target = builder.target;
+        this.local = new BoundingPoint(30f);
+
+        rectangle = new Rectangle(getX(), getY(), getWidth(), getHeight());
+        maxLinearAcceleration = 40f;
+        maxSpeed = 80f;
+        setMaxAngularAcceleration(500f);
+        setMaxAngularSpeed(100f);
+
+        this.wander = new Wander<>(this).setWanderRate(MathUtils.PI * 4).setEnabled(true).setFaceEnabled(false).setWanderRadius(80f).setWanderOffset(0);
+        this.seekPoint = new Seek<Vector2>(this, local).setEnabled(true);
+
+        blendedSteering.add(new BlendedSteering.BehaviorAndWeight<>(wander, 0.8f));
+        // blendedSteering.add(new BlendedSteering.BehaviorAndWeight<>(wander, 2f));
+
+        System.out.println(wander.getInternalTargetPosition());
+        velocity = new Vector2();
+        this.tileDataMap = builder.tileDataMap;
+
+        this.tileCollider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
     }
 
     public static class Builder {
 
         private final Level currentLevel;
-        private final Entity target;
+        private final EntityLocation target;
+        private final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
 
-        Builder(Entity target, Level currentLevel) {
+        public Builder(EntityLocation target, Level currentLevel, ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap) {
 
+            this.tileDataMap = tileDataMap;
             this.currentLevel = currentLevel;
             this.target = target;
 
         }
 
-        WanderVirus build() {
+        public WanderVirus build() {
 
             return new WanderVirus(this);
 
         }
 
+    }
+
+    @Override
+    public void act(float delta) {
+        GdxAI.getTimepiece().update(delta);
+        //update(delta);
+        // seekPoint.calculateSteering(steeringOutput);
+
+
+       // if (new Vector2(getX() - local.position.x, getY() - local.position.y).len() > local.radius) {
+
+            //seeking = true;
+            //seekPoint.calculateSteering(steeringOutput);
+
+       // } else if (!seeking) {
+            wander.calculateSteering(steeringOutput);
+        //}
+
+
+        shotLine.x = target.getX() - getX();
+        shotLine.y = target.getY() - getY();
+
+        System.out.println(target.getPosition() + " Heres the target");
+
+        timeElapsed += delta;
+
+        if (timeElapsed > 3f) {
+
+            getVirusBullets().add( new SanatizerBullet.Builder(getX(), getY(), new Vector2(shotLine.x, shotLine.y), 2.1f ,assetManager.manager.get(assetManager.bulletSprite))
+                    .initCollision(tileDataMap).maxBounces(1)
+                    .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+
+            timeElapsed = 0;
+
+
+        }
+
+
+
+
+        seeking = getX() - local.position.x < 1f && getY() - local.position.y < 1f ? false : true;
+
+
+
+        steeringOutput.linear.scl(delta);
+        // System.out.println(steeringOutput.linear);
+        this.velocity.x = steeringOutput.linear.x;
+        this.velocity.y = steeringOutput.linear.y;
+        //moveBy(this.velocity.x, this.velocity.y);
+
+
+        //velocity.scl(0.8f);
+
+
+
+        rectangle.x = getX();
+        rectangle.y = getY();
+
+        collisionLogic();
+        //local.updateLocation((int)getX(), (int)getY());
+       // moveBy(0.5f, 2f);
+
+    }
+
+    public class BoundingPoint implements Location<Vector2> {
+
+        private final Vector2 position;
+        private final float radius;
+
+        public BoundingPoint(float radius) {
+
+            System.out.println(WanderVirus.this.getX() + " " + WanderVirus.this.getY());
+
+            position = new Vector2(200,200);
+            this.radius = radius;
+        }
+
+        @Override
+        public Vector2 getPosition() {
+            return position;
+        }
+
+        @Override
+        public float getOrientation() {
+            return 0;
+        }
+
+        @Override
+        public void setOrientation(float orientation) {
+
+        }
+
+        @Override
+        public float vectorToAngle(Vector2 vector) {
+            return SteeringUtils.vectorToAngle(vector);
+        }
+
+        @Override
+        public Vector2 angleToVector(Vector2 outVector, float angle) {
+            return SteeringUtils.angleToVector(outVector, angle);
+        }
+
+        @Override
+        public Location<Vector2> newLocation() {
+            return null;
+        }
+
+        public void updateLocation(int x, int y) {
+            this.position.x = x;
+            this.position.y = y;
+        }
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        spr.draw(batch);
+    }
+
+    @Override
+    protected void positionChanged() {
+        spr.setPosition(getX(), getY());
     }
 
     @Override
@@ -49,5 +230,48 @@ public class WanderVirus extends AbstractEnemy{
     @Override
     public boolean handleMessage(Telegram telegram) {
         return false;
+    }
+
+    @Override
+    public boolean collisionLogic() {
+
+        if (tileCollider.tileHorizontal(velocity)) {
+
+            moveBy(velocity.x, 0);
+        }
+        if (tileCollider.tileVertical(velocity)) {
+
+            moveBy(0,velocity.y);
+        }
+        return false;
+
+
+
+    }
+
+
+    @Override
+    public void bottomCollision(int x, int y) {
+        // getBoundingBox().setPosition(x, tileDataMap.get(0).get(y).get(x).getBottomEdge() - getWidth());
+        // rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
+
+        //setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
+    }
+
+    @Override
+    public void topCollision(int x, int y) {
+        //rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
+        //setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
+    }
+
+    @Override
+    public void rightCollision(int x, int y) {
+        setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), rectangle.getY());
+        velocity.x = 0;
+    }
+
+    @Override
+    public void leftCollision(int x, int y) {
+        setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), rectangle.getY());
     }
 }

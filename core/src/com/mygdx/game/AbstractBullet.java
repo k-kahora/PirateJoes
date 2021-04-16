@@ -16,6 +16,7 @@ public abstract class AbstractBullet extends Actor implements Entity {
     public final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
     final Rectangle defaultRectangle;
 
+
     public AbstractBullet(ArrayList<ArrayList<ArrayList<TileData>>> a, Vector2 direction) {
 
         velocity = direction.nor().scl(10f);
@@ -31,8 +32,6 @@ public abstract class AbstractBullet extends Actor implements Entity {
         velocity = new Vector2();
         tileDataMap = a;
         defaultRectangle = new Rectangle();
-
-
 
     }
 

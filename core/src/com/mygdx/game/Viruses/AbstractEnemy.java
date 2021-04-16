@@ -33,7 +33,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     public  MyAssetManager assetManager = new MyAssetManager();
     Entity target;
     Vector2 velocity;
-    final Deque<SanatizerBullet> virusBullets;
+    private LinkedList<SanatizerBullet> virusBullets;
     final List<SanatizerBullet> removeBullets;
     final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
     final Circle detectionCircle;
@@ -46,7 +46,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
 
 
-    public AbstractEnemy(Entity target, Level currentLevel) {
+    public AbstractEnemy(EntityLocation target, Level currentLevel) {
         this.target = target;
         this.detectionCircle = new Circle();
         this.boundingBox = new Rectangle();
@@ -87,6 +87,9 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     float angularVelocity;
     float maxSpeed;
     float maxLinearAcceleration;
+    float maxAngularSpeed;
+    float maxAngularAccel;
+
     boolean independentFacing;
 
     private float linearSpeedThreshold;
@@ -101,9 +104,14 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
             setBoundingBox(getX(), getY(), getWidth(), getHeight());
 
         }
+
+
+
+        blendedSteering.calculateSteering(steeringOutput);
+        applySteering(delta);
+
         if (blendedSteering != null) {
-            blendedSteering.calculateSteering(steeringOutput);
-            applySteering(delta);
+
         }
 
 
@@ -114,13 +122,15 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     public final void applySteering(float delta) {
         boolean anyAccerlaeration = false;
 
+        steeringOutput.linear.scl(delta);
+        velocity.x = steeringOutput.linear.x;
+        velocity.y = steeringOutput.linear.y;
+        moveBy(velocity.x, velocity.y);
+        anyAccerlaeration = true;
+
         // if there is a steeringOutput velocity then apply
         if (!steeringOutput.linear.isZero()) {
-            steeringOutput.linear.scl(delta);
-            velocity.x = steeringOutput.linear.x;
-            velocity.y = steeringOutput.linear.y;
-            moveBy(velocity.x, velocity.y);
-            anyAccerlaeration = true;
+
         }
 
         // makes sure the linear speed never exceed the maxSpeed
@@ -206,17 +216,17 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     @Override
     public void setMaxAngularSpeed(float maxAngularSpeed) {
-
+        this.maxAngularSpeed = maxAngularSpeed;
     }
 
     @Override
     public float getMaxAngularAcceleration() {
-        return 10f;
+        return maxAngularAccel;
     }
 
     @Override
     public void setMaxAngularAcceleration(float maxAngularAcceleration) {
-
+        this.maxAngularAccel = maxAngularAcceleration;
     }
 
     @Override
@@ -293,9 +303,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     }
 
 
-    public void shoot(Vector2 direction, float velocity) {
-        virusBullets.add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(direction.x, direction.y), velocity,assetManager.manager.get(assetManager.bulletSprite)).maxBounces(2).initCollision(fluVirusTileColliderMap).build());
-    }
+
 
 
     public Circle getDetectionCircle() {
@@ -322,8 +330,22 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     }
 
+    public LinkedList<SanatizerBullet> getVirusBullets() {
+
+        return virusBullets;
+
+    }
+
+    public void clearBullets() {
+
+        virusBullets.clear();
+
+    }
+
+
     public abstract boolean isDead();
     public abstract void setDetonationToInstant();
     public abstract void setDeath();
     public abstract boolean handleMessage(Telegram telegram);
+
 }

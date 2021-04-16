@@ -21,9 +21,7 @@ import com.mygdx.game.Slime;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
-import com.mygdx.game.Viruses.AbstractEnemy;
-import com.mygdx.game.Viruses.Enemy;
-import com.mygdx.game.Viruses.FluVirus;
+import com.mygdx.game.Viruses.*;
 import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
 
@@ -69,9 +67,10 @@ public class Level1 extends AbstractLevel {
         // adss teh collision map for this level
         collisonMaps.add(secondLayer.getTileMap());
 
+
         // need this for every level so its clear what the charecter can interact with
         character.addTileMap(collisonMaps.get(0));
-
+        collisonMaps.add(getWalls().getTileMap());
 
         Rectangle characterBoundingBox = character.getBoundingBox();
 
@@ -86,11 +85,13 @@ public class Level1 extends AbstractLevel {
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).build());
 
         getFluViruses().get(0).setPosition(32, 32);
         getFluViruses().get(1).setPosition(400, 32);
         getFluViruses().get(2).setPosition(50, 32);
         getFluViruses().get(3).setPosition(200, 32);
+        getFluViruses().get(4).setPosition(240, 200);
 
 
         // cast to a sterable

@@ -164,9 +164,16 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         for (AbstractEnemy a : groupOfViruses) {
 
+
+
             a.act(delta);
             a.draw(getPirateJoe().batch, 0);
             removedBullets.addAll(a.isHit(bullets));
+
+
+                bullets.addAll(a.getVirusBullets());
+                a.clearBullets();
+
 
 
 
@@ -179,10 +186,21 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         groupOfViruses.removeAll(killedViruses, false);
 
+
+
         for (int i = 0; i < bullets.size(); ++i) {
 
             if (i != 0) {
-                bulletCollision(bullets.get(i - 1), bullets.get(i));
+
+                for (SanatizerBullet bullet: bullets) {
+
+                    // never refrences the same bullet
+                    if (bullet != bullets.get(i))
+                        bulletCollision(bullet, bullets.get(i));
+
+                }
+
+
             }
 
             bullets.get(i).draw(getPirateJoe().batch,0);
@@ -195,7 +213,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
 
             if (bullets.get(i).remove) {
-                removedBullets.add(bullets.get(0));
+                removedBullets.add(bullets.get(i));
             }
             bullets.get(i).act(Gdx.graphics.getDeltaTime());
         }

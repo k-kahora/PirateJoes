@@ -91,8 +91,8 @@ public class FluVirus extends AbstractEnemy  {
 
         this.splashAtlas = assetManager.manager.get(assetManager.splashBullet);
 
-        maxSpeed = 400f;
-        maxLinearAcceleration = 60f;
+        maxSpeed = 600f;
+        maxLinearAcceleration = 70f;
         this.getDetectionLine = new Vector2();
 
         chase = new IndexedAStarPathFinder<TileData>(getLevel());
@@ -174,6 +174,8 @@ public class FluVirus extends AbstractEnemy  {
         //drawDebugBox();
 
     }
+
+
 
     @Override
     public void act(float delta) {

@@ -31,7 +31,7 @@ public class SlimeSploshion extends Sprite {
         this.x = x;
         this.y = y;
 
-        animation = new Animation<TextureRegion>(1/8f,atlas.getRegions());
+        animation = new Animation<TextureRegion>(1/80f,atlas.getRegions());
         this.timeElapsed = timeElapsed;
 
 
@@ -73,7 +73,6 @@ public class SlimeSploshion extends Sprite {
 
         distance = (float)Math.sqrt(Math.pow((character.getCenterPosition().x - centerX),2) + Math.pow((character.getCenterPosition().y - centerY),2));
 
-        System.out.println(distance);
 
         if (distance < killradius) {
 
