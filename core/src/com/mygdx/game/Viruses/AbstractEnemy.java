@@ -80,6 +80,15 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     }
 
+    public void setBoundingBox(Rectangle rect) {
+
+        boundingBox.x = rect.getX();
+        boundingBox.y = rect.getY();
+        boundingBox.width = rect.getWidth();
+        boundingBox.height = rect.getHeight();
+
+    }
+
 
     Vector2 position;
     float orientation;
@@ -110,9 +119,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         blendedSteering.calculateSteering(steeringOutput);
         applySteering(delta);
 
-        if (blendedSteering != null) {
 
-        }
 
 
 
@@ -316,7 +323,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 ;
         for (SanatizerBullet s : bullets) {
 
-            if (Intersector.overlaps(getBoundingBox(), s.getBoundingBox())) {
+            if (s.isLethal && Intersector.overlaps(getBoundingBox(), s.getBoundingBox())) {
 
                 tagged = true;
                 remove.add(s);

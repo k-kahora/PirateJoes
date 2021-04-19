@@ -28,10 +28,12 @@ public class WanderVirus extends AbstractEnemy{
 
     private final Sprite spr;
     private final Wander<Vector2> wander;
+    private final Seek<Vector2> seek;
+
     private final Seek<Vector2> seekPoint;
     private final EntityLocation target;
     private boolean seeking = false;
-    private boolean canShoot = false;
+    private boolean canShoot = false, dead = false;
 
     private Queue<SanatizerBullet> testBullets = new LinkedList<>();
     private SanatizerBullet a = null;
@@ -48,7 +50,6 @@ public class WanderVirus extends AbstractEnemy{
     private final TileCollision tileCollider;
     private final BoundingPoint local;
 
-    private Arrive<Vector2> seek;
 
     private WanderVirus(Builder builder) {
         super(builder.target, builder.currentLevel);
@@ -65,8 +66,9 @@ public class WanderVirus extends AbstractEnemy{
         setMaxAngularAcceleration(500f);
         setMaxAngularSpeed(100f);
 
-        this.wander = new Wander<>(this).setWanderRate(MathUtils.PI * 4).setEnabled(true).setFaceEnabled(false).setWanderRadius(80f).setWanderOffset(0);
+        this.wander = new Wander<>(this).setWanderRate(MathUtils.PI * 8).setEnabled(true).setFaceEnabled(false).setWanderRadius(10f).setWanderOffset(0);
         this.seekPoint = new Seek<Vector2>(this, local).setEnabled(true);
+        this.seek = new Seek<>(this, target).setEnabled(true);
 
         blendedSteering.add(new BlendedSteering.BehaviorAndWeight<>(wander, 0.8f));
         // blendedSteering.add(new BlendedSteering.BehaviorAndWeight<>(wander, 2f));
@@ -102,6 +104,7 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public void act(float delta) {
+        //update(delta);
         GdxAI.getTimepiece().update(delta);
         //update(delta);
         // seekPoint.calculateSteering(steeringOutput);
@@ -113,7 +116,7 @@ public class WanderVirus extends AbstractEnemy{
             //seekPoint.calculateSteering(steeringOutput);
 
        // } else if (!seeking) {
-            wander.calculateSteering(steeringOutput);
+
         //}
 
         shotLine.x = target.getX() - getX();
@@ -134,8 +137,9 @@ public class WanderVirus extends AbstractEnemy{
         }
 
 
-
-
+        // if shot
+        if (isTagged())
+            setDeath();
 
         if (testBullets.peek() != null) {
 
@@ -162,7 +166,7 @@ public class WanderVirus extends AbstractEnemy{
 
         }
 
-        System.out.println(canShoot);
+
 
         if (canShoot) {
 
@@ -176,9 +180,9 @@ public class WanderVirus extends AbstractEnemy{
                 timeElapsed2 = 0;
             }
 
-
-
         }
+
+        wander.calculateSteering(steeringOutput);
 
         if (a.remove || a.playerHit) {
 
@@ -208,6 +212,8 @@ public class WanderVirus extends AbstractEnemy{
 
         rectangle.x = getX();
         rectangle.y = getY();
+
+        setBoundingBox(rectangle);
 
         collisionLogic();
         //local.updateLocation((int)getX(), (int)getY());
@@ -288,7 +294,7 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public boolean isDead() {
-        return false;
+        return dead;
     }
 
     @Override
@@ -298,8 +304,10 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public void setDeath() {
-
+        dead = true;
     }
+
+
 
     @Override
     public boolean handleMessage(Telegram telegram) {
@@ -340,12 +348,12 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public void rightCollision(int x, int y) {
-        setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), rectangle.getY());
-        velocity.x = 0;
+        //setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), rectangle.getY());
+        //velocity.x = 0;
     }
 
     @Override
     public void leftCollision(int x, int y) {
-        setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), rectangle.getY());
+        //setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), rectangle.getY());
     }
 }

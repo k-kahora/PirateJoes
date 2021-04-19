@@ -189,7 +189,6 @@ public class FluVirus extends AbstractEnemy  {
 
         //moveBy(velocity.x, velocity.y);
 
-
         if (isTagged())
             benShot();
 

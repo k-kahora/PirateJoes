@@ -23,7 +23,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
     private boolean collided = false;
     private final float x,y,speed;
-    public boolean remove, outOfBounds, playerHit = false;
+    public boolean remove, outOfBounds, playerHit = false, isLethal = false;
     private final boolean canCollide, testBullet;
     private Rectangle rectangle;
     private final Sprite sprite;
@@ -31,7 +31,7 @@ public class SanatizerBullet extends AbstractBullet  {
     private final int maxBounces;
     private final int mapIndex;
 
-    private float timeElapsed;
+    private float timeElapsed, distanceTraveled = 0.5f;
 
     private Animation<TextureRegion> splash;
     private TextureAtlas atlas;
@@ -254,6 +254,18 @@ public class SanatizerBullet extends AbstractBullet  {
         rectangle.y = getY();
 
         timeElapsed += delta;
+
+        // after bullet travele 10 pixels its lethal
+
+        //System.out.println(timeElapsed * velocity.len() + " the distance");
+
+        // make sthe bullet useless until it travels a min Distance
+        if (timeElapsed * speed > distanceTraveled) {
+
+            isLethal = true;
+
+        }
+
 
 
         // only two bouces max

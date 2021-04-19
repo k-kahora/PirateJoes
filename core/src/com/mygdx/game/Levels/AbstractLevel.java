@@ -164,15 +164,12 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         for (AbstractEnemy a : groupOfViruses) {
 
-
-
             a.act(delta);
             a.draw(getPirateJoe().batch, 0);
             removedBullets.addAll(a.isHit(bullets));
 
-
-                bullets.addAll(a.getVirusBullets());
-                a.clearBullets();
+            bullets.addAll(a.getVirusBullets());
+            a.clearBullets();
 
 
 
@@ -208,6 +205,12 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
             if (bullets.get(i).collided()) {
                 ParticleManager.splashBullets.addAll(bullets.get(i).getSplashAnimation());
                 bullets.get(i).resetCollision();
+            }
+
+            if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
+
+                Gdx.app.exit();
+
             }
 
 
