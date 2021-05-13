@@ -63,7 +63,6 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         blendedSteering = new BlendedSteering<>(this);
         this.removeBullets = new LinkedList<>();
 
-
     }
 
 
@@ -327,7 +326,6 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
                 tagged = true;
                 remove.add(s);
-
 
             }
 

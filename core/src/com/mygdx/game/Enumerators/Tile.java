@@ -4,23 +4,21 @@ import java.util.EnumSet;
 
 public enum Tile {
 
-
-
     AIR("tile_map1", EnumSet.of(Collisions.BOTTOM),false),
     GRASS("tile_map2",EnumSet.of(Collisions.BOTTOM),false),
     STONE("tile_map3",  EnumSet.of(Collisions.BOTTOM),false),
-    DOOR("collision_tile1",  EnumSet.of(Collisions.BOTTOM),false),
-    BASKET_FULL("collision_tile3",EnumSet.of(Collisions.SOLID, Collisions.SOLID),false),
-    INVISIBLE("collision_tile2", EnumSet.of(Collisions.NONE),false),
+    DOOR("barrier10",  EnumSet.of(Collisions.BOTTOM),false),
+    BASKET_FULL("barrier10",EnumSet.of(Collisions.SOLID, Collisions.SOLID),false),
+    INVISIBLE("barrier1", EnumSet.of(Collisions.NONE),false),
 
-    LEFT_WALL("collision_tile4"),
-    RIGHT_WALL("collision_tile5"),
-    BOTTOM_WALL("collision_tile6"),
-    TOP_WALL("collision_tile7"),
-    TOP_RIGHT_WALL("collision_tile8"),
-    TOP_LEFT_WALL("collision_tile9"),
-    BOTTOM_LEFT_WALL("collision_tile10"),
-    BOTTOM_RIGHT_WALL("collision_tile11"),
+    LEFT_WALL("barrier2"),
+    RIGHT_WALL("barrier3"),
+    BOTTOM_WALL("barrier4"),
+    TOP_WALL("barrier5"),
+    TOP_RIGHT_WALL("barrier6"),
+    TOP_LEFT_WALL("barrier7"),
+    BOTTOM_LEFT_WALL("barrier8"),
+    BOTTOM_RIGHT_WALL("barrier9"),
 
     NULL();
 
@@ -30,7 +28,7 @@ public enum Tile {
     private EnumSet<Collisions> set;
 
     private Tile() {
-        this.atlasReference = "collision_tile2";
+        this.atlasReference = "barrier1";
         this.set = EnumSet.of(Collisions.NONE);
         this.interact = false;
     }

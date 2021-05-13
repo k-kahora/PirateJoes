@@ -59,14 +59,14 @@ public class Level1 extends AbstractLevel {
     public void show() {
 
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
-        secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().collisionMap));
+        secondLayer = new TileEditor("interact.txt", getAssetManager().manager.get(getAssetManager().bruh));
+
+        setRender();
+
         secondLayer.addLevel(this);
-
-
 
         // adss teh collision map for this level
         collisonMaps.add(secondLayer.getTileMap());
-
 
         // need this for every level so its clear what the charecter can interact with
         character.addTileMap(collisonMaps.get(0));
@@ -93,10 +93,11 @@ public class Level1 extends AbstractLevel {
         getFluViruses().get(3).setPosition(200, 32);
         getFluViruses().get(4).setPosition(240, 200);
 
-
         // cast to a sterable
         // calls this so all Flu viruses have enabled AI
         initMessages();
+
+        System.out.println("after init");
 
 
 
@@ -113,61 +114,16 @@ public class Level1 extends AbstractLevel {
     }
 
     @Override
-    public void render(float delta) {
-
-
-
-        // when the char presses space
-       timeElapsed += delta;
-
-        // sets mouse cord relative to pixels
-        PirateJoes.mouseCordinates.x = Gdx.input.getX();
-        PirateJoes.mouseCordinates.y = Gdx.input.getY();
-
-        getPirateJoe().batch.setProjectionMatrix(getViewport().getCamera().combined);
-
-        // turns pixle cordinates to world cordinates
-        getViewport().getCamera().unproject(PirateJoes.mouseCordinates);
-
-        getPirateJoe().batch.begin();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        baseLayer.draw(getPirateJoe().batch);
-        secondLayer.draw(getPirateJoe().batch);
-        getWalls().draw(getPirateJoe().batch);
-//        slime.draw(pirateJoes.batch, 100);
-
-
-
-
-
-
-        update(delta);
-
-        getPirateJoe().batch.end();
-        character.drawDebugBox();
-
-
-
-
-
-
-        //viewport.getCamera().position.set(character.getX(),character.getY(),0);
-        getViewport().getCamera().update();
-
-
-
-
+    public void setRender() {
+        super.baseLayer = baseLayer;
+        super.secondLayer = secondLayer;
     }
 
     @Override
     public void initMessages() {
 
         // adds the flue virus as a listener
-        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(0 ), Messages.CHASE);
-        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(1 ), Messages.CHASE);
-        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(0 ), Messages.DETONATING);
-        getMessageDispatcherAI().addListener((Telegraph) getEnemeyGroup().get(1 ), Messages.DETONATING);
+
 
     }
 
@@ -192,10 +148,6 @@ public class Level1 extends AbstractLevel {
 
     }
 
-    @Override
-    public int getIndex(TileData node) {
-        return node.INDEX;
-    }
 
 
     // get node count returns the size of the collison map excluding null tiles for easier A* implementation
@@ -203,6 +155,11 @@ public class Level1 extends AbstractLevel {
     public int getNodeCount() {
 
         return collisionTiles.size;
+    }
+
+    @Override
+    public int getIndex(TileData node) {
+        return node.INDEX;
     }
 
     @Override
@@ -225,10 +182,7 @@ public class Level1 extends AbstractLevel {
 
 
 
-    @Override
-    public Array<Connection<TileData>> getConnections(TileData fromNode) {
-        return fromNode.getConnectionArray();
-    }
+
 
     @Override
     public ArrayList<ArrayList<ArrayList<TileData>>> getCollisionMap() {

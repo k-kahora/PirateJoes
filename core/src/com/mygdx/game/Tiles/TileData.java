@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.utils.Pair;
@@ -23,11 +24,15 @@ public class TileData {
     private int left;
     public static int TILE_WIDTH;
     public static int TILE_HEIGHT;
+    public final boolean broken;
     private Tile tile;
     private Array<Connection<TileData>> connectionArray = new Array<>();
     public int INDEX = 9000;
     private final Pair<Float, Float> position;
     private final boolean isWalls;
+    public boolean stable = true;
+
+    private Vector2 weakPoint = new Vector2();
 
     private final Rectangle box;
 
@@ -39,12 +44,14 @@ public class TileData {
     }
 
     public TileData() {
+
         this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
         this.INDEX = 0;
         this.position = new Pair<>(0f,0f);
         this.box = new Rectangle(0,0,16,16);
         this.isWalls = false;
+        broken = false;
 
     }
 
@@ -58,9 +65,50 @@ public class TileData {
         this.left = x;
 
         this.atlas = atlas;
-        textureRegion = atlas.findRegion(tile.getAtlasReference());
 
+        if (tile.getAtlasReference().equals("barrier10")) {
 
+            String bar = "barrier1";
+
+            int brokenWeight = 5, slopWeight = 8, orangeWeight = 13, bannaWeight = 17, fullWeight = 40;
+
+            // full is 0
+            // bannana is 1
+            // slop is 2
+            // orange is 3
+            // broken is 4
+
+            int randomTexture = (int)(Math.random() * 40);
+
+            if (randomTexture < brokenWeight) {
+                broken = true;
+                weakPoint.x = x + TILE_WIDTH / 2;
+                weakPoint.y = y + TILE_HEIGHT / 2;
+                bar += "4";
+            }
+            else if (randomTexture < slopWeight) {
+                broken = false;
+                bar += "2";
+            }
+            else if (randomTexture < orangeWeight) {
+                broken = false;
+                bar += "3";
+            }
+            else if (randomTexture < bannaWeight) {
+                broken = false;
+                bar += "1";
+            }
+            else {
+                broken = false;
+                bar += "0";
+            }
+
+            textureRegion = atlas.findRegion(bar);
+
+        } else {
+            textureRegion = atlas.findRegion(tile.getAtlasReference()); //tile.getAtlasReference()
+            broken = false;
+        }
 
         // id there collidbale then add them to the INDEXER
         if (!isWalls) {
@@ -74,7 +122,6 @@ public class TileData {
         this.position = new Pair<>((float)x,(float)y);
         this.box = new Rectangle(x * 16, y * 16, 16, 16);
 
-
     }
 
     // This makes the wall just this constructor
@@ -85,9 +132,6 @@ public class TileData {
         TILE_HEIGHT *= scale;
         TILE_WIDTH *= scale;
     }
-
-
-
 
         // this sets the size of textures bases on how many regions in the atlas
         // it then adds each texture to the list of TextureRegions
@@ -143,18 +187,33 @@ public class TileData {
         return position;
     }
 
-    private static class Indexer {
+    // have to reset index when a new level is made
+    public static class Indexer {
 
-        private static int index = 0; // not sure why I have to make -1 to work but other wise its an error :\
+        private static int index = 0;
 
         public static int getIndex() {
 
             return index++;
         }
 
+        public static void reset() {
+
+            index = 0;
+
+        }
+
     }
 
     public void setTextureRegion() {
         textureRegion = new TextureRegion(new Texture(Gdx.files.internal("test_tile.png")));
+    }
+
+    public Vector2 getWeakPoint() {
+        return weakPoint;
+    }
+
+    public void setToInvisible() {
+        tile = Tile.INVISIBLE;
     }
 }

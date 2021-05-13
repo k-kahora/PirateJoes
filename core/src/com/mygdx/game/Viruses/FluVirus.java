@@ -47,7 +47,7 @@ public class FluVirus extends AbstractEnemy  {
     private final Vector2 getDetectionLine;
     private static final HeuristicTile her = new HeuristicTile();
 
-    private FollowPath<Vector2,LinePath.LinePathParam> followPath;
+    private final FollowPath<Vector2,LinePath.LinePathParam> followPath;
     private Seek<Vector2> seek;
     private final IndexedAStarPathFinder<TileData> chase;
     private final TilePath resultPath;
@@ -229,7 +229,7 @@ public class FluVirus extends AbstractEnemy  {
         Vector2 start = new Vector2(StartX, StartY);
         Vector2 end = new Vector2(endX, endY);
 
-
+        System.out.println("StartX: " + StartX + " StartY: " + StartY + " endX: " + endX + " endY: " + endY);
 
         TileData startNode = fluVirusTileColliderMap.get(0).get(StartY).get(StartX);
         TileData endNode = fluVirusTileColliderMap.get(0).get(endY).get(endX);

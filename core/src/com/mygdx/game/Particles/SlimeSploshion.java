@@ -80,8 +80,6 @@ public class SlimeSploshion extends Sprite {
 
         }
 
-
-
     }
 
     public void dispose() {

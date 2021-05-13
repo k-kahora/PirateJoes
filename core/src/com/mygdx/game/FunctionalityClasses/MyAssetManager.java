@@ -29,16 +29,20 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> charecterIdleLeft = new AssetDescriptor<TextureAtlas>("spriteSheets/idleLeft.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> slime = new AssetDescriptor<TextureAtlas>("spriteSheets/slime_right.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap.atlas", TextureAtlas.class);
-    public AssetDescriptor<TextureAtlas> collisionMap = new AssetDescriptor<TextureAtlas>("spriteSheets/collision_map.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
     public AssetDescriptor<Texture> fluVirus = new AssetDescriptor<Texture>("spriteSheets/FluVirus.png", Texture.class);
     public AssetDescriptor<Texture> startScreen = new AssetDescriptor<Texture>("sprites/homescreen.png", Texture.class);
+    //public AssetDescriptor<TextureAtlas> barrier = new AssetDescriptor<>("spriteSheets/barrier_version_.atlas", TextureAtlas.class);
+    public AssetDescriptor<TextureAtlas> bruh = new AssetDescriptor<TextureAtlas>("spriteSheets/collision_map.atlas", TextureAtlas.class);
 
     public AssetDescriptor<TextureAtlas> splashBullet = new AssetDescriptor<TextureAtlas>("spriteSheets/bulletCollisionBubble.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> slimeSploshion = new AssetDescriptor<>("spriteSheets/slimeDetonation.atlas", TextureAtlas.class);
 
     public AssetDescriptor<TextureAtlas> slimeBlows = new AssetDescriptor<TextureAtlas>("spriteSheets/slimeBlow.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> storeManager = new AssetDescriptor<Texture>("sprites/Manager.png", Texture.class);
+
+    public AssetDescriptor<Texture> landMine = new AssetDescriptor<Texture>("spriteSheets/landMine.png", Texture.class);
+    public AssetDescriptor<TextureAtlas> yogurtBlowUp = new AssetDescriptor<TextureAtlas>("spriteSheets/yogurt.atlas", TextureAtlas.class);
 
     // adds to teh loading que
     public void load() {
@@ -58,6 +62,8 @@ public class MyAssetManager {
         manager.load(charecterAtlasLeft);
         manager.load(bulletSprite);
         manager.load(splashBullet);
+        manager.load(landMine);
+        manager.load(yogurtBlowUp);
     }
 
     public void loadGui() {
@@ -67,7 +73,8 @@ public class MyAssetManager {
 
     public void loadTileMap() {
         manager.load(tileMap);
-        manager.load(collisionMap);
+        //manager.load(barrier);
+        manager.load(bruh);
     }
 
     public void loadEnemys() {
@@ -76,6 +83,7 @@ public class MyAssetManager {
         manager.load(splashBullet);
         manager.load(slimeBlows);
         manager.load(slimeSploshion);
+
     }
 
     public void dispose() {

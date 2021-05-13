@@ -4,77 +4,98 @@ size: 256,32
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-collision_tile1
+barrier1
   rotate: false
   xy: 2, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile10
+barrier10
   rotate: false
   xy: 164, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile11
+barrier11
   rotate: false
   xy: 182, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile2
+barrier12
+  rotate: false
+  xy: 200, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+barrier13
+  rotate: false
+  xy: 218, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+barrier14
+  rotate: false
+  xy: 236, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+barrier2
   rotate: false
   xy: 20, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile3
+barrier3
   rotate: false
   xy: 38, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile4
+barrier4
   rotate: false
   xy: 56, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile5
+barrier5
   rotate: false
   xy: 74, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile6
+barrier6
   rotate: false
   xy: 92, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile7
+barrier7
   rotate: false
   xy: 110, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile8
+barrier8
   rotate: false
   xy: 128, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-collision_tile9
+barrier9
   rotate: false
   xy: 146, 2
   size: 16, 16

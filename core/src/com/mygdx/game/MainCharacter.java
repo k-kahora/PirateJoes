@@ -5,11 +5,8 @@ import static java.lang.Math.abs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -24,6 +21,7 @@ import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.Messages;
 import com.mygdx.game.utils.SteeringUtils;
+import org.w3c.dom.css.Rect;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -53,9 +51,10 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     boolean flagRight = false;
     boolean flagLeft = false;
+    boolean spacePressed = false;
 
     boolean shooting = false;
-    private float shootingTimer = 0;
+    private float shootingTimer = 0, timeElapsedMines = 0;
     private int numTimesFired;
 
     public float xBeforeVector;
@@ -75,6 +74,7 @@ public class MainCharacter extends Actor implements EntityLocation {
     com.mygdx.game.FunctionalityClasses.MyAssetManager assetManager;
 
     LinkedList<SanatizerBullet> bullets, removedBullets;
+    LinkedList<LandMine> landMines;
 
     private int clickCount;
 
@@ -90,9 +90,11 @@ public class MainCharacter extends Actor implements EntityLocation {
         numTimesFired = 0;
         removedBullets = new LinkedList<>();
 
-        maxSpeed = 1f;
-        friction = 0.05f;
-        acceleration = 0.04f;
+        landMines = new LinkedList<>();
+
+        maxSpeed = 2f;
+        friction = 0.01f;
+        acceleration = 0.5f;
 
         // how many bullets can be fired in succesion
         clickCount = 0;
@@ -160,8 +162,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         centerPosition.x = getX() + getWidth() / 2;
         centerPosition.y = getY() + getHeight() / 2;
 
-        keys();
-
+        keys(delta);
 
         // once you start clicking you can only fore five untile shoting Timer is 0
         // if the player shoot start a timer
@@ -172,15 +173,6 @@ public class MainCharacter extends Actor implements EntityLocation {
             shootingTimer = 0;
             numTimesFired = 0;
         }
-
-
-
-
-
-
-
-
-
 
         if (!direction.equals(new Vector2())) {
 
@@ -244,15 +236,8 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         }
 
-
-
-
-
         collisionLogic();
-
-
-
-
+        deltaMines(delta);
 
     }
 
@@ -264,6 +249,9 @@ public class MainCharacter extends Actor implements EntityLocation {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
+
+        drawMines(batch);
+
         /*
         for (int i = 0; i < bullets.size(); ++i) {
             bullets.get(i).draw(batch,0);
@@ -375,7 +363,12 @@ public class MainCharacter extends Actor implements EntityLocation {
     }
 
 
-    private void keys() {
+    private void keys(float delta) {
+
+
+        if (spacePressed)
+            timeElapsedMines += delta;
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             flagLeft = false;
@@ -413,24 +406,28 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         }
 
+        // if list is empty add one to the list if not wait till a timer is reached before allowing a second
+        // also only a max of two mines at a time
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                 AbstractLevel.getMessageDispatcherAI().dispatchMessage(Messages.CHASE);
+
+            spacePressed = true;
+
+            if (landMines.size() < 1)
+                landMines.add(new LandMine(10f, assetManager.manager.get(assetManager.landMine)));
+
+            if (timeElapsedMines > 1f && landMines.size() < 2) {
+                landMines.add(new LandMine(10f, assetManager.manager.get(assetManager.landMine)));
+                timeElapsedMines = 0;
+                spacePressed = false;
+            }
+
         }
-
-
-    }
-
-    public void dispose() {
-
-
 
     }
 
     public Rectangle getBoundingBox() {
         return rectangle;
     }
-
-
 
     public void addCollider(TileCollision collision) {
         this.collision = collision;
@@ -508,6 +505,105 @@ public class MainCharacter extends Actor implements EntityLocation {
     public Vector2 getCenterPosition() {
 
         return centerPosition;
+
+    }
+
+    public class LandMine {
+
+        Vector2 position;
+        float deathRadius;
+        Sprite sprite;
+        Rectangle boundingBox;
+        float timeElasped = 1, yogurtBlowUpDelta = 0, scaleFactor = 1;
+        public boolean blownUp = false;
+
+        public final float killRadius = 40f;
+
+        private Animation<TextureRegion> yogurtBlowUp;
+
+        // implement animation
+        public LandMine(float deathRadius, Texture atlas) {
+
+            this.position = new Vector2(getX(), getY());
+
+            sprite = new Sprite(atlas);
+            boundingBox = new Rectangle(getX(), getY(), sprite.getWidth(), sprite.getHeight());
+            this.deathRadius = deathRadius;
+
+            yogurtBlowUp = new Animation<TextureRegion>(1 / 24f, assetManager.manager.get(assetManager.yogurtBlowUp).getRegions());
+
+            sprite.setPosition(getX(), getY());
+
+        }
+
+        public void act(float delta) {
+
+            float centerX = position.x + sprite.getRegionWidth()/2;
+            float centerY = position.y + sprite.getRegionHeight()/2;
+
+
+
+            sprite.setScale(scaleFactor);
+
+            scaleFactor += 0.001;
+            this.timeElasped += delta;
+
+            if (timeElasped > 4f) {
+
+                blownUp = true;
+
+                sprite.setScale(8f);
+
+                yogurtBlowUpDelta += delta;
+
+                sprite.setRegion(yogurtBlowUp.getKeyFrame(yogurtBlowUpDelta));
+
+                if (yogurtBlowUp.isAnimationFinished(yogurtBlowUpDelta))
+                    landMines.remove(this);
+
+                if (new Vector2((MainCharacter.this.getX() + MainCharacter.this.rectangle.getWidth()/2) - centerX, (MainCharacter.this.getY() + MainCharacter.this.rectangle.getHeight()/2) - centerY).len() < killRadius) {
+                      Gdx.app.exit();
+                }
+            }
+        }
+
+        public Vector2 returnPosition() {
+
+            return position;
+        }
+
+
+    }
+
+    private void drawMines(Batch batch) {
+
+        for (LandMine mine : landMines) {
+
+            mine.sprite.draw(batch);
+
+        }
+
+    }
+
+    public LinkedList<LandMine> getLandMines() {
+
+        return landMines;
+
+    }
+
+    public void deltaMines(float delta) {
+
+        for (LandMine mine : landMines) {
+
+            mine.act(delta);
+
+        }
+
+    }
+
+    public void reset() {
+
+        collisionMap = null;
 
     }
 

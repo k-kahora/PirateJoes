@@ -184,11 +184,14 @@ public class WanderVirus extends AbstractEnemy{
 
         wander.calculateSteering(steeringOutput);
 
+        if (a != null) {
+
+
         if (a.remove || a.playerHit) {
 
             removedBullets.add(a);
 
-        }
+        }}
 
 
 

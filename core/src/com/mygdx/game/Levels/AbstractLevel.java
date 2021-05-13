@@ -7,26 +7,33 @@ import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.Enumerators.LEVELS;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
 import com.mygdx.game.MainCharacter;
 import com.mygdx.game.Particles.BulletSplash;
 import com.mygdx.game.Particles.ParticleManager;
 import com.mygdx.game.SanatizerBullet;
+import com.mygdx.game.Tiles.LineOfSight;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.AbstractEnemy;
 import com.mygdx.game.Viruses.Enemy;
 import com.mygdx.game.Viruses.FluVirus;
 import com.mygdx.game.utils.Messages;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import sun.awt.image.ImageWatched;
+import sun.rmi.rmic.Main;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /*
 Skeltal implementaion for all levels implemnts screen and Level all Actual levels must extend this class
@@ -41,12 +48,17 @@ Impe,emting level is very important for path finding as it alows the level to be
 
  */
 
+
+
 public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private static PirateJoes pirateJoes;
 
-
+    private float timeElapsed = 0f;
     public final static String tileDir;
+    private static int levelCount = 0;
+
+    protected TileEditor baseLayer,secondLayer;
 
     MyAssetManager assetManager;
 
@@ -55,6 +67,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private Array<AbstractEnemy> groupOfViruses;
     private Array<AbstractEnemy> killedViruses;
+
+    private List<TileData> weakPoints = new LinkedList<>();
 
     public final MainCharacter character;
 
@@ -69,11 +83,13 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private LinkedList<SanatizerBullet> bullets;
     private LinkedList<SanatizerBullet> removedBullets;
+    private LinkedList<MainCharacter.LandMine> mines;
 
     static {
         cameraHeight = 17;
         cameraWidth = 31;
         worldUnits = 16;
+        //location of txt maps
         tileDir = "android/assets/tileMaps/";
     }
 
@@ -86,9 +102,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         aiDispatcher = new MessageDispatcher();
 
         loadAssets();
-        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.collisionMap), true);
-
-
+        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.bruh), true);
 
         groupOfViruses = new Array<>();
         killedViruses = new Array<>();
@@ -101,23 +115,20 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         bullets = character.getBullets();
         removedBullets = new LinkedList<>();
 
-
     }
 
     public abstract void initMessages();
 
     // level must implemt these
-    public abstract int getIndex(TileData node);
     public abstract int getNodeCount();
-
-
+    public abstract void setRender();
+    public abstract boolean handleMessage(Telegram msg);
 
     public static MessageDispatcher getMessageDispatcherAI() {
         return aiDispatcher;
     }
 
     public static MessageDispatcher getMessageToLevel() { return messageToLevel; }
-
 
     public static Viewport getViewport() {
         return viewport;
@@ -126,8 +137,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     public static final PirateJoes getPirateJoe() {
         return pirateJoes;
     }
-
-
 
     @Override
     public void resize(int width, int height) {
@@ -141,8 +150,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         assetManager.loadTileMap();
         assetManager.manager.finishLoading();
 
-
-
     }
 
     public TileEditor getWalls() {
@@ -153,14 +160,29 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         return assetManager;
     }
 
-    public abstract boolean handleMessage(Telegram msg);
+    private void clear() {
+
+        character.clear();
+        bullets.clear();
+
+    }
 
     public void update(float delta) {
 
+        destroyWalls();
+
+        weakPoints = secondLayer.getWeakPoints();
+
+        mines = character.getLandMines();
+
+        if (groupOfViruses.isEmpty()) {
+            clear();
+            LevelManager.incrementLeve();
+            ParticleManager.clear();
+        }
+
         character.draw(getPirateJoe().batch, 0);
-
         character.act(Gdx.graphics.getDeltaTime());
-
 
         for (AbstractEnemy a : groupOfViruses) {
 
@@ -171,19 +193,15 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
             bullets.addAll(a.getVirusBullets());
             a.clearBullets();
 
-
-
+            for (MainCharacter.LandMine l : mines) {
+                yogurt(a, l);
+            }
 
             if (a.isDead())
                 killedViruses.add(a);
-
         }
 
-
-
         groupOfViruses.removeAll(killedViruses, false);
-
-
 
         for (int i = 0; i < bullets.size(); ++i) {
 
@@ -197,7 +215,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
                 }
 
-
             }
 
             bullets.get(i).draw(getPirateJoe().batch,0);
@@ -209,20 +226,17 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-                Gdx.app.exit();
+                //Gdx.app.exit();
 
             }
-
-
 
             if (bullets.get(i).remove) {
                 removedBullets.add(bullets.get(i));
             }
             bullets.get(i).act(Gdx.graphics.getDeltaTime());
         }
+
         bullets.removeAll(removedBullets);
-
-
 
         ParticleManager.updateBulletSplashes(getPirateJoe().batch, delta);
         ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta, groupOfViruses, character);
@@ -240,6 +254,108 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         if (Intersector.overlaps(previousBullet.getBoundingBox(), bullet.getBoundingBox())) {
             removedBullets.add(previousBullet);
             removedBullets.add(bullet);
+        }
+
+    }
+
+    private void destroyWalls() {
+
+        for (TileData v : weakPoints) {
+
+            for (MainCharacter.LandMine l : mines) {
+
+                if (l.blownUp && new Vector2(l.returnPosition().x - v.getWeakPoint().x, l.returnPosition().y - v.getWeakPoint().y).len() < l.killRadius) {
+
+                    v.stable = false;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    private void yogurt(AbstractEnemy a, MainCharacter.LandMine l) {
+
+        if (l.blownUp && new Vector2(l.returnPosition().x - a.getX(), l.returnPosition().y - a.getY()).len() < l.killRadius) {
+
+            //a.setTagged(true);
+            a.setTagged(true);
+            a.setDetonationToInstant();
+
+        }
+
+    }
+
+    public void render(float delta) {
+
+        timeElapsed += delta;
+
+        // sets mouse cord relative to pixels
+        PirateJoes.mouseCordinates.x = Gdx.input.getX();
+        PirateJoes.mouseCordinates.y = Gdx.input.getY();
+
+        getPirateJoe().batch.setProjectionMatrix(getViewport().getCamera().combined);
+
+        // turns pixle cordinates to world cordinates
+        getViewport().getCamera().unproject(PirateJoes.mouseCordinates);
+
+        getPirateJoe().batch.begin();
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        baseLayer.draw(getPirateJoe().batch);
+        secondLayer.draw(getPirateJoe().batch);
+        getWalls().draw(getPirateJoe().batch);
+
+        update(delta);
+
+        getPirateJoe().batch.end();
+        character.drawDebugBox();
+
+        //viewport.getCamera().position.set(character.getX(),character.getY(),0);
+        getViewport().getCamera().update();
+
+    }
+
+    @Override
+    public Array<Connection<TileData>> getConnections(TileData fromNode) {
+        return fromNode.getConnectionArray();
+    }
+
+    public static class LevelManager {
+
+        public static LEVELS currentLevel = LEVELS.LEVEL1;
+
+        public static void incrementLeve() {
+
+            switch (currentLevel) {
+
+                case LEVEL1:
+                    //TileData.Indexer.reset();
+                    //getPirateJoe().setScreen(new Level2(getPirateJoe()));
+                    //currentLevel = LEVELS.LEVEL2;
+                    break;
+                case LEVEL2:
+                    //getPirateJoe().setScreen(new Level3(getPirateJoe()));
+                    currentLevel = LEVELS.LEVEL3;
+                    break;
+                case LEVEL3:
+                    //getPirateJoe().setScreen(new Level4(getPirateJoe()));
+                    currentLevel = LEVELS.LEVEL4;
+                    break;
+                case LEVEL4:
+                    //getPirateJoe().setScreen(new Level5(getPirateJoe()));
+                    currentLevel = LEVELS.LEVEL5;
+                    break;
+                case LEVEL5:
+                    //getPirateJoe().setScreen(new Finish(getPirateJoe()));
+                    currentLevel = LEVELS.FINISH;
+                    break;
+
+            }
+
+
         }
 
     }

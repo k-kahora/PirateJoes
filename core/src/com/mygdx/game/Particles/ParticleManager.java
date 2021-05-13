@@ -16,6 +16,7 @@ public class ParticleManager {
     public static final List<BulletSplash> splashBullets = new LinkedList<>();
     public static final List<SlimeSploshion> slimeBlowingUp = new LinkedList<>();
 
+
     public static void updateBulletSplashes (SpriteBatch batch, float delta) {
 
 
@@ -56,8 +57,12 @@ public class ParticleManager {
             bulletParticles.add(a);
         }
 
+    }
 
+    public static void clear() {
 
+        splashBullets.clear();
+        slimeBlowingUp.clear();
 
     }
 

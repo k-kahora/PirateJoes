@@ -17,7 +17,7 @@ public class HeuristicTile implements Heuristic<TileData> {
         float endX = (float)endNode.getIndex().getIndexi();
         float endy = (float)endNode.getIndex().getIndexj();
 
-        return (float)Math.sqrt((Math.pow(startX - endX, 2f) + Math.pow(startY - endy, 2f)));
+        return (float)Math.sqrt((Math.pow(startX - endX, 2) + Math.pow(startY - endy, 2)));
 
 
     }
