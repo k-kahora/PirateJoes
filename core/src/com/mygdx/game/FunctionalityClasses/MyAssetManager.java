@@ -27,6 +27,7 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> charecterAtlasRight = new AssetDescriptor<TextureAtlas>("spriteSheets/managerRight.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> charecterIdleRight = new AssetDescriptor<TextureAtlas>("spriteSheets/idleRight.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> charecterIdleLeft = new AssetDescriptor<TextureAtlas>("spriteSheets/idleLeft.atlas", TextureAtlas.class);
+    public AssetDescriptor<Texture> skull = new AssetDescriptor<Texture>("spriteSheets/skull.png", Texture.class);
     public AssetDescriptor<TextureAtlas> slime = new AssetDescriptor<TextureAtlas>("spriteSheets/slime_right.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
@@ -64,6 +65,7 @@ public class MyAssetManager {
         manager.load(splashBullet);
         manager.load(landMine);
         manager.load(yogurtBlowUp);
+        manager.load(skull);
     }
 
     public void loadGui() {

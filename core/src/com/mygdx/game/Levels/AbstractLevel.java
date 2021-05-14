@@ -182,7 +182,12 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         }
 
         character.draw(getPirateJoe().batch, 0);
-        character.act(Gdx.graphics.getDeltaTime());
+
+        for (MainCharacter.LandMine l : character.getLandMines())
+            l.draw(getPirateJoe().batch,delta);
+
+        if (!character.isDead())
+            character.act(Gdx.graphics.getDeltaTime());
 
         for (AbstractEnemy a : groupOfViruses) {
 
@@ -332,9 +337,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
             switch (currentLevel) {
 
                 case LEVEL1:
-                    //TileData.Indexer.reset();
-                    //getPirateJoe().setScreen(new Level2(getPirateJoe()));
-                    //currentLevel = LEVELS.LEVEL2;
+                    TileData.Indexer.reset();
+                    getPirateJoe().setScreen(new Level2(getPirateJoe()));
+                    currentLevel = LEVELS.LEVEL2;
                     break;
                 case LEVEL2:
                     //getPirateJoe().setScreen(new Level3(getPirateJoe()));

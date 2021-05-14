@@ -42,6 +42,8 @@ public class MainCharacter extends Actor implements EntityLocation {
     private Animation<TextureRegion> leftIdle;
     private Animation<TextureRegion> rightWalk;
 
+    Sprite deathSprite = new Sprite();
+
     private final Deque<BulletSplash> splashAnimations;
 
     Vector2 direction, velocity, position;
@@ -84,6 +86,9 @@ public class MainCharacter extends Actor implements EntityLocation {
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
 
+        deathSprite.setRegion(assetManager.manager.get(assetManager.skull));
+        deathSprite.setPosition(200,200);
+
         splashAnimations = new LinkedList<>();
 
         bullets = new LinkedList<>();
@@ -92,9 +97,9 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         landMines = new LinkedList<>();
 
-        maxSpeed = 2f;
-        friction = 0.01f;
-        acceleration = 0.5f;
+        maxSpeed = 1.3f;
+        friction = 0.1f;
+        acceleration = 0.4f;
 
         // how many bullets can be fired in succesion
         clickCount = 0;
@@ -125,7 +130,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         debugBoxScale = 4;
 
         rectangle = new Rectangle(getX() + debugBoxScale,getY(), sprite.getWidth(), sprite.getHeight());
-       setBounds(rectangle.getWidth(), getY(), sprite.getWidth(), sprite.getHeight());
+        setBounds(rectangle.getWidth(), getY(), sprite.getWidth(), sprite.getHeight());
 
         xBeforeVector = getX();
         yBeforeVector = getY();
@@ -162,7 +167,8 @@ public class MainCharacter extends Actor implements EntityLocation {
         centerPosition.x = getX() + getWidth() / 2;
         centerPosition.y = getY() + getHeight() / 2;
 
-        keys(delta);
+        if (!isDead())
+            keys(delta);
 
         // once you start clicking you can only fore five untile shoting Timer is 0
         // if the player shoot start a timer
@@ -237,7 +243,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         }
 
         collisionLogic();
-        deltaMines(delta);
+        //deltaMines(delta);
 
     }
 
@@ -248,9 +254,13 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        sprite.draw(batch);
 
-        drawMines(batch);
+        sprite.draw(batch);
+       // else
+            //deathSprite.draw(batch);
+           // deathSprite.setPosition(40,40);
+
+
 
         /*
         for (int i = 0; i < bullets.size(); ++i) {
@@ -520,6 +530,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         public final float killRadius = 40f;
 
         private Animation<TextureRegion> yogurtBlowUp;
+        private Object[] arrayOfTextures;
 
         // implement animation
         public LandMine(float deathRadius, Texture atlas) {
@@ -534,14 +545,18 @@ public class MainCharacter extends Actor implements EntityLocation {
 
             sprite.setPosition(getX(), getY());
 
+            arrayOfTextures = yogurtBlowUp.getKeyFrames();
+
+            System.out.println("Number of Frames = " + arrayOfTextures.length);
+
+        }
+
+        public void draw(SpriteBatch batch, float delta) {
+            sprite.draw(batch);
+            act(delta);
         }
 
         public void act(float delta) {
-
-            float centerX = position.x + sprite.getRegionWidth()/2;
-            float centerY = position.y + sprite.getRegionHeight()/2;
-
-
 
             sprite.setScale(scaleFactor);
 
@@ -549,6 +564,9 @@ public class MainCharacter extends Actor implements EntityLocation {
             this.timeElasped += delta;
 
             if (timeElasped > 4f) {
+
+                float centerX = position.x + sprite.getRegionWidth()/2;
+                float centerY = position.y + sprite.getRegionHeight()/2;
 
                 blownUp = true;
 
@@ -561,8 +579,9 @@ public class MainCharacter extends Actor implements EntityLocation {
                 if (yogurtBlowUp.isAnimationFinished(yogurtBlowUpDelta))
                     landMines.remove(this);
 
-                if (new Vector2((MainCharacter.this.getX() + MainCharacter.this.rectangle.getWidth()/2) - centerX, (MainCharacter.this.getY() + MainCharacter.this.rectangle.getHeight()/2) - centerY).len() < killRadius) {
-                      Gdx.app.exit();
+                if (new Vector2((MainCharacter.this.getX() + MainCharacter.this.rectangle.getWidth()/2) - position.x, (MainCharacter.this.getY() + MainCharacter.this.rectangle.getHeight()/2) - position.y).len() < killRadius
+                    && SteeringUtils.middleAnimationForExplosion(arrayOfTextures, yogurtBlowUp.getKeyFrameIndex(yogurtBlowUpDelta)) ) {
+                      MainCharacter.this.death();
                 }
             }
         }
@@ -604,6 +623,35 @@ public class MainCharacter extends Actor implements EntityLocation {
     public void reset() {
 
         collisionMap = null;
+
+    }
+
+    private boolean death = false;
+
+
+    public void death() {
+
+        Texture texture = (assetManager.manager.get(assetManager.skull));
+
+
+        //setWidth(texture.getWidth());
+        //setHeight(texture.getHeight());
+
+        sprite.setSize(24,24);
+
+        sprite.setRegion(texture);
+     //   sprite.setRegionWidth(48);
+      //  sprite.setRegionHeight(24);
+
+        //sprite.setScale(1.2f, 1f);
+
+        death = true;
+
+    }
+
+    public boolean isDead() {
+
+        return death;
 
     }
 

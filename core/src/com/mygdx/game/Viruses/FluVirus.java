@@ -229,8 +229,6 @@ public class FluVirus extends AbstractEnemy  {
         Vector2 start = new Vector2(StartX, StartY);
         Vector2 end = new Vector2(endX, endY);
 
-        System.out.println("StartX: " + StartX + " StartY: " + StartY + " endX: " + endX + " endY: " + endY);
-
         TileData startNode = fluVirusTileColliderMap.get(0).get(StartY).get(StartX);
         TileData endNode = fluVirusTileColliderMap.get(0).get(endY).get(endX);
 
