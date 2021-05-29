@@ -26,6 +26,7 @@ import org.w3c.dom.css.Rect;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 public class MainCharacter extends Actor implements EntityLocation {
 
@@ -41,6 +42,8 @@ public class MainCharacter extends Actor implements EntityLocation {
     private Animation<TextureRegion> rightIdle;
     private Animation<TextureRegion> leftIdle;
     private Animation<TextureRegion> rightWalk;
+
+    private List<TileData> weakPoints = new LinkedList<>();
 
     Sprite deathSprite = new Sprite();
 
@@ -97,9 +100,9 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         landMines = new LinkedList<>();
 
-        maxSpeed = 1.3f;
-        friction = 0.1f;
-        acceleration = 0.4f;
+        maxSpeed = 1.4f;
+        friction = 0.09f;
+        acceleration = 0.07f;
 
         // how many bullets can be fired in succesion
         clickCount = 0;
@@ -175,7 +178,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         if (numTimesFired > 0) {
             shootingTimer += Gdx.graphics.getDeltaTime();
         }
-        if (shootingTimer > 1.75f) {
+        if (shootingTimer > 1.4f) {
             shootingTimer = 0;
             numTimesFired = 0;
         }
@@ -256,6 +259,8 @@ public class MainCharacter extends Actor implements EntityLocation {
     public void draw(Batch batch, float parentAlpha) {
 
         sprite.draw(batch);
+
+
        // else
             //deathSprite.draw(batch);
            // deathSprite.setPosition(40,40);
@@ -375,9 +380,15 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     private void keys(float delta) {
 
+        float timeBetweenMines = 1f;
 
         if (spacePressed)
             timeElapsedMines += delta;
+
+        if (timeElapsedMines > timeBetweenMines) {
+            timeElapsedMines = 0;
+            spacePressed = false;
+        }
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
@@ -409,7 +420,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
 
             numTimesFired++;
-            if (shootingTimer != 0 && numTimesFired > 5) {
+            if (shootingTimer != 0 && numTimesFired > 3) {
                 return;
             }
            shoot();
@@ -420,15 +431,16 @@ public class MainCharacter extends Actor implements EntityLocation {
         // also only a max of two mines at a time
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 
-            spacePressed = true;
+            // whens time is reached reset
 
-            if (landMines.size() < 1)
+            if (landMines.size() == 0) {
                 landMines.add(new LandMine(10f, assetManager.manager.get(assetManager.landMine)));
+                spacePressed = true;
+            }
 
-            if (timeElapsedMines > 1f && landMines.size() < 2) {
+            if (landMines.size() == 1 && !spacePressed) {
                 landMines.add(new LandMine(10f, assetManager.manager.get(assetManager.landMine)));
-                timeElapsedMines = 0;
-                spacePressed = false;
+                spacePressed = true;
             }
 
         }
@@ -461,7 +473,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
 
             bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 2.1f ,assetManager.manager.get(assetManager.bulletSprite))
-                    .initCollision(collisionMap).maxBounces(10)
+                    .initCollision(collisionMap).maxBounces(2)
                     .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
 
@@ -523,9 +535,10 @@ public class MainCharacter extends Actor implements EntityLocation {
         Vector2 position;
         float deathRadius;
         Sprite sprite;
-        Rectangle boundingBox;
+        public final Rectangle boundingBox;
         float timeElasped = 1, yogurtBlowUpDelta = 0, scaleFactor = 1;
-        public boolean blownUp = false;
+        public boolean blownUp = false, activated = false;
+
 
         public final float killRadius = 40f;
 
@@ -538,6 +551,8 @@ public class MainCharacter extends Actor implements EntityLocation {
             this.position = new Vector2(getX(), getY());
 
             sprite = new Sprite(atlas);
+
+
             boundingBox = new Rectangle(getX(), getY(), sprite.getWidth(), sprite.getHeight());
             this.deathRadius = deathRadius;
 
@@ -563,7 +578,9 @@ public class MainCharacter extends Actor implements EntityLocation {
             scaleFactor += 0.001;
             this.timeElasped += delta;
 
-            if (timeElasped > 4f) {
+            if (timeElasped > 4f || activated) {
+
+                AbstractLevel.destroyWalls(MainCharacter.this.landMines, weakPoints);
 
                 float centerX = position.x + sprite.getRegionWidth()/2;
                 float centerY = position.y + sprite.getRegionHeight()/2;
@@ -591,18 +608,13 @@ public class MainCharacter extends Actor implements EntityLocation {
             return position;
         }
 
-
-    }
-
-    private void drawMines(Batch batch) {
-
-        for (LandMine mine : landMines) {
-
-            mine.sprite.draw(batch);
-
+        public void activate() {
+            activated = true;
         }
 
+
     }
+
 
     public LinkedList<LandMine> getLandMines() {
 
@@ -653,6 +665,10 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         return death;
 
+    }
+
+    public void setWeakPoints(List<TileData> w) {
+        weakPoints = w;
     }
 
 

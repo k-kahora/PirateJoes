@@ -6,10 +6,14 @@ import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.Ray;
 import com.mygdx.game.Enumerators.Tile;
+import com.mygdx.game.Enumerators.Types;
 import com.mygdx.game.FunctionalityClasses.Entity;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.Level;
@@ -19,6 +23,7 @@ import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.SteeringUtils;
 import org.w3c.dom.css.Rect;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -44,12 +49,15 @@ public class WanderVirus extends AbstractEnemy{
     private Vector2 shotLine = new Vector2();
 
     private final Rectangle rectangle;
+    private float bulletSpeed;
 
     public final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
 
     private final TileCollision tileCollider;
     private final BoundingPoint local;
+    private final Turret nozzle;
 
+    private final Types type;
 
     private WanderVirus(Builder builder) {
         super(builder.target, builder.currentLevel);
@@ -59,6 +67,8 @@ public class WanderVirus extends AbstractEnemy{
 
         this.target = builder.target;
         this.local = new BoundingPoint(30f);
+        this.type = builder.type;
+        this.bulletSpeed = builder.bulletSpeed;
 
         rectangle = new Rectangle(getX(), getY(), getWidth(), getHeight());
         maxLinearAcceleration = 40f;
@@ -78,6 +88,8 @@ public class WanderVirus extends AbstractEnemy{
         this.tileDataMap = builder.tileDataMap;
 
         this.tileCollider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
+
+        this.nozzle = new Turret();
     }
 
     public static class Builder {
@@ -85,12 +97,17 @@ public class WanderVirus extends AbstractEnemy{
         private final Level currentLevel;
         private final EntityLocation target;
         private final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
+        private float bulletSpeed;
+
+        private Types type;
 
         public Builder(EntityLocation target, Level currentLevel, ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap) {
 
             this.tileDataMap = tileDataMap;
             this.currentLevel = currentLevel;
             this.target = target;
+            this.type = Types.STILL;
+            this.bulletSpeed = 2.1f;
 
         }
 
@@ -98,6 +115,18 @@ public class WanderVirus extends AbstractEnemy{
 
             return new WanderVirus(this);
 
+        }
+
+        public Builder wander() {
+            this.type = Types.WANDER;
+            return this;
+        }
+
+        public Builder fast() {
+            this.type = Types.ROCKET;
+            this.bulletSpeed = 3.2f;
+
+            return this;
         }
 
     }
@@ -125,14 +154,13 @@ public class WanderVirus extends AbstractEnemy{
         timeElapsed += delta;
         timeElapsed2 += delta;
 
-        if (timeElapsed > 0.2f) {
+        if (timeElapsed > 1f) {
 
-            testBullets.add( new SanatizerBullet.Builder(getX(), getY(), new Vector2(shotLine.x, shotLine.y), 15f ,assetManager.manager.get(assetManager.bulletSprite))
+            testBullets.add( new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, new Vector2(shotLine.x, shotLine.y), 16f ,assetManager.manager.get(assetManager.bulletSprite))
                     .initCollision(tileDataMap).maxBounces(0)
                     .build());
 
             timeElapsed = 0;
-
 
         }
 
@@ -173,7 +201,7 @@ public class WanderVirus extends AbstractEnemy{
             // add random time elapsed
             if (timeElapsed2 > 0.8) {
 
-                getVirusBullets().add(new SanatizerBullet.Builder(getX(), getY(), new Vector2(shotLine.x, shotLine.y), 2.1f, assetManager.manager.get(assetManager.bulletSprite))
+                getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, new Vector2(shotLine.x, shotLine.y), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
                         .initCollision(tileDataMap).maxBounces(1)
                         .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
@@ -201,18 +229,28 @@ public class WanderVirus extends AbstractEnemy{
         seeking = getX() - local.position.x < 1f && getY() - local.position.y < 1f ? false : true;
 
 
+        switch (type) {
 
-        steeringOutput.linear.scl(delta);
-        // System.out.println(steeringOutput.linear);
-        this.velocity.x = steeringOutput.linear.x;
-        this.velocity.y = steeringOutput.linear.y;
-        //moveBy(this.velocity.x, this.velocity.y);
+            case STILL:
+                break;
+            case WANDER:
+                steeringOutput.linear.scl(delta);
+                steeringOutput.linear.scl(1.1f);
+                // System.out.println(steeringOutput.linear);
+                this.velocity.x = steeringOutput.linear.x;
+                this.velocity.y = steeringOutput.linear.y;
+                break;
+
+        }
+
+
 
 
         //velocity.scl(0.8f);
 
 
 
+        //moveBy(this.velocity.x, this.velocity.y);
         rectangle.x = getX();
         rectangle.y = getY();
 
@@ -221,6 +259,8 @@ public class WanderVirus extends AbstractEnemy{
         collisionLogic();
         //local.updateLocation((int)getX(), (int)getY());
        // moveBy(0.5f, 2f);
+
+        nozzle.act(delta);
 
     }
 
@@ -287,6 +327,10 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         testBullets.removeAll(removedBullets);
+
+        nozzle.draw(batch);
+
+
 
     }
 
@@ -359,4 +403,76 @@ public class WanderVirus extends AbstractEnemy{
     public void leftCollision(int x, int y) {
         //setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), rectangle.getY());
     }
+
+    private class Turret {
+
+        Sprite nozzle = new Sprite(assetManager.manager.get(assetManager.nozzle));
+        Vector2 ray = new Vector2();
+
+        Vector2 direction = new Vector2();
+        private Vector2 tip = new Vector2(1,1);
+        private Ray endPoint = new Ray();
+        private Vector3 start;
+
+        float centerx, centery;
+
+        public Turret() {
+            start = new Vector3();
+
+
+          //  nozzle.setPosition(centerx, centery);
+            //WanderVirus.this.spr.setRegion(nozzle.getTexture());
+
+            nozzle.setOrigin(0,8);
+
+
+            tip.setLength(nozzle.getWidth());
+
+
+
+        }
+
+        public void rotate(Vector2 angleToMoveTo) {
+
+
+
+        }
+
+        public void act(float delta) {
+
+            float xOffset = WanderVirus.this.getX() + nozzle.getWidth()/2;
+
+            nozzle.setPosition(xOffset, WanderVirus.this.getY());
+            start.set(nozzle.getX(), nozzle.getY() + WanderVirus.this.getHeight()/2, 0);
+            endPoint.set(start, new Vector3(shotLine.x, shotLine.y, 0));
+
+            nozzle.setRotation(shotLine.angleDeg());
+            tip.setAngleDeg(shotLine.angleDeg());
+
+            tip.setLength(16f);
+
+
+
+
+
+        }
+
+        public void draw(Batch batch) {
+
+            nozzle.draw(batch);
+
+
+        }
+
+        public Vector2 tip() {
+
+            Vector3 newVec = endPoint.getEndPoint(start, 16f);
+
+
+           return new Vector2(newVec.x, newVec.y);
+
+        }
+
+    }
+
 }

@@ -115,6 +115,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         bullets = character.getBullets();
         removedBullets = new LinkedList<>();
 
+
+
     }
 
     public abstract void initMessages();
@@ -168,10 +170,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     }
 
     public void update(float delta) {
-
-        destroyWalls();
-
-        weakPoints = secondLayer.getWeakPoints();
 
         mines = character.getLandMines();
 
@@ -231,7 +229,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-                //Gdx.app.exit();
+               character.death();
 
             }
 
@@ -239,6 +237,17 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                 removedBullets.add(bullets.get(i));
             }
             bullets.get(i).act(Gdx.graphics.getDeltaTime());
+
+            for (MainCharacter.LandMine mine : character.getLandMines())
+
+            if (Intersector.overlaps(mine.boundingBox, bullets.get(i).getBoundingBox()))
+             {
+
+                 mine.activate();
+                 removedBullets.add(bullets.get(i));
+
+            }
+
         }
 
         bullets.removeAll(removedBullets);
@@ -263,11 +272,11 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     }
 
-    private void destroyWalls() {
+    public static void destroyWalls(LinkedList<MainCharacter.LandMine> mines1, List<TileData> weakPoints1) {
 
-        for (TileData v : weakPoints) {
+        for (TileData v : weakPoints1) {
 
-            for (MainCharacter.LandMine l : mines) {
+            for (MainCharacter.LandMine l : mines1) {
 
                 if (l.blownUp && new Vector2(l.returnPosition().x - v.getWeakPoint().x, l.returnPosition().y - v.getWeakPoint().y).len() < l.killRadius) {
 
@@ -343,6 +352,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                     break;
                 case LEVEL2:
                     //getPirateJoe().setScreen(new Level3(getPirateJoe()));
+                    TileData.Indexer.reset();
+                    getPirateJoe().setScreen(new Level3(getPirateJoe()));
                     currentLevel = LEVELS.LEVEL3;
                     break;
                 case LEVEL3:

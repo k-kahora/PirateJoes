@@ -66,11 +66,18 @@ public class TileData {
 
         this.atlas = atlas;
 
-        if (tile.getAtlasReference().equals("barrier10")) {
+        if (tile.getAtlasReference().equals("barrier14")) {
+            textureRegion = atlas.findRegion(tile.getAtlasReference());
+            broken = true;
+            weakPoint.x = x + TILE_WIDTH / 2;
+            weakPoint.y = y + TILE_HEIGHT / 2;
+        }
+
+        else if (tile.getAtlasReference().equals("barrier10")) {
 
             String bar = "barrier1";
 
-            int brokenWeight = 5, slopWeight = 8, orangeWeight = 13, bannaWeight = 17, fullWeight = 40;
+            int slopWeight = 8, orangeWeight = 13, bannaWeight = 17, fullWeight = 40;
 
             // full is 0
             // bannana is 1
@@ -80,13 +87,7 @@ public class TileData {
 
             int randomTexture = (int)(Math.random() * 40);
 
-            if (randomTexture < brokenWeight) {
-                broken = true;
-                weakPoint.x = x + TILE_WIDTH / 2;
-                weakPoint.y = y + TILE_HEIGHT / 2;
-                bar += "4";
-            }
-            else if (randomTexture < slopWeight) {
+            if (randomTexture < slopWeight) {
                 broken = false;
                 bar += "2";
             }

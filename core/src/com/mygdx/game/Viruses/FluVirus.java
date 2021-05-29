@@ -51,7 +51,7 @@ public class FluVirus extends AbstractEnemy  {
     private Seek<Vector2> seek;
     private final IndexedAStarPathFinder<TileData> chase;
     private final TilePath resultPath;
-    private boolean drawPath = true;
+    private boolean drawPath = true, benShot = false;
     private LineOfSight lineOfSight;
 
     private final float radiusDetection = 40f;
@@ -59,6 +59,8 @@ public class FluVirus extends AbstractEnemy  {
     private boolean dead;
     private boolean instantDetonation = false;
     private float fuseTime = 0f;
+
+    private float shotAnimation = 1/12f, closeAnimation = 1/50f;
 
 
     private Animation<TextureRegion> slimeMoves;
@@ -83,7 +85,7 @@ public class FluVirus extends AbstractEnemy  {
 
 
         slimeMoves = new Animation<TextureRegion>(1/12f, assetManager.manager.get(assetManager.slime).getRegions());
-        slimeBlows = new Animation<TextureRegion>(1/12f, assetManager.manager.get(assetManager.slimeBlows).getRegions());
+        slimeBlows = new Animation<TextureRegion>(closeAnimation, assetManager.manager.get(assetManager.slimeBlows).getRegions());
 
         this.sprite = new Sprite(slimeBlows.getKeyFrame(0));
         this.position = new Vector2(getX(), getY());
@@ -91,8 +93,8 @@ public class FluVirus extends AbstractEnemy  {
 
         this.splashAtlas = assetManager.manager.get(assetManager.splashBullet);
 
-        maxSpeed = 600f;
-        maxLinearAcceleration = 70f;
+        maxSpeed = 300f;
+        maxLinearAcceleration = 50f;
         this.getDetectionLine = new Vector2();
 
         chase = new IndexedAStarPathFinder<TileData>(getLevel());
@@ -208,6 +210,11 @@ public class FluVirus extends AbstractEnemy  {
             fuseTime += delta;
             sprite.setRegion(slimeBlows.getKeyFrame(fuseTime, false));
 
+            if (benShot)
+                slimeBlows.setFrameDuration(shotAnimation);
+            else
+                slimeBlows.setFrameDuration(closeAnimation);
+
             if (slimeBlows.isAnimationFinished(fuseTime) || instantDetonation) {
 
                 dead = true;
@@ -268,6 +275,7 @@ public class FluVirus extends AbstractEnemy  {
 
         fuse = true;
         drawPath = false;
+        benShot = true;
     }
 
     @Override

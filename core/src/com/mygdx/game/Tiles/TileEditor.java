@@ -144,12 +144,14 @@ public class TileEditor  {
                         tile = com.mygdx.game.Enumerators.Tile.GRASS;
                         break;
                     case ("*"):
-                        tile = com.mygdx.game.Enumerators.Tile.AIR;
+                        tile = Tile.AIR;
                         break;
                     case ("@"):
                         tile = com.mygdx.game.Enumerators.Tile.STONE;
                         break;
-
+                    case  ("+"):
+                        tile = Tile.BROKEN;
+                        break;
 
                     case ("0"):
                         tile = com.mygdx.game.Enumerators.Tile.INVISIBLE;

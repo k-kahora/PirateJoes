@@ -10,6 +10,7 @@ public enum Tile {
     DOOR("barrier10",  EnumSet.of(Collisions.BOTTOM),false),
     BASKET_FULL("barrier10",EnumSet.of(Collisions.SOLID, Collisions.SOLID),false),
     INVISIBLE("barrier1", EnumSet.of(Collisions.NONE),false),
+    BROKEN("barrier14", EnumSet.of(Collisions.SOLID, Collisions.SOLID), false),
 
     LEFT_WALL("barrier2"),
     RIGHT_WALL("barrier3"),

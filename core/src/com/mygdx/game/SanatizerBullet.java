@@ -31,13 +31,16 @@ public class SanatizerBullet extends AbstractBullet  {
     private final int maxBounces;
     private final int mapIndex;
 
-    private float timeElapsed, distanceTraveled = 0.5f;
+    private float timeElapsed, distanceTraveled = 27f;
 
     private Animation<TextureRegion> splash;
     private TextureAtlas atlas;
     private boolean collsionAnimation = false;
     private Deque<BulletSplash> wallCollsions;
     private Sprite test;
+
+    private Vector2 ogPos = new Vector2();
+    private Vector2 quad = new Vector2();
 
     private SanatizerBullet(Builder builder) {
 
@@ -49,6 +52,8 @@ public class SanatizerBullet extends AbstractBullet  {
         test.setPosition(200,200);
         this.x = builder.x;
         this.y = builder.y;
+        ogPos.x = builder.x;
+        ogPos.y = builder.y;
         this.maxBounces = builder.maxBounces;
         this.speed = builder.speed;
         this.velocity = builder.velocity;
@@ -59,10 +64,12 @@ public class SanatizerBullet extends AbstractBullet  {
         this.testBullet = builder.testBullet;
         this.atlas = builder.atlas;
         this.splash = builder.bulletExplosionAnimation;
+        this.quad = builder.quad;
 
-        setPosition(x,y);
+        setPosition(x ,y);
         this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
+        sprite.scale(-0.2f);
 
     }
 
@@ -85,6 +92,7 @@ public class SanatizerBullet extends AbstractBullet  {
         private boolean testBullet;
         private TextureAtlas atlas;
         private Animation<TextureRegion> bulletExplosionAnimation;
+        private Vector2 quad = new Vector2();
 
 
         public Builder(float x, float y, Vector2 velocity, float speed, Texture texture) {
@@ -125,6 +133,13 @@ public class SanatizerBullet extends AbstractBullet  {
         public Builder testBullet(boolean a) {
 
             testBullet = a;
+            return this;
+
+        }
+
+        public Builder addQuad(Vector2 quad) {
+
+            this.quad = quad;
             return this;
 
         }
@@ -252,6 +267,8 @@ public class SanatizerBullet extends AbstractBullet  {
 
         rectangle.x = getX();
         rectangle.y = getY();
+        rectangle.width = sprite.getWidth();
+        rectangle.height = sprite.getHeight();
 
         timeElapsed += delta;
 
@@ -260,7 +277,7 @@ public class SanatizerBullet extends AbstractBullet  {
         //System.out.println(timeElapsed * velocity.len() + " the distance");
 
         // make sthe bullet useless until it travels a min Distance
-        if (timeElapsed * speed > distanceTraveled) {
+        if (new Vector2(ogPos.x - rectangle.x, ogPos.y - rectangle.y).len() > distanceTraveled) {
 
             isLethal = true;
 

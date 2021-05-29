@@ -19,8 +19,8 @@ public final class SteeringUtils {
 
     public static boolean middleAnimationForExplosion(Object[] objects, int index) {
 
-        int third = objects.length / 10;
-        if (index > third * 4 && index < third * 6) {
+        int third = objects.length / 5;
+        if (index > third * 1 && index < third * 2) {
 
             System.out.println("Frame of death: " + index);
 
