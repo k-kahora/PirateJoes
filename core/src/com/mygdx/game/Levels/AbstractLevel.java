@@ -229,7 +229,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-               character.death();
+               // character.death();
 
             }
 

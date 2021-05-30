@@ -2,47 +2,56 @@ package com.mygdx.game.Viruses;
 
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.ai.steer.Steerable;
+import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.utils.Location;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
+import com.mygdx.game.Enumerators.Collisions;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Enumerators.Types;
 import com.mygdx.game.FunctionalityClasses.Entity;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.Levels.Level;
+import com.mygdx.game.MainCharacter;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.SteeringUtils;
+import org.graalvm.compiler.lir.alloc.SaveCalleeSaveRegisters;
 import org.w3c.dom.css.Rect;
 
+import javax.swing.plaf.BorderUIResource;
 import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class WanderVirus extends AbstractEnemy{
 
     private final Sprite spr;
     private final Wander<Vector2> wander;
+    private SteeringBehavior<Vector2> behavior;
+    private final Flee<Vector2> flee;
     private final Seek<Vector2> seek;
+
+    private boolean justShot = false;
+    private Color COLOR;
+
+    private final float MAX_FIRE_RATE = 0.1f;
 
     private final Seek<Vector2> seekPoint;
     private final EntityLocation target;
     private boolean seeking = false;
     private boolean canShoot = false, dead = false;
+    private float fireRate = 0.1f;
 
     private Queue<SanatizerBullet> testBullets = new LinkedList<>();
     private SanatizerBullet a = null;
     private ArrayList<SanatizerBullet> removedBullets = new ArrayList<>();
+
+
 
     private float timeElapsed = 0, timeElapsed2 = 0;
 
@@ -77,6 +86,7 @@ public class WanderVirus extends AbstractEnemy{
         setMaxAngularSpeed(100f);
 
         this.wander = new Wander<>(this).setWanderRate(MathUtils.PI * 8).setEnabled(true).setFaceEnabled(false).setWanderRadius(10f).setWanderOffset(0);
+        this.flee = new Flee<>(this, target);
         this.seekPoint = new Seek<Vector2>(this, local).setEnabled(true);
         this.seek = new Seek<>(this, target).setEnabled(true);
 
@@ -89,7 +99,13 @@ public class WanderVirus extends AbstractEnemy{
 
         this.tileCollider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
-        this.nozzle = new Turret();
+        this.nozzle = new Turret(1/29f, 10);
+
+
+        behavior = wander;
+
+        COLOR = builder.COLOR;
+
     }
 
     public static class Builder {
@@ -98,8 +114,11 @@ public class WanderVirus extends AbstractEnemy{
         private final EntityLocation target;
         private final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
         private float bulletSpeed;
+        private PrioritySteering<Vector2> behavior;
+        private Color COLOR;
 
         private Types type;
+        private Flee<Vector2> flee;
 
         public Builder(EntityLocation target, Level currentLevel, ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap) {
 
@@ -108,6 +127,7 @@ public class WanderVirus extends AbstractEnemy{
             this.target = target;
             this.type = Types.STILL;
             this.bulletSpeed = 2.1f;
+            this.COLOR = null;
 
         }
 
@@ -115,16 +135,33 @@ public class WanderVirus extends AbstractEnemy{
 
             return new WanderVirus(this);
 
+
         }
 
         public Builder wander() {
             this.type = Types.WANDER;
+            this.COLOR = Color.CHARTREUSE;
             return this;
         }
 
         public Builder fast() {
             this.type = Types.ROCKET;
             this.bulletSpeed = 3.2f;
+            this.COLOR = Color.TEAL;
+
+            return this;
+        }
+
+        public Builder smart() {
+            this.type = Types.SMART;
+            this.COLOR = Color.LIME;
+
+            return this;
+        }
+
+        public Builder invisible() {
+
+            this.COLOR = Color.CLEAR;
 
             return this;
         }
@@ -152,7 +189,7 @@ public class WanderVirus extends AbstractEnemy{
         shotLine.y = target.getY() - getY();
 
         timeElapsed += delta;
-        timeElapsed2 += delta;
+
 
         if (timeElapsed > 1f) {
 
@@ -180,7 +217,8 @@ public class WanderVirus extends AbstractEnemy{
 
             }
 
-            else if (new Vector2(a.getX() - target.getX(), a.getY() - target.getY()).len() < 15f) {
+            // i fthe bullets in a certain radius it can see the target
+            else if (new Vector2(a.getX() - target.getX(), a.getY() - target.getY()).len() < 20f) {
 
 
 
@@ -196,21 +234,19 @@ public class WanderVirus extends AbstractEnemy{
 
 
 
-        if (canShoot) {
+
 
             // add random time elapsed
-            if (timeElapsed2 > 0.8) {
+            if (nozzle.isFinished(delta)) {
 
-                getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, new Vector2(shotLine.x, shotLine.y), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
+
+                getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
                         .initCollision(tileDataMap).maxBounces(1)
                         .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
-                timeElapsed2 = 0;
+
+
             }
-
-        }
-
-        wander.calculateSteering(steeringOutput);
 
         if (a != null) {
 
@@ -221,25 +257,51 @@ public class WanderVirus extends AbstractEnemy{
 
         }}
 
-
-
-
-
+        behavior.calculateSteering(steeringOutput);
 
         seeking = getX() - local.position.x < 1f && getY() - local.position.y < 1f ? false : true;
-
 
         switch (type) {
 
             case STILL:
                 break;
+
             case WANDER:
+                //behavior.calculateSteering(steeringOutput);
+                behavior = wander;
                 steeringOutput.linear.scl(delta);
                 steeringOutput.linear.scl(1.1f);
                 // System.out.println(steeringOutput.linear);
                 this.velocity.x = steeringOutput.linear.x;
                 this.velocity.y = steeringOutput.linear.y;
+
                 break;
+            // no break so it essentially gets the smart atributes;
+            case SMART:
+
+               // behavior = wander;
+
+                // if it can see the player and the players close it flees
+                if (SteeringUtils.inRadius(getPosition(), target.getPosition(), 50f) && canShoot) {
+
+
+                    behavior = flee;
+
+
+                } else if (canShoot){
+                    behavior = seek;
+                } else {
+                    behavior = wander;
+                }
+
+                steeringOutput.linear.scl(delta);
+                steeringOutput.linear.scl(1.1f);
+                this.velocity.x = steeringOutput.linear.x;
+                this.velocity.y = steeringOutput.linear.y;
+
+                break;
+
+
 
         }
 
@@ -315,6 +377,7 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+
         spr.draw(batch);
 
         for (SanatizerBullet a : testBullets) {
@@ -327,8 +390,11 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         testBullets.removeAll(removedBullets);
-
         nozzle.draw(batch);
+
+        if (COLOR != null)
+            spr.setColor(COLOR);
+
 
 
 
@@ -406,19 +472,43 @@ public class WanderVirus extends AbstractEnemy{
 
     private class Turret {
 
-        Sprite nozzle = new Sprite(assetManager.manager.get(assetManager.nozzle));
-        Vector2 ray = new Vector2();
+        private float fireRate;
+        private final Animation<TextureRegion> nozzleAnimation;
 
-        Vector2 direction = new Vector2();
-        private Vector2 tip = new Vector2(1,1);
+        private int prevFrame = -1;
+
+        private Sprite nozzle;
+
+        private final float rotationRate = 2f;
+
+
+
+        private Vector2 tip = new Vector2(1,0);
         private Ray endPoint = new Ray();
         private Vector3 start;
+        private float timeElapsedNoz = 0f, missFireTimer = 0f;
+        private boolean chance = false;
+        private int missFire = 0;
+
+
+        private float timeElasped = 0f;
 
         float centerx, centery;
 
         public Turret() {
-            start = new Vector3();
+            this(1/5f,-1);
+        }
 
+        public Turret(float fireRate) {
+            this(fireRate, -1);
+        }
+
+        public Turret(float fireRate, int missFire) {
+            this.missFire = missFire;
+            start = new Vector3();
+            this.fireRate = fireRate;
+            nozzleAnimation = new Animation<TextureRegion>(fireRate, assetManager.manager.get(assetManager.nozzle).getRegions());
+            nozzle = new Sprite(nozzleAnimation.getKeyFrame(0f));
 
           //  nozzle.setPosition(centerx, centery);
             //WanderVirus.this.spr.setRegion(nozzle.getTexture());
@@ -438,18 +528,70 @@ public class WanderVirus extends AbstractEnemy{
 
         }
 
+
+
+
         public void act(float delta) {
 
             float xOffset = WanderVirus.this.getX() + nozzle.getWidth()/2;
 
             nozzle.setPosition(xOffset, WanderVirus.this.getY());
-            start.set(nozzle.getX(), nozzle.getY() + WanderVirus.this.getHeight()/2, 0);
-            endPoint.set(start, new Vector3(shotLine.x, shotLine.y, 0));
+            //start.set(nozzle.getX(), nozzle.getY() + WanderVirus.this.getHeight()/2, 0);
+            //endPoint.set(start, new Vector3(tip.x, tip.y, 0));
 
-            nozzle.setRotation(shotLine.angleDeg());
-            tip.setAngleDeg(shotLine.angleDeg());
 
-            tip.setLength(16f);
+
+            // mutates tip
+            tip = SteeringUtils.angleToVector(tip, (float)Math.toRadians(nozzle.getRotation()));
+            System.out.println(Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)));
+
+            if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) > 90 ) {
+              nozzle.rotate(-rotationRate);
+            } else {
+                nozzle.rotate(+rotationRate);
+            }
+
+            //nozzle.rotate(rotationRate);
+
+            //nozzle.setRotation(shotLine.angleDeg());
+            //tip.setAngleDeg(shotLine.angleDeg());
+
+
+            if (chance)
+                missFireTimer += delta;
+
+            if (canShoot) {
+
+
+            if (missFireTimer > SteeringUtils.rangeOfTimes(0f, 10f) || !chance) {
+
+                missFireTimer = 0;
+
+
+                //if (canShoot) {
+
+                    chance = false;
+
+                    // if it can shoot and it isnt current in a timeout then calculate next chance
+
+
+                    timeElapsedNoz += delta;
+                    nozzle.setRegion(nozzleAnimation.getKeyFrame(timeElapsedNoz, true));
+
+
+               // }
+
+
+
+
+            }
+            } else {
+
+
+                nozzle.setRegion(nozzleAnimation.getKeyFrame(0f));
+                timeElapsedNoz = 0;
+                missFireTimer = 0;
+            }
 
 
 
@@ -461,6 +603,9 @@ public class WanderVirus extends AbstractEnemy{
 
             nozzle.draw(batch);
 
+            if (COLOR != null)
+            nozzle.setColor(COLOR);
+
 
         }
 
@@ -468,10 +613,40 @@ public class WanderVirus extends AbstractEnemy{
 
             Vector3 newVec = endPoint.getEndPoint(start, 16f);
 
+            float centerX = getX() + getWidth()/2;
+            float centery = getY() + getHeight()/2;
 
-           return new Vector2(newVec.x, newVec.y);
+            Vector2 sillVec = SteeringUtils.angleToVector((float)Math.toRadians(nozzle.getRotation() - 90));
+
+            sillVec.scl(16f);
+
+
+           return new Vector2(sillVec.x + centerX, centery + sillVec.y);
 
         }
+
+
+
+        public boolean isFinished(float delta) {
+
+
+
+            if (nozzleAnimation.isAnimationFinished(timeElapsedNoz)) {
+
+               chance = true;
+               timeElapsed2 += delta;
+               timeElapsedNoz = 0;
+
+
+                return true;
+            }
+
+            justShot = false;
+
+
+            return false;
+        }
+
 
     }
 
