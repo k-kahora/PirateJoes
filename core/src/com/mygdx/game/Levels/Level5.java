@@ -15,14 +15,14 @@ import com.mygdx.game.utils.GraphMaker;
 
 import java.util.ArrayList;
 
-public class Level3 extends AbstractLevel{
+public class Level5 extends AbstractLevel{
 
     TileEditor baseLayer, secondLayer;
     ArrayList<ArrayList<ArrayList<TileData>>> collisonMaps;
     TileCollision collider;
     Array<TileData> collisionTiles;
 
-    public Level3(PirateJoes pirateJoes) {
+    public Level5(PirateJoes pirateJoes) {
         super(pirateJoes);
     }
 
@@ -58,7 +58,7 @@ public class Level3 extends AbstractLevel{
     @Override
     public void show() {
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
-        secondLayer = new TileEditor("level3.txt", getAssetManager().manager.get(getAssetManager().bruh));
+        secondLayer = new TileEditor("level4.txt", getAssetManager().manager.get(getAssetManager().bruh));
         setRender();
         secondLayer.addLevel(this);
 
@@ -76,20 +76,20 @@ public class Level3 extends AbstractLevel{
 
         collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
-        character.setPosition(100,60);
+        character.setPosition(200,150);
 
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).smart().build());
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).build());
+        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper().build());
 
 
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).wander().build());
+
+        //getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).wander().build());
 
 
         //getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());//
         //getFluViruses().get(3).setPosition(40, 40);
-        getFluViruses().get(0).setPosition(20, 30);
-        getFluViruses().get(1).setPosition(400, 200);
-        getFluViruses().get(2).setPosition(350, 100);
+        getFluViruses().get(0).setPosition(300, 230);
+
+
     }
 
 

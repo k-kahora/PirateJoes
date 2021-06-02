@@ -13,14 +13,18 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.mygdx.game.Enumerators.Collisions;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Enumerators.Types;
+import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.Entity;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
+import com.mygdx.game.FunctionalityClasses.RayCast;
+import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.Level;
 import com.mygdx.game.MainCharacter;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.SteeringUtils;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.graalvm.compiler.lir.alloc.SaveCalleeSaveRegisters;
 import org.w3c.dom.css.Rect;
 
@@ -38,6 +42,8 @@ public class WanderVirus extends AbstractEnemy{
 
     private boolean justShot = false;
     private Color COLOR;
+
+    private Vector2 rayCast = new Vector2();
 
     private final float MAX_FIRE_RATE = 0.1f;
 
@@ -67,6 +73,7 @@ public class WanderVirus extends AbstractEnemy{
     private final Turret nozzle;
 
     private final Types type;
+    private final Level currentLevel;
 
     private WanderVirus(Builder builder) {
         super(builder.target, builder.currentLevel);
@@ -93,13 +100,15 @@ public class WanderVirus extends AbstractEnemy{
         blendedSteering.add(new BlendedSteering.BehaviorAndWeight<>(wander, 0.8f));
         // blendedSteering.add(new BlendedSteering.BehaviorAndWeight<>(wander, 2f));
 
-        System.out.println(wander.getInternalTargetPosition());
+
         velocity = new Vector2();
         this.tileDataMap = builder.tileDataMap;
 
         this.tileCollider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
         this.nozzle = new Turret(1/29f, 10);
+
+        this.currentLevel = builder.currentLevel;
 
 
         behavior = wander;
@@ -152,6 +161,20 @@ public class WanderVirus extends AbstractEnemy{
             return this;
         }
 
+        public Builder hyper() {
+            this.type = Types.HYPER;
+            this.bulletSpeed = 3.2f;
+            this.COLOR = Color.TEAL;
+
+            return this;
+        }
+
+        public Builder stupid() {
+            this.type = Types.STUPID;
+
+            return this;
+        }
+
         public Builder smart() {
             this.type = Types.SMART;
             this.COLOR = Color.LIME;
@@ -190,16 +213,17 @@ public class WanderVirus extends AbstractEnemy{
 
         timeElapsed += delta;
 
+        //rayCast = RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, fluVirusTileColliderMap.get(0));
 
-        if (timeElapsed > 1f) {
+        if (RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, target.getPosition(),fluVirusTileColliderMap.get(0))) {
 
-            testBullets.add( new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, new Vector2(shotLine.x, shotLine.y), 16f ,assetManager.manager.get(assetManager.bulletSprite))
-                    .initCollision(tileDataMap).maxBounces(0)
-                    .build());
+            canShoot = true;
 
-            timeElapsed = 0;
-
+        } else {
+            canShoot = false;
         }
+
+
 
 
         // if shot
@@ -266,6 +290,7 @@ public class WanderVirus extends AbstractEnemy{
             case STILL:
                 break;
 
+
             case WANDER:
                 //behavior.calculateSteering(steeringOutput);
                 behavior = wander;
@@ -277,20 +302,29 @@ public class WanderVirus extends AbstractEnemy{
 
                 break;
             // no break so it essentially gets the smart atributes;
+
+            case ROCKET:
             case SMART:
 
                // behavior = wander;
 
                 // if it can see the player and the players close it flees
-                if (SteeringUtils.inRadius(getPosition(), target.getPosition(), 50f) && canShoot) {
+                if (SteeringUtils.inRadius(getPosition(), target.getPosition(), 55f) && canShoot) {
 
-
+                    behavior.setEnabled(true);
                     behavior = flee;
 
 
-                } else if (canShoot){
+                } else if (SteeringUtils.inRadius(getPosition(), target.getPosition(), 70f) && canShoot) {
+                    behavior.setEnabled(false);
+                }
+
+
+                else if (canShoot){
+                    behavior.setEnabled(true);
                     behavior = seek;
                 } else {
+                    behavior.setEnabled(true);
                     behavior = wander;
                 }
 
@@ -333,7 +367,7 @@ public class WanderVirus extends AbstractEnemy{
 
         public BoundingPoint(float radius) {
 
-            System.out.println(WanderVirus.this.getX() + " " + WanderVirus.this.getY());
+
 
             position = new Vector2(200,200);
             this.radius = radius;
@@ -394,6 +428,12 @@ public class WanderVirus extends AbstractEnemy{
 
         if (COLOR != null)
             spr.setColor(COLOR);
+
+       // DebugDrawer.DrawDebugCircle(rayCast, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+       // DebugDrawer.DrawDebugLine(getPosition(), target.getPosition(), 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+
+
+        //System.out.println(rayCast);
 
 
 
@@ -479,7 +519,7 @@ public class WanderVirus extends AbstractEnemy{
 
         private Sprite nozzle;
 
-        private final float rotationRate = 2f;
+        private final float rotationRate = 4f;
 
 
 
@@ -522,34 +562,62 @@ public class WanderVirus extends AbstractEnemy{
 
         }
 
-        public void rotate(Vector2 angleToMoveTo) {
+        private boolean rotating = true;
+        private int randomDegree = 90;
+
+        public void rotate() {
+
+
+
+            Vector2 noz = SteeringUtils.angleToVector((float)Math.toRadians(nozzle.getRotation() - 90));
+            //double randomDegree = Math.toDegrees(vectorToAngle(noz));
+
+           if (rotating) {
+
+                randomDegree = (int)(Math.random() * 360) - 180;
+                rotating = false;
+
+           }
+
+
+
+
+
+            if (Math.abs(Math.toDegrees(vectorToAngle(noz)) - randomDegree) < 3.0){
+                //System.out.println("true");
+                rotating = true;
+            }
+
+            if (Math.toDegrees(vectorToAngle(noz)) > randomDegree) {
+                nozzle.rotate(-2);
+            } else if (Math.toDegrees(vectorToAngle(noz)) < randomDegree) {
+                nozzle.rotate(+2);
+            }
+
+           // System.out.println(Math.toDegrees(vectorToAngle(noz)) - randomDegree);
+
+
 
 
 
         }
 
 
-
+        //DELETE TESTING
+        boolean chance2 = true;
 
         public void act(float delta) {
 
-            float xOffset = WanderVirus.this.getX() + nozzle.getWidth()/2;
+            float xOffset = WanderVirus.this.getX() + nozzle.getWidth() / 2;
 
             nozzle.setPosition(xOffset, WanderVirus.this.getY());
             //start.set(nozzle.getX(), nozzle.getY() + WanderVirus.this.getHeight()/2, 0);
             //endPoint.set(start, new Vector3(tip.x, tip.y, 0));
 
 
-
             // mutates tip
-            tip = SteeringUtils.angleToVector(tip, (float)Math.toRadians(nozzle.getRotation()));
-            System.out.println(Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)));
+            tip = SteeringUtils.angleToVector(tip, (float) Math.toRadians(nozzle.getRotation()));
 
-            if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) > 90 ) {
-              nozzle.rotate(-rotationRate);
-            } else {
-                nozzle.rotate(+rotationRate);
-            }
 
             //nozzle.rotate(rotationRate);
 
@@ -560,9 +628,45 @@ public class WanderVirus extends AbstractEnemy{
             if (chance)
                 missFireTimer += delta;
 
+            // if it can shoot then rotate nozzle towards player
+            // if its a stupid type it never aims for the player
+
+            //modifys tip using complex bounce algorithim
+            if (type == Types.HYPER && chance2) {
+                try {
+                    SteeringUtils.bounceShot(tip, target, WanderVirus.this, fluVirusTileColliderMap);
+                } catch (Exception e) {
+
+                }
+            chance2 = false;
+        }
+
+
             if (canShoot) {
 
 
+
+                if (type != Types.STUPID) {
+
+
+
+                    //System.out.println(Math.abs(Math.toDegrees(vectorToAngle(tip)) - Math.toDegrees(vectorToAngle(shotLine))));
+
+                    if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) > 88
+                        && Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) < 92) {
+
+
+                    }
+
+                    else if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) > 90) {
+                        nozzle.rotate(-rotationRate);
+                    } else {
+                        nozzle.rotate(+rotationRate);
+                    }
+                }
+
+
+                // the range of time between each fire
             if (missFireTimer > SteeringUtils.rangeOfTimes(0f, 10f) || !chance) {
 
                 missFireTimer = 0;
@@ -585,13 +689,27 @@ public class WanderVirus extends AbstractEnemy{
 
 
             }
+            // when it doesnt see the player call rotate and rotate inr andom directions
             } else {
 
 
                 nozzle.setRegion(nozzleAnimation.getKeyFrame(0f));
                 timeElapsedNoz = 0;
                 missFireTimer = 0;
+
+                rotate();
+
+
+
             }
+
+
+
+
+
+
+
+
 
 
 

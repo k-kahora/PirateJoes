@@ -14,7 +14,7 @@ import org.w3c.dom.css.Rect;
 
 // 9000 means the tile is not indexed
 
-public class TileData {
+public class TileData implements Cloneable{
 
     private TextureRegion textureRegion;
     private TextureAtlas atlas;
@@ -216,5 +216,30 @@ public class TileData {
 
     public void setToInvisible() {
         tile = Tile.INVISIBLE;
+    }
+
+    /*
+    private TextureRegion textureRegion;
+    private TextureAtlas atlas;
+    private int bottom;
+    private int top;
+    private int right;
+    private int left;
+    public static int TILE_WIDTH;
+    public static int TILE_HEIGHT;
+    public final boolean broken;
+    private Tile tile;
+    private Array<Connection<TileData>> connectionArray = new Array<>();
+    public int INDEX = 9000;
+    private final Pair<Float, Float> position;
+    private final boolean isWalls;
+    public boolean stable = true;
+
+    private Vector2 weakPoint = new Vector2();
+     */
+    @Override
+    public TileData clone() throws CloneNotSupportedException {
+        TileData clone = (TileData)super.clone();
+        return  clone;
     }
 }

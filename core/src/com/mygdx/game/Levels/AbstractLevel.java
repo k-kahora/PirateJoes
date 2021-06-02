@@ -352,12 +352,13 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                     break;
                 case LEVEL2:
                     //getPirateJoe().setScreen(new Level3(getPirateJoe()));
-                    TileData.Indexer.reset();
+
                     getPirateJoe().setScreen(new Level3(getPirateJoe()));
                     currentLevel = LEVELS.LEVEL3;
                     break;
                 case LEVEL3:
-                    //getPirateJoe().setScreen(new Level4(getPirateJoe()));
+                    TileData.Indexer.reset();
+                    getPirateJoe().setScreen(new Level3(getPirateJoe()));
                     currentLevel = LEVELS.LEVEL4;
                     break;
                 case LEVEL4:
@@ -375,6 +376,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         }
 
     }
+
 
 
 }

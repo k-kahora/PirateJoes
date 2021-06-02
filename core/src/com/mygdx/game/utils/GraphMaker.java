@@ -135,5 +135,42 @@ public final class GraphMaker {
 
     }
 
+    public static void parseMap(ArrayList<ArrayList<TileData>> map) {
+
+
+
+
+        System.out.println(map.get(1).get(3).getTile());
+
+        map.remove(0);
+        map.remove(map.size() - 1);
+
+        System.out.println(map.get(1).get(3).getTile());
+
+        System.out.println("BRUH");
+
+/*
+
+        int count = map.size();
+
+        for (int i = 0; i < count; ++i) {
+
+            // removes column of ?
+            map.get(i).remove(0);
+            map.get(i).remove(count - 1);
+
+
+        }
+
+ */
+
+
+
+
+
+
+
+    }
+
 
 }

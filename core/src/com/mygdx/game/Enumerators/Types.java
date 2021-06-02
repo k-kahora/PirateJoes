@@ -6,6 +6,8 @@ public enum Types {
     WANDER,
     SMART,
     ROCKET,
-    INVISIBLE;
+    INVISIBLE,
+    HYPER,
+    STUPID;
 
 }

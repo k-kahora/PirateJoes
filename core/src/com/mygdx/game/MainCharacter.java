@@ -100,7 +100,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         landMines = new LinkedList<>();
 
-        maxSpeed = 1.4f;
+        maxSpeed = 0.6f;
         friction = 0.09f;
         acceleration = 0.07f;
 
@@ -175,13 +175,8 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         // once you start clicking you can only fore five untile shoting Timer is 0
         // if the player shoot start a timer
-        if (numTimesFired > 0) {
-            shootingTimer += Gdx.graphics.getDeltaTime();
-        }
-        if (shootingTimer > 1.4f) {
-            shootingTimer = 0;
-            numTimesFired = 0;
-        }
+
+
 
         if (!direction.equals(new Vector2())) {
 
@@ -206,6 +201,9 @@ public class MainCharacter extends Actor implements EntityLocation {
             }
 
         }
+
+        if (bullets.isEmpty())
+            numTimesFired = 0;
 
 
 
@@ -419,8 +417,8 @@ public class MainCharacter extends Actor implements EntityLocation {
         // if the timer started and there is more than five bullets dont call shoot
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
 
-            numTimesFired++;
-            if (shootingTimer != 0 && numTimesFired > 3) {
+
+            if (bullets.size() > 3) {
                 return;
             }
            shoot();

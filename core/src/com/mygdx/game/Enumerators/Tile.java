@@ -25,25 +25,28 @@ public enum Tile {
 
     private String atlasReference;
     //private Collisions collide;
-    private boolean interact;
+    private boolean interact, wall;
     private EnumSet<Collisions> set;
 
     private Tile() {
         this.atlasReference = "barrier1";
         this.set = EnumSet.of(Collisions.NONE);
         this.interact = false;
+        this.wall = false;
     }
 
     private Tile(String atlasReference, EnumSet<Collisions> set, boolean interact) {
         this.atlasReference = atlasReference;
         this.set = set;
         this.interact = interact;
+        this.wall = false;
     }
 
     private Tile(String atlasReference) {
         this.atlasReference = atlasReference;
         this.set = EnumSet.of(Collisions.SOLID);
         this.interact = false;
+        this.wall = true;
     }
 
     public String getAtlasReference() {
@@ -56,6 +59,10 @@ public enum Tile {
 
     public boolean isInteractable() {
         return interact;
+    }
+
+    public boolean isWall() {
+        return wall;
     }
 
 }

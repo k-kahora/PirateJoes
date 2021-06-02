@@ -18,4 +18,5 @@ public interface Level extends IndexedGraph<TileData> {
     public ArrayList<ArrayList<ArrayList<TileData>>> getCollisionMap();
 
     public ArrayList<? extends Steerable<Vector2>> getEnemeyGroup();
+
 }

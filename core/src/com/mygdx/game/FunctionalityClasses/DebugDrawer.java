@@ -31,4 +31,15 @@ public class DebugDrawer {
         Gdx.gl.glLineWidth(1);
 
     }
+
+    public static void DrawDebugCircle(Vector2 start, float radius, int lineWidth, Color color, Matrix4 projectionMatrix)
+    {
+        Gdx.gl.glLineWidth(lineWidth);
+        debugRenderer.setProjectionMatrix(projectionMatrix);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        debugRenderer.setColor(color);
+        debugRenderer.circle(start.x, start.y, radius);
+        debugRenderer.end();
+        Gdx.gl.glLineWidth(1);
+    }
 }
