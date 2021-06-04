@@ -30,6 +30,7 @@ public class SanatizerBullet extends AbstractBullet  {
     private final Vector2 velocity;
     private final int maxBounces;
     private final int mapIndex;
+    private final boolean playerShot;
 
     private float timeElapsed, distanceTraveled = 27f;
 
@@ -65,6 +66,7 @@ public class SanatizerBullet extends AbstractBullet  {
         this.atlas = builder.atlas;
         this.splash = builder.bulletExplosionAnimation;
         this.quad = builder.quad;
+        this.playerShot = builder.playerShot;
 
         setPosition(x ,y);
         this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
@@ -93,6 +95,7 @@ public class SanatizerBullet extends AbstractBullet  {
         private TextureAtlas atlas;
         private Animation<TextureRegion> bulletExplosionAnimation;
         private Vector2 quad = new Vector2();
+        private boolean playerShot = false;
 
 
         public Builder(float x, float y, Vector2 velocity, float speed, Texture texture) {
@@ -142,6 +145,12 @@ public class SanatizerBullet extends AbstractBullet  {
             this.quad = quad;
             return this;
 
+        }
+
+        public Builder playerShot() {
+
+            this.playerShot = true;
+            return this;
         }
 
         public Builder explosionAnimation(TextureAtlas atlas) {
@@ -338,6 +347,10 @@ public class SanatizerBullet extends AbstractBullet  {
 
     public void resetCollision() {
         collided = false;
+    }
+
+    public boolean isPlayerBullet() {
+        return playerShot;
     }
 
 

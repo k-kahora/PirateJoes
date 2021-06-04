@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.mygdx.game.Levels.Level;
 import com.mygdx.game.Particles.BulletSplash;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
@@ -81,9 +82,13 @@ public class MainCharacter extends Actor implements EntityLocation {
     LinkedList<SanatizerBullet> bullets, removedBullets;
     LinkedList<LandMine> landMines;
 
+    Level currentLevel;
+
     private int clickCount;
 
-    public MainCharacter() {
+    public MainCharacter(Level level) {
+
+        this.currentLevel = level;
 
         assetManager = new MyAssetManager();
         assetManager.loadCharecter();
@@ -378,6 +383,8 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     private void keys(float delta) {
 
+
+
         float timeBetweenMines = 1f;
 
         if (spacePressed)
@@ -418,9 +425,15 @@ public class MainCharacter extends Actor implements EntityLocation {
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
 
 
+
             if (bullets.size() > 3) {
+
                 return;
             }
+
+
+
+
            shoot();
 
         }
@@ -458,6 +471,8 @@ public class MainCharacter extends Actor implements EntityLocation {
 //     The moment we start shotting the designated time we only can fire five bullets untile the timer runs out.
     private void shoot() {
 
+
+
         velocity.x = 0;
         velocity.y = 0;
 
@@ -469,11 +484,14 @@ public class MainCharacter extends Actor implements EntityLocation {
         // converts vector to appropiate angle
         mouseCordinatesRelativeToActor(bulletVellocity, rectangleMidX, rectangleMidY);
 
+        SanatizerBullet newBullet = new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 2.1f ,assetManager.manager.get(assetManager.bulletSprite))
+                .initCollision(collisionMap).maxBounces(2)
+                .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).playerShot().build();
 
-            bullets.add(new SanatizerBullet.Builder(rectangleMidX, rectangleMidY, bulletVellocity, 2.1f ,assetManager.manager.get(assetManager.bulletSprite))
-                    .initCollision(collisionMap).maxBounces(2)
-                    .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+        currentLevel.addBullets(newBullet);
 
+
+            bullets.add(newBullet);
 
     }
 
@@ -524,7 +542,9 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     public Vector2 getCenterPosition() {
 
-        return centerPosition;
+        Vector2 rectVec = new Vector2(rectangle.getX() + rectangle.getWidth()/2, rectangle.getY() + rectangle.getHeight()/2);
+
+        return rectVec;
 
     }
 
@@ -633,6 +653,17 @@ public class MainCharacter extends Actor implements EntityLocation {
     public void reset() {
 
         collisionMap = null;
+
+    }
+
+    public void reduceTimesFired(SanatizerBullet a) {
+
+        bullets.remove(a);
+    }
+
+    public void addBullets(LinkedList<SanatizerBullet> worldBullets) {
+
+        worldBullets.addAll(bullets);
 
     }
 

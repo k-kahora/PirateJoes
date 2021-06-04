@@ -9,8 +9,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
-import com.mygdx.game.utils.Pair;
+import com.mygdx.game.utils.Edge;
 import org.w3c.dom.css.Rect;
+
+import java.util.ArrayList;
 
 // 9000 means the tile is not indexed
 
@@ -28,9 +30,10 @@ public class TileData implements Cloneable{
     private Tile tile;
     private Array<Connection<TileData>> connectionArray = new Array<>();
     public int INDEX = 9000;
-    private final Pair<Float, Float> position;
+    private final Edge<Float, Float> position;
     private final boolean isWalls;
     public boolean stable = true;
+    private Array<Edge<Integer, Integer>> edges = new Array<>();
 
     private Vector2 weakPoint = new Vector2();
 
@@ -48,7 +51,7 @@ public class TileData implements Cloneable{
         this.tile = Tile.BASKET_FULL;
         this.bottom = 1;
         this.INDEX = 0;
-        this.position = new Pair<>(0f,0f);
+        this.position = new Edge<>(0f,0f);
         this.box = new Rectangle(0,0,16,16);
         this.isWalls = false;
         broken = false;
@@ -65,6 +68,15 @@ public class TileData implements Cloneable{
         this.left = x;
 
         this.atlas = atlas;
+
+        // should be clockwise
+        edges.add(new Edge<>(left, bottom));
+        edges.add(new Edge<>(left, top));
+        edges.add(new Edge<>(right, top));
+        edges.add(new Edge<>(right, bottom));
+
+
+
 
         if (tile.getAtlasReference().equals("barrier14")) {
             textureRegion = atlas.findRegion(tile.getAtlasReference());
@@ -120,7 +132,7 @@ public class TileData implements Cloneable{
 
         //System.out.println(INDEX);
 
-        this.position = new Pair<>((float)x,(float)y);
+        this.position = new Edge<>((float)x,(float)y);
         this.box = new Rectangle(x * 16, y * 16, 16, 16);
 
     }
@@ -184,7 +196,7 @@ public class TileData implements Cloneable{
         return connectionArray;
     }
 
-    public Pair getIndex() {
+    public Edge<Float, Float> getIndex() {
         return position;
     }
 
@@ -241,5 +253,11 @@ public class TileData implements Cloneable{
     public TileData clone() throws CloneNotSupportedException {
         TileData clone = (TileData)super.clone();
         return  clone;
+    }
+
+    public Array<Edge<Integer, Integer>> getEdges() {
+
+        return edges;
+
     }
 }

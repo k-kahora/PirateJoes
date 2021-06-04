@@ -26,11 +26,14 @@ import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.AbstractEnemy;
 import com.mygdx.game.Viruses.Enemy;
 import com.mygdx.game.Viruses.FluVirus;
+import com.mygdx.game.utils.Edge;
+import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import sun.awt.image.ImageWatched;
 import sun.rmi.rmic.Main;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,6 +88,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private LinkedList<SanatizerBullet> removedBullets;
     private LinkedList<MainCharacter.LandMine> mines;
 
+    protected Array<Edge> levelEdges = new Array<>();
+
     static {
         cameraHeight = 17;
         cameraWidth = 31;
@@ -107,13 +112,17 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         groupOfViruses = new Array<>();
         killedViruses = new Array<>();
 
-        character = new MainCharacter();
+        character = new MainCharacter(this);
         character.setPosition(32,32);
 
         character.addTileMap(getWalls().getTileMap());
 
-        bullets = character.getBullets();
+        bullets = new LinkedList<>();
+
+        //bullets = character.getBullets();
         removedBullets = new LinkedList<>();
+
+        levelEdges = GraphMaker.edgeMap(secondLayer.getTileMap());
 
 
 
@@ -171,7 +180,10 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     public void update(float delta) {
 
+
+
         mines = character.getLandMines();
+
 
         if (groupOfViruses.isEmpty()) {
             clear();
@@ -191,7 +203,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             a.act(delta);
             a.draw(getPirateJoe().batch, 0);
-            removedBullets.addAll(a.isHit(bullets));
+            //removedBullets.addAll
+
+            a.isHit(bullets);
 
             bullets.addAll(a.getVirusBullets());
             a.clearBullets();
@@ -221,6 +235,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
             }
 
             bullets.get(i).draw(getPirateJoe().batch,0);
+            bullets.get(i).act(Gdx.graphics.getDeltaTime());
 
             if (bullets.get(i).collided()) {
                 ParticleManager.splashBullets.addAll(bullets.get(i).getSplashAnimation());
@@ -235,8 +250,11 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).remove) {
                 removedBullets.add(bullets.get(i));
+                if (bullets.get(i).isPlayerBullet()) {
+                    character.reduceTimesFired(bullets.get(i));
+                }
             }
-            bullets.get(i).act(Gdx.graphics.getDeltaTime());
+
 
             for (MainCharacter.LandMine mine : character.getLandMines())
 
@@ -244,7 +262,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
              {
 
                  mine.activate();
-                 removedBullets.add(bullets.get(i));
+                 bullets.get(i).remove = true;
+                 //removedBullets.add(bullets.get(i));
 
             }
 
@@ -266,8 +285,10 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private void bulletCollision(SanatizerBullet previousBullet, SanatizerBullet bullet) {
 
         if (Intersector.overlaps(previousBullet.getBoundingBox(), bullet.getBoundingBox())) {
-            removedBullets.add(previousBullet);
-            removedBullets.add(bullet);
+            previousBullet.remove = true;
+            bullet.remove = true;
+           // removedBullets.add(previousBullet);
+           // removedBullets.add(bullet);
         }
 
     }
@@ -375,6 +396,10 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         }
 
+    }
+
+    public void addBullets(SanatizerBullet sanatizerBullet) {
+        bullets.add(sanatizerBullet);
     }
 
 

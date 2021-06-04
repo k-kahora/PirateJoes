@@ -10,7 +10,8 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.Level;
-import com.mygdx.game.utils.Pair;
+import com.mygdx.game.utils.GraphMaker;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +29,10 @@ public class TileEditor  {
     private TextureAtlas atlas;
     private Level level;
     private boolean isWalls;
+
+    private Array<TileData> collidableTiles = new Array<>();
+
+
 
     public void addLevel(Level level) {
 
@@ -248,6 +253,8 @@ public class TileEditor  {
         }
 
         // delete
+
+
 
         this.tileMapData = tileDataMap;
         return tileDataMap;

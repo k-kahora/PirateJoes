@@ -124,7 +124,7 @@ public final class GraphMaker {
 
     }
 
-    public static Vector2 convertIndexToPoint(Pair pair) {
+    public static Vector2 convertIndexToPoint(Edge pair) {
 
 
         float x = (float)pair.getIndexi();
@@ -169,6 +169,72 @@ public final class GraphMaker {
 
 
 
+
+    }
+
+    public static Array<Edge> edgeMap(ArrayList<ArrayList<TileData>> map) {
+
+        Array<Array<Edge<Integer, Integer>>> edges = new Array<>();
+
+        Array<Edge> returnEdges = new Array<>();
+
+        for (ArrayList<TileData> list : map) {
+
+            for (TileData data : list) {
+
+                if (data.getTile() != Tile.INVISIBLE && data.getTile() != Tile.NULL)
+                    edges.add(data.getEdges());
+;
+            }
+
+        }
+
+
+        for (Array<Edge<Integer, Integer>> edge1 : edges) {
+
+            for (int i = 0; i < edges.size; ++i) {
+
+                Array<Edge<Integer, Integer>> edge2 = edges.get(i);
+
+                if (edge1 == edges.get(i)) {
+                    continue;
+                }
+
+                if (edge2.get(2).equals(edge1.get(1))) {
+                    edge2.removeIndex(2);
+                    edge1.removeIndex(1);
+
+                    continue;
+                }
+
+                if (edge2.get(1).equals(edge1.get(2))) {
+                    edge2.removeIndex(1);
+                    edge1.removeIndex(2);
+                }
+
+            }
+
+        }
+
+        //edges.removeAll(removedEdges, false);
+
+
+
+        //System.out.println(edges);
+
+        for (Array<Edge<Integer, Integer>> thing : edges) {
+
+            for (Edge god : thing) {
+
+                System.out.println(god);
+
+                returnEdges.add(god);
+
+            }
+
+        }
+
+        return returnEdges;
 
     }
 

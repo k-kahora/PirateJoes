@@ -58,7 +58,9 @@ public class Level5 extends AbstractLevel{
     @Override
     public void show() {
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
+
         secondLayer = new TileEditor("level4.txt", getAssetManager().manager.get(getAssetManager().bruh));
+        GraphMaker.edgeMap(secondLayer.getTileMap());
         setRender();
         secondLayer.addLevel(this);
 
@@ -78,7 +80,7 @@ public class Level5 extends AbstractLevel{
 
         character.setPosition(200,150);
 
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper().build());
+        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper(levelEdges).build());
 
 
 

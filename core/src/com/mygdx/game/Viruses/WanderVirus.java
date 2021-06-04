@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Collisions;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Enumerators.Types;
@@ -23,8 +24,10 @@ import com.mygdx.game.MainCharacter;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.utils.Edge;
 import com.mygdx.game.utils.SteeringUtils;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import org.graalvm.compiler.graph.Edges;
 import org.graalvm.compiler.lir.alloc.SaveCalleeSaveRegisters;
 import org.w3c.dom.css.Rect;
 
@@ -39,6 +42,10 @@ public class WanderVirus extends AbstractEnemy{
     private SteeringBehavior<Vector2> behavior;
     private final Flee<Vector2> flee;
     private final Seek<Vector2> seek;
+
+    private final Array<Edge> edges;
+
+    private final Array<Vector2> rays = new Array<>();
 
     private boolean justShot = false;
     private Color COLOR;
@@ -110,6 +117,7 @@ public class WanderVirus extends AbstractEnemy{
 
         this.currentLevel = builder.currentLevel;
 
+        this.edges = builder.edges;
 
         behavior = wander;
 
@@ -125,6 +133,8 @@ public class WanderVirus extends AbstractEnemy{
         private float bulletSpeed;
         private PrioritySteering<Vector2> behavior;
         private Color COLOR;
+
+        private Array<Edge> edges = new Array<>();
 
         private Types type;
         private Flee<Vector2> flee;
@@ -161,10 +171,11 @@ public class WanderVirus extends AbstractEnemy{
             return this;
         }
 
-        public Builder hyper() {
+        public Builder hyper(Array<Edge> edges) {
             this.type = Types.HYPER;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
+            this.edges = edges;
 
             return this;
         }
@@ -193,6 +204,8 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public void act(float delta) {
+
+
         //update(delta);
         GdxAI.getTimepiece().update(delta);
         //update(delta);
@@ -215,13 +228,15 @@ public class WanderVirus extends AbstractEnemy{
 
         //rayCast = RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, fluVirusTileColliderMap.get(0));
 
-        if (RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, target.getPosition(),fluVirusTileColliderMap.get(0))) {
+        if (RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, target.getCenterPosition(),fluVirusTileColliderMap.get(0))) {
 
             canShoot = true;
 
         } else {
             canShoot = false;
         }
+
+
 
 
 
@@ -353,10 +368,12 @@ public class WanderVirus extends AbstractEnemy{
         setBoundingBox(rectangle);
 
         collisionLogic();
+        castAllRays();
         //local.updateLocation((int)getX(), (int)getY());
        // moveBy(0.5f, 2f);
 
         nozzle.act(delta);
+
 
     }
 
@@ -409,34 +426,57 @@ public class WanderVirus extends AbstractEnemy{
         }
     }
 
+    private void castAllRays() {
+
+        Vector2 centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
+
+        rays.add(RayCast.castRay(centerPos, shotLine, fluVirusTileColliderMap.get(0)));
+       // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2(), fluVirusTileColliderMap.get(0)));
+
+        // the four corners
+        rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 256)), fluVirusTileColliderMap.get(0)));
+        rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 16)), fluVirusTileColliderMap.get(0)));
+        rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(480, 256)), fluVirusTileColliderMap.get(0)));
+        rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(480, 16)), fluVirusTileColliderMap.get(0)));
+
+
+        //for (int i = 0; i < 360; i+=6) {
+           // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2((float)Math.sin(i), (float)Math.cos(i)), fluVirusTileColliderMap.get(0)));
+        //}
+
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
         spr.draw(batch);
 
-        for (SanatizerBullet a : testBullets) {
-
-            //a.draw(batch,1);
-            a.act(1f);
-
-
-
-        }
-
-        testBullets.removeAll(removedBullets);
         nozzle.draw(batch);
 
         if (COLOR != null)
             spr.setColor(COLOR);
 
-       // DebugDrawer.DrawDebugCircle(rayCast, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
-       // DebugDrawer.DrawDebugLine(getPosition(), target.getPosition(), 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+
 
 
         //System.out.println(rayCast);
 
+        drawRays();
 
 
+
+    }
+
+    private void drawRays() {
+
+        for (Vector2 ray : rays) {
+
+            DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+            DebugDrawer.DrawDebugLine(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), ray, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+
+        }
+
+        rays.clear();
 
     }
 

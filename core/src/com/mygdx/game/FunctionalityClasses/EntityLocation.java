@@ -7,5 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 
 public interface EntityLocation extends Entity,Location<Vector2> {
 
+    public Vector2 getCenterPosition();
 
 }

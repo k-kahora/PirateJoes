@@ -326,6 +326,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
                 tagged = true;
                 remove.add(s);
+                s.remove = true;
 
             }
 

@@ -20,9 +20,10 @@ import com.mygdx.game.Tiles.HeuristicTile;
 import com.mygdx.game.Tiles.LineOfSight;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
+import com.mygdx.game.utils.Edge;
 import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
-import com.mygdx.game.utils.Pair;
+
 
 import java.util.ArrayList;
 
@@ -260,14 +261,14 @@ public class FluVirus extends AbstractEnemy  {
     }
 
 
-    private Pair calcMiddleTarget() {
+    private Edge calcMiddleTarget() {
 
         Rectangle rect = target.getBoundingBox();
 
         int x = (int)(rect.getX() / 16);
         int y = (int)(rect.getY() / 16);
 
-        return new Pair(x,y);
+        return new Edge(x,y);
 
     }
 
