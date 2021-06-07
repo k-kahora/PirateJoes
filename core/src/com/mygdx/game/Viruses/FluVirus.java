@@ -3,24 +3,18 @@ package com.mygdx.game.Viruses;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.steer.behaviors.*;
-import com.badlogic.gdx.ai.steer.proximities.RadiusProximity;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
-import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
-import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.Level;
 import com.mygdx.game.Particles.ParticleManager;
 import com.mygdx.game.Particles.SlimeSploshion;
-import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.HeuristicTile;
 import com.mygdx.game.Tiles.LineOfSight;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
-import com.mygdx.game.utils.Edge;
+import com.mygdx.game.utils.Point;
 import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Messages;
 
@@ -261,14 +255,14 @@ public class FluVirus extends AbstractEnemy  {
     }
 
 
-    private Edge calcMiddleTarget() {
+    private Point calcMiddleTarget() {
 
         Rectangle rect = target.getBoundingBox();
 
         int x = (int)(rect.getX() / 16);
         int y = (int)(rect.getY() / 16);
 
-        return new Edge(x,y);
+        return new Point(x,y);
 
     }
 

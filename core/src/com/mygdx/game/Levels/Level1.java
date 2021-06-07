@@ -118,6 +118,7 @@ public class Level1 extends AbstractLevel {
         super.baseLayer = baseLayer;
         super.secondLayer = secondLayer;
         character.setWeakPoints(secondLayer.getWeakPoints());
+        //levelEdges = GraphMaker.edgeMap(secondLayer.getTileMap());
     }
 
     @Override

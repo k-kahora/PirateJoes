@@ -3,7 +3,6 @@ package com.mygdx.game.Levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
-import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
@@ -17,24 +16,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Enumerators.LEVELS;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
 import com.mygdx.game.MainCharacter;
-import com.mygdx.game.Particles.BulletSplash;
 import com.mygdx.game.Particles.ParticleManager;
 import com.mygdx.game.SanatizerBullet;
-import com.mygdx.game.Tiles.LineOfSight;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.AbstractEnemy;
-import com.mygdx.game.Viruses.Enemy;
-import com.mygdx.game.Viruses.FluVirus;
-import com.mygdx.game.utils.Edge;
-import com.mygdx.game.utils.GraphMaker;
-import com.mygdx.game.utils.Messages;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import sun.awt.image.ImageWatched;
-import sun.rmi.rmic.Main;
+import com.mygdx.game.utils.Point;
 
-import java.awt.image.AreaAveragingScaleFilter;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,7 +76,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private LinkedList<SanatizerBullet> removedBullets;
     private LinkedList<MainCharacter.LandMine> mines;
 
-    protected Array<Edge> levelEdges = new Array<>();
+    protected Array<Point<Integer, Integer>> levelEdges = new Array<>();
 
     static {
         cameraHeight = 17;
@@ -122,7 +110,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         //bullets = character.getBullets();
         removedBullets = new LinkedList<>();
 
-        levelEdges = GraphMaker.edgeMap(secondLayer.getTileMap());
+
 
 
 

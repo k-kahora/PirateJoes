@@ -2,7 +2,6 @@ package com.mygdx.game.Viruses;
 
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.ai.steer.Steerable;
 import com.badlogic.gdx.ai.steer.SteeringBehavior;
 import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.utils.Location;
@@ -11,28 +10,18 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.Enumerators.Collisions;
-import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Enumerators.Types;
 import com.mygdx.game.FunctionalityClasses.DebugDrawer;
-import com.mygdx.game.FunctionalityClasses.Entity;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.FunctionalityClasses.RayCast;
 import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.Level;
-import com.mygdx.game.MainCharacter;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
-import com.mygdx.game.utils.Edge;
+import com.mygdx.game.utils.Point;
 import com.mygdx.game.utils.SteeringUtils;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import org.graalvm.compiler.graph.Edges;
-import org.graalvm.compiler.lir.alloc.SaveCalleeSaveRegisters;
-import org.w3c.dom.css.Rect;
 
-import javax.swing.plaf.BorderUIResource;
-import java.awt.geom.Line2D;
 import java.util.*;
 
 public class WanderVirus extends AbstractEnemy{
@@ -43,7 +32,7 @@ public class WanderVirus extends AbstractEnemy{
     private final Flee<Vector2> flee;
     private final Seek<Vector2> seek;
 
-    private final Array<Edge> edges;
+    private final Array<Point<Integer, Integer>> edges;
 
     private final Array<Vector2> rays = new Array<>();
 
@@ -134,7 +123,7 @@ public class WanderVirus extends AbstractEnemy{
         private PrioritySteering<Vector2> behavior;
         private Color COLOR;
 
-        private Array<Edge> edges = new Array<>();
+        private Array<Point<Integer, Integer>> edges = new Array<>();
 
         private Types type;
         private Flee<Vector2> flee;
@@ -171,7 +160,7 @@ public class WanderVirus extends AbstractEnemy{
             return this;
         }
 
-        public Builder hyper(Array<Edge> edges) {
+        public Builder hyper(Array<Point<Integer, Integer>> edges) {
             this.type = Types.HYPER;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
@@ -279,11 +268,11 @@ public class WanderVirus extends AbstractEnemy{
             if (nozzle.isFinished(delta)) {
 
 
-                getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
+                /*getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
                         .initCollision(tileDataMap).maxBounces(1)
                         .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
-
+            */
 
             }
 
@@ -430,15 +419,27 @@ public class WanderVirus extends AbstractEnemy{
 
         Vector2 centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
 
-        rays.add(RayCast.castRay(centerPos, shotLine, fluVirusTileColliderMap.get(0)));
+        //rays.add(RayCast.castRay(centerPos, shotLine, fluVirusTileColliderMap.get(0)));
        // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2(), fluVirusTileColliderMap.get(0)));
 
         // the four corners
+        /*
+
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 256)), fluVirusTileColliderMap.get(0)));
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 16)), fluVirusTileColliderMap.get(0)));
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(480, 256)), fluVirusTileColliderMap.get(0)));
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(480, 16)), fluVirusTileColliderMap.get(0)));
 
+
+         */
+
+        for (Point<Integer, Integer> point : edges) {
+
+            //rays.add(new Vector2(point.getIndexi(), point.getIndexj()));
+
+            rays.add((RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(point.getIndexi(), point.getIndexj())), fluVirusTileColliderMap.get(0))));
+
+        }
 
         //for (int i = 0; i < 360; i+=6) {
            // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2((float)Math.sin(i), (float)Math.cos(i)), fluVirusTileColliderMap.get(0)));
@@ -473,6 +474,8 @@ public class WanderVirus extends AbstractEnemy{
 
             DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
             DebugDrawer.DrawDebugLine(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), ray, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+
+            //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
 
         }
 

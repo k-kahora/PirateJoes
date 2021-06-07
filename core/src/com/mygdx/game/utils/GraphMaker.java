@@ -1,20 +1,13 @@
 package com.mygdx.game.utils;
 
-import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.Enumerators.Collisions;
 import com.mygdx.game.Enumerators.Tile;
-import com.mygdx.game.Tiles.TileConnection;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
-import org.graalvm.compiler.hotspot.phases.LoadJavaMirrorWithKlassPhase;
-import sun.awt.image.ImageWatched;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public final class GraphMaker {
 
@@ -103,7 +96,7 @@ public final class GraphMaker {
 
         }
 
-        System.out.println(listOfNodes.size);
+
         return listOfNodes;
 
     }
@@ -124,7 +117,7 @@ public final class GraphMaker {
 
     }
 
-    public static Vector2 convertIndexToPoint(Edge pair) {
+    public static Vector2 convertIndexToPoint(Point pair) {
 
 
         float x = (float)pair.getIndexi();
@@ -145,9 +138,8 @@ public final class GraphMaker {
         map.remove(0);
         map.remove(map.size() - 1);
 
-        System.out.println(map.get(1).get(3).getTile());
 
-        System.out.println("BRUH");
+
 
 /*
 
@@ -172,71 +164,158 @@ public final class GraphMaker {
 
     }
 
-    public static Array<Edge> edgeMap(ArrayList<ArrayList<TileData>> map) {
+    private static Array<Point<Integer, Integer>> edgeMapToPointMap(Array<Edge<Integer>> map) {
 
-        Array<Array<Edge<Integer, Integer>>> edges = new Array<>();
+        Array<Point<Integer, Integer>> returnArray = new Array<>();
 
-        Array<Edge> returnEdges = new Array<>();
+        for (Edge edge : map) {
+
+            returnArray.add(edge.a);
+            returnArray.add(edge.b);
+
+        }
+
+        return returnArray;
+
+    }
+
+    public static Array<Point<Integer, Integer>> edgeMap(ArrayList<ArrayList<TileData>> map) {
+
+        Array<Edge<Integer>> edges = new Array<>(), removedEdges = new Array<>();
+
+        Array<Point> returnEdges = new Array<>();
 
         for (ArrayList<TileData> list : map) {
 
             for (TileData data : list) {
 
                 if (data.getTile() != Tile.INVISIBLE && data.getTile() != Tile.NULL)
-                    edges.add(data.getEdges());
+                    for (Edge pointInTile : data.getEdges()) {
+                        edges.add(pointInTile);
+                    }
+
+               // System.out.println(edges);
 ;
             }
 
         }
 
-
-        for (Array<Edge<Integer, Integer>> edge1 : edges) {
+        for (Edge edge : edges) {
 
             for (int i = 0; i < edges.size; ++i) {
 
-                Array<Edge<Integer, Integer>> edge2 = edges.get(i);
+                // same referce then skip
+                if (edges.get(i) == edge) continue;
 
-                if (edge1 == edges.get(i)) {
-                    continue;
-                }
+                if (edges.get(i).equalsReverse(edge)) {
 
-                if (edge2.get(2).equals(edge1.get(1))) {
-                    edge2.removeIndex(2);
-                    edge1.removeIndex(1);
+                    removedEdges.add(edge);
 
-                    continue;
-                }
-
-                if (edge2.get(1).equals(edge1.get(2))) {
-                    edge2.removeIndex(1);
-                    edge1.removeIndex(2);
                 }
 
             }
 
         }
 
-        //edges.removeAll(removedEdges, false);
-
-
+        edges.removeAll(removedEdges, false);
 
         //System.out.println(edges);
 
-        for (Array<Edge<Integer, Integer>> thing : edges) {
+        smoothHorizontal(edges);
 
-            for (Edge god : thing) {
+        return edgeMapToPointMap(edges);
 
-                System.out.println(god);
 
-                returnEdges.add(god);
+    }
+
+    public static Edge nextEdge(Point a, Array<Edge<Integer>> map) {
+
+        for (int i = 0; i < map.size; ++i) {
+
+            Edge edge = map.get(i);
+
+            if (edge.a.equals(a)) {
+
+                return edge;
 
             }
 
         }
 
-        return returnEdges;
+        return null;
 
     }
+
+    public static void smoothHorizontal(Array<Edge<Integer>> map) {
+
+        Array<Edge<Integer>> removeEdges = new Array<>();
+
+        for (Edge edge : map) {
+
+            Point edgeStart = edge.a;
+            Point edgeEnd = edge.b;
+
+
+
+            Edge nextEdge = nextEdge(edgeEnd, map);
+
+
+
+            if (nextEdge == null) continue;
+
+            Point nextPoint = nextEdge.b;
+
+
+
+            if (edgeStart.getIndexj().equals(edgeEnd.getIndexj()) && nextPoint.getIndexj().equals(edgeEnd.getIndexj())) {
+
+
+
+                removeEdges.add(nextEdge);
+                edge.changeEdge(nextPoint);
+
+            }
+
+            if (edgeStart.getIndexi().equals(edgeEnd.getIndexi()) && nextPoint.getIndexi().equals(edgeEnd.getIndexi())) {
+
+
+
+                removeEdges.add(nextEdge);
+                edge.changeEdge(nextPoint);
+
+            }
+
+
+        }
+
+        map.removeAll(removeEdges, false);
+
+        //map.clear();
+
+    }
+
+    public static <T extends Point> Array<T> removeDupes(Array<T> edges) {
+
+        int dupeCount = 0;
+
+        Array<T> noDupe = new Array<>();
+
+        for (T edge : edges) {
+
+            if (!noDupe.contains(edge,false)) {
+
+                noDupe.add(edge);
+
+            }
+
+        }
+
+        return noDupe;
+
+
+    }
+
+
 
 
 }

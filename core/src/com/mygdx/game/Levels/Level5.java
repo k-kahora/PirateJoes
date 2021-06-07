@@ -47,6 +47,7 @@ public class Level5 extends AbstractLevel{
         super.baseLayer = baseLayer;
         super.secondLayer = secondLayer;
         character.setWeakPoints(secondLayer.getWeakPoints());
+        levelEdges = GraphMaker.edgeMap(secondLayer.getTileMap());
 
     }
 
@@ -60,7 +61,7 @@ public class Level5 extends AbstractLevel{
         baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
 
         secondLayer = new TileEditor("level4.txt", getAssetManager().manager.get(getAssetManager().bruh));
-        GraphMaker.edgeMap(secondLayer.getTileMap());
+        //GraphMaker.edgeMap(secondLayer.getTileMap());
         setRender();
         secondLayer.addLevel(this);
 
