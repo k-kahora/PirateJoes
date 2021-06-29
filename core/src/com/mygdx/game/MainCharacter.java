@@ -105,7 +105,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
         landMines = new LinkedList<>();
 
-        maxSpeed = 0.6f;
+        maxSpeed = 1.2f;
         friction = 0.09f;
         acceleration = 0.07f;
 
@@ -396,7 +396,7 @@ public class MainCharacter extends Actor implements EntityLocation {
         }
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             flagLeft = false;
 
             flagRight = true;
@@ -405,7 +405,7 @@ public class MainCharacter extends Actor implements EntityLocation {
 
             direction.x = 1f;
         }
-        else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
 
             // thse flags make sure only one direction is happening at a time
             flagRight = false;
@@ -414,27 +414,26 @@ public class MainCharacter extends Actor implements EntityLocation {
 
             direction.x = -1f;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             direction.y = 1f;
         }
-        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
+
             direction.y = -1f;
+
         }
 
         // if the timer started and there is more than five bullets dont call shoot
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
 
-
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
 
             if (bullets.size() > 3) {
 
                 return;
+
             }
 
-
-
-
-           shoot();
+            shoot();
 
         }
 

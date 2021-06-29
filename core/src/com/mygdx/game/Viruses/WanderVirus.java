@@ -19,6 +19,7 @@ import com.mygdx.game.Levels.Level;
 import com.mygdx.game.SanatizerBullet;
 import com.mygdx.game.Tiles.TileCollision;
 import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Point;
 import com.mygdx.game.utils.SteeringUtils;
 
@@ -32,9 +33,14 @@ public class WanderVirus extends AbstractEnemy{
     private final Flee<Vector2> flee;
     private final Seek<Vector2> seek;
 
+    private Vector2 centerPos = new Vector2();
+
+    private final Polygon polygon = new Polygon();
+
+
     private final Array<Point<Integer, Integer>> edges;
 
-    private final Array<Vector2> rays = new Array<>();
+    private Array<Vector2> rays = new Array<>();
 
     private boolean justShot = false;
     private Color COLOR;
@@ -53,7 +59,7 @@ public class WanderVirus extends AbstractEnemy{
     private SanatizerBullet a = null;
     private ArrayList<SanatizerBullet> removedBullets = new ArrayList<>();
 
-
+    private float[] points;
 
     private float timeElapsed = 0, timeElapsed2 = 0;
 
@@ -161,7 +167,7 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         public Builder hyper(Array<Point<Integer, Integer>> edges) {
-            this.type = Types.HYPER;
+            this.type = Types.WANDER;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
             this.edges = edges;
@@ -193,6 +199,8 @@ public class WanderVirus extends AbstractEnemy{
 
     @Override
     public void act(float delta) {
+
+        centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
 
 
         //update(delta);
@@ -268,11 +276,11 @@ public class WanderVirus extends AbstractEnemy{
             if (nozzle.isFinished(delta)) {
 
 
-                /*getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
+                getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
                         .initCollision(tileDataMap).maxBounces(1)
                         .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
-            */
+
 
             }
 
@@ -415,15 +423,16 @@ public class WanderVirus extends AbstractEnemy{
         }
     }
 
+    private boolean sortCalled = false;
+
     private void castAllRays() {
 
-        Vector2 centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
 
         //rays.add(RayCast.castRay(centerPos, shotLine, fluVirusTileColliderMap.get(0)));
-       // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2(), fluVirusTileColliderMap.get(0)));
+        // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2(), fluVirusTileColliderMap.get(0)));
 
         // the four corners
-        /*
+
 
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 256)), fluVirusTileColliderMap.get(0)));
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 16)), fluVirusTileColliderMap.get(0)));
@@ -431,15 +440,45 @@ public class WanderVirus extends AbstractEnemy{
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(480, 16)), fluVirusTileColliderMap.get(0)));
 
 
-         */
-
         for (Point<Integer, Integer> point : edges) {
 
             //rays.add(new Vector2(point.getIndexi(), point.getIndexj()));
 
+
             rays.add((RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(point.getIndexi(), point.getIndexj())), fluVirusTileColliderMap.get(0))));
+            rays.add((RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(point.getIndexi(), point.getIndexj()).rotateRad(0.0001f)), fluVirusTileColliderMap.get(0))));
+            rays.add((RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(point.getIndexi(), point.getIndexj()).rotateRad(-0.0001f)), fluVirusTileColliderMap.get(0))));
 
         }
+
+        if (!sortCalled) {
+            rays = GraphMaker.sortRays(rays, centerPos);
+            sortCalled = true;
+
+
+            Vector2[] arrayOfVectors = rays.toArray(Vector2.class);
+
+            Array<Float> arrayOfFloats = new Array<Float>();
+
+            for (Vector2 floater : rays) {
+
+                arrayOfFloats.add(floater.x);
+                arrayOfFloats.add(floater.y);
+
+            }
+
+            points = new float[arrayOfFloats.size];
+
+            for (int i = 0; i < points.length; i += 1) {
+
+                points[i] = arrayOfFloats.get(i);
+
+            }
+
+        }
+
+
+        polygon.setVertices(points);
 
         //for (int i = 0; i < 360; i+=6) {
            // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2((float)Math.sin(i), (float)Math.cos(i)), fluVirusTileColliderMap.get(0)));
@@ -472,14 +511,16 @@ public class WanderVirus extends AbstractEnemy{
 
         for (Vector2 ray : rays) {
 
-            DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
-            DebugDrawer.DrawDebugLine(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), ray, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+            //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+            // DebugDrawer.DrawDebugLine(centerPos, ray, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
 
             //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
 
         }
 
         rays.clear();
+
+        DebugDrawer.DrawDebugPolygon(polygon, 4, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
     }
 

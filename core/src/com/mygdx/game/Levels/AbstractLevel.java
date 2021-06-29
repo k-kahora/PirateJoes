@@ -232,7 +232,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-               // character.death();
+               character.death();
 
             }
 
@@ -361,17 +361,18 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                     break;
                 case LEVEL2:
                     //getPirateJoe().setScreen(new Level3(getPirateJoe()));
-
+                    TileData.Indexer.reset();
                     getPirateJoe().setScreen(new Level3(getPirateJoe()));
                     currentLevel = LEVELS.LEVEL3;
                     break;
                 case LEVEL3:
                     TileData.Indexer.reset();
-                    getPirateJoe().setScreen(new Level3(getPirateJoe()));
+                    getPirateJoe().setScreen(new Level4(getPirateJoe()));
                     currentLevel = LEVELS.LEVEL4;
                     break;
                 case LEVEL4:
-                    //getPirateJoe().setScreen(new Level5(getPirateJoe()));
+                    TileData.Indexer.reset();
+                    getPirateJoe().setScreen(new Level5(getPirateJoe()));
                     currentLevel = LEVELS.LEVEL5;
                     break;
                 case LEVEL5:

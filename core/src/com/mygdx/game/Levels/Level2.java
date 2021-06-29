@@ -45,6 +45,7 @@ public class Level2 extends AbstractLevel{
         super.baseLayer = baseLayer;
         super.secondLayer = secondLayer;
         character.setWeakPoints(secondLayer.getWeakPoints());
+        levelEdges = GraphMaker.edgeMap(secondLayer.getTileMap());
 
     }
 
@@ -77,10 +78,18 @@ public class Level2 extends AbstractLevel{
 
         character.setPosition(200,200);
 
+        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper(levelEdges).build());
+
+        getFluViruses().get(0).setPosition(20, 30);
+
+        /*
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());//
         getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).wander().build());
         getFluViruses().get(0).setPosition(20, 30);
         getFluViruses().get(1).setPosition(40,30);
+
+
+         */
 
     }
 

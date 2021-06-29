@@ -246,11 +246,69 @@ public final class GraphMaker {
 
     }
 
+    public static Array<Vector2> sortRays(Array<Vector2> array, Vector2 centerpos) {
+
+        ArrayList<Vector2Compare> arrayList = new ArrayList<>();
+
+        float count = 0;
+
+        for (Vector2 vec : array) {
+
+            arrayList.add(new Vector2Compare(vec));
+
+        }
+
+        for (Vector2Compare vec : arrayList) {
+
+            float angle = vec.x - centerpos.x;
+            float det = vec.y - centerpos.y;
+
+
+
+            // calculates the angle with direction in mind
+            float radian = (float)Math.toDegrees(Math.atan2(det, angle));
+
+
+
+
+
+            vec.setAngleToCompare(radian);
+
+
+            System.out.println(radian);
+
+
+
+
+        }
+
+        Collections.sort(arrayList);
+
+        //System.out.println(arrayList);
+
+        Array<Vector2> returnArray = new Array<>();
+
+        for (Vector2Compare vec : arrayList) {
+
+            //System.out.println(vec);
+            returnArray.add(vec);
+
+        }
+
+        return returnArray;
+
+
+
+
+    }
+
     public static void smoothHorizontal(Array<Edge<Integer>> map) {
 
         Array<Edge<Integer>> removeEdges = new Array<>();
 
         for (Edge edge : map) {
+
+            //if(removeEdges.contains(edge, false)) continue;
 
             Point edgeStart = edge.a;
             Point edgeEnd = edge.b;
@@ -265,8 +323,6 @@ public final class GraphMaker {
 
             Point nextPoint = nextEdge.b;
 
-
-
             if (edgeStart.getIndexj().equals(edgeEnd.getIndexj()) && nextPoint.getIndexj().equals(edgeEnd.getIndexj())) {
 
 
@@ -274,7 +330,10 @@ public final class GraphMaker {
                 removeEdges.add(nextEdge);
                 edge.changeEdge(nextPoint);
 
+                //  nextEdge.changeEdgeComplete(edge);;
+
             }
+
 
             if (edgeStart.getIndexi().equals(edgeEnd.getIndexi()) && nextPoint.getIndexi().equals(edgeEnd.getIndexi())) {
 
@@ -284,6 +343,8 @@ public final class GraphMaker {
                 edge.changeEdge(nextPoint);
 
             }
+
+
 
 
         }

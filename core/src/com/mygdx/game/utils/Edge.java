@@ -50,6 +50,17 @@ public class Edge<T extends Number> {
 
     }
 
+    public void changeEdgeComplete(Edge<T> edge) {
+
+        this.a.setIndexJ(edge.a.getIndexj());
+        this.a.setIndexi(edge.a.getIndexi());
+
+
+        this.b.setIndexi(edge.b.getIndexi());
+        this.b.setIndexJ(edge.b.getIndexj());
+
+    }
+
     @Override
     public String toString() {
 
