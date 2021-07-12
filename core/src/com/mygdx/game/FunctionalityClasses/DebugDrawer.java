@@ -88,10 +88,16 @@ public class DebugDrawer {
         initPolygon(polygon);
 
 
+/*
+
         pgsb.setProjectionMatrix(projectionMatrix);
         pgsb.begin();
         polySprite.draw(pgsb);
         pgsb.end();
+
+
+
+        */
 
         Gdx.gl.glLineWidth(lineWidth);
         debugRenderer.setProjectionMatrix(projectionMatrix);

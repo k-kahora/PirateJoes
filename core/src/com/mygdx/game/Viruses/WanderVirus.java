@@ -22,6 +22,7 @@ import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.utils.GraphMaker;
 import com.mygdx.game.utils.Point;
 import com.mygdx.game.utils.SteeringUtils;
+import com.mygdx.game.utils.Vector2Compare;
 
 import java.util.*;
 
@@ -167,7 +168,7 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         public Builder hyper(Array<Point<Integer, Integer>> edges) {
-            this.type = Types.WANDER;
+            this.type = Types.HYPER;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
             this.edges = edges;
@@ -425,6 +426,10 @@ public class WanderVirus extends AbstractEnemy{
 
     private boolean sortCalled = false;
 
+    private Array<Vector2> rayo = new Array<Vector2>();
+
+    private Array<Vector2> arraayOfReducedRays = new Array<>();
+
     private void castAllRays() {
 
 
@@ -453,14 +458,22 @@ public class WanderVirus extends AbstractEnemy{
 
         if (!sortCalled) {
             rays = GraphMaker.sortRays(rays, centerPos);
+
+            arraayOfReducedRays = GraphMaker.listToArray(GraphMaker.reducePoints(rays));
+
+            // linesHorizontal = GraphMaker.makeLines(arraayOfReducedRays, false);
+
+            linesVertical = GraphMaker.makeLines(arraayOfReducedRays, true);
+
             sortCalled = true;
 
+            rayo = rays;
 
-            Vector2[] arrayOfVectors = rays.toArray(Vector2.class);
+            Vector2[] arrayOfVectors = arraayOfReducedRays.toArray(Vector2.class);
 
             Array<Float> arrayOfFloats = new Array<Float>();
 
-            for (Vector2 floater : rays) {
+            for (Vector2 floater : arraayOfReducedRays) {
 
                 arrayOfFloats.add(floater.x);
                 arrayOfFloats.add(floater.y);
@@ -496,31 +509,80 @@ public class WanderVirus extends AbstractEnemy{
         if (COLOR != null)
             spr.setColor(COLOR);
 
-
-
-
         //System.out.println(rayCast);
 
         drawRays();
 
-
-
     }
 
+    private LinkedList<LinkedList<Vector2>> linesHorizontal = new LinkedList<>(), linesVertical = new LinkedList<>();
     private void drawRays() {
 
-        for (Vector2 ray : rays) {
+        for (Vector2 ray : arraayOfReducedRays) {
 
             //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
-            // DebugDrawer.DrawDebugLine(centerPos, ray, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+            //DebugDrawer.DrawDebugLine(centerPos, ray, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+            DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
 
-            //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+        }
+
+        /*
+        for (Vector2 rayo : rays) {
+
+            DebugDrawer.DrawDebugCircle(rayo, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+
+        }
+
+
+         */
+
+
+        if (linesHorizontal.size() > 1) {
+
+            for (LinkedList<Vector2> list : linesHorizontal) {
+
+                Vector2 start = list.get(0);
+                Vector2 end = list.get(list.size() - 1);
+
+                //for (Vector2 point : list) {
+
+                    // Vector2 end = point;
+
+                    DebugDrawer.DrawDebugLine(start, end, 12, Color.GREEN, AbstractLevel.getViewport().getCamera().combined);
+
+
+                //}
+
+
+
+            }
+
+        }
+        if (linesVertical.size() > 1) {
+
+            for (LinkedList<Vector2> list : linesVertical) {
+
+                Vector2 start = list.get(0);
+                Vector2 end = list.get(list.size() - 1);
+
+                //for (Vector2 point : list) {
+
+                // Vector2 end = point;
+
+                DebugDrawer.DrawDebugLine(start, end, 12, Color.RED, AbstractLevel.getViewport().getCamera().combined);
+
+
+                //}
+
+
+
+            }
 
         }
 
         rays.clear();
 
-        DebugDrawer.DrawDebugPolygon(polygon, 4, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+        //DebugDrawer.DrawDebugPolygon(polygon, 7, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
     }
 

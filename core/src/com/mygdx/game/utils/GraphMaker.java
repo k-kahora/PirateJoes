@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
+import sun.awt.image.ImageWatched;
 
 import java.util.*;
 
@@ -275,9 +276,6 @@ public final class GraphMaker {
             vec.setAngleToCompare(radian);
 
 
-            System.out.println(radian);
-
-
 
 
         }
@@ -288,17 +286,139 @@ public final class GraphMaker {
 
         Array<Vector2> returnArray = new Array<>();
 
-        for (Vector2Compare vec : arrayList) {
+        for (Vector2 vec : arrayList) {
 
-            //System.out.println(vec);
             returnArray.add(vec);
+            //System.out.println(vec);
 
         }
+
 
         return returnArray;
 
 
 
+
+    }
+
+    public static LinkedList<Vector2> reducePoints(Array<Vector2> listOfLines) {
+
+        LinkedList<Vector2> list = new LinkedList<>();
+
+
+        for (int i = 0; i < listOfLines.size; ++i) {
+
+            if (list.size() < 2) {
+
+                list.add(listOfLines.get(i));
+                continue;
+
+            }
+
+            Vector2 point3, point2, point1;
+
+            if (list.size() > 1 ) {
+
+                point1 = new Vector2(list.get(list.size() - 2));
+                point2 = new Vector2(list.get(list.size() - 1));
+                point3 = new Vector2(listOfLines.get(i));
+
+
+                if (Math.abs((point2.x - point1.x) * (point3.y - point2.y) - ((point2.y - point1.y) * (point3.x - point2.x))) < 0.1) {
+
+                    list.remove(list.size() - 1);
+                    list.add(point3);
+                    continue;
+
+                } else {
+
+                    list.add(point3);
+
+                }
+
+            }
+
+        }
+
+        // checks first and last pointsw
+        if ((int)list.get(0).x == (int)list.get(list.size() - 1).x && (int)list.get(0).y == (int)list.get(list.size() - 1).y)
+            list.remove(list.get(0));
+
+        return list;
+
+    }
+
+    public static LinkedList<LinkedList<Vector2>> makeLines(Array<Vector2> listOfLines, boolean xORy) {
+
+        // x is true y is false
+
+        LinkedList<LinkedList<Vector2>> returnLines = new LinkedList<>();
+
+        for (int j = 0; j < listOfLines.size; ++j) {
+
+            Vector2 point = listOfLines.get(j);
+
+            LinkedList<Vector2> inList = new LinkedList<>();
+
+            for (int i = j; i < listOfLines.size; ++i) {
+
+                Vector2 point1 = listOfLines.get(i);
+
+                if (xORy) {
+                    if (Math.abs(point.y - point1.y) < 0.9) {
+
+                        inList.add(point);
+                        inList.add(point1);
+
+                    } else {
+
+                        break;
+                    }
+                } else {
+
+                    if (Math.abs(point.x - point1.x) < 0.9) {
+
+                        inList.add(point);
+                        inList.add(point1);
+
+                    } else {
+
+                        break;
+                    }
+
+                }
+
+            }
+
+            if (!inList.isEmpty())
+                returnLines.add(inList);
+
+        }
+
+        // connects end and fron
+
+        Vector2 start = listOfLines.get(0);
+        Vector2 end = listOfLines.get(listOfLines.size - 1);
+
+        LinkedList<Vector2> lastLine = new LinkedList<>();
+
+        if (start.x - end.x < 0.9) {
+
+            lastLine.add(start);
+            lastLine.add(end);
+
+        }
+
+        if (start.y - end.y < 0.9) {
+
+            lastLine.add(start);
+            lastLine.add(end);
+
+        }
+
+        returnLines.add(lastLine);
+
+        return returnLines;
 
     }
 
@@ -316,7 +436,6 @@ public final class GraphMaker {
 
 
             Edge nextEdge = nextEdge(edgeEnd, map);
-
 
 
             if (nextEdge == null) continue;
@@ -373,6 +492,20 @@ public final class GraphMaker {
 
         return noDupe;
 
+
+    }
+
+    public static <T> Array<T> listToArray(LinkedList<T> list) {
+
+        Array<T> returnArray = new Array<>();
+
+        for (T data : list) {
+
+            returnArray.add(data);
+
+        }
+
+        return returnArray;
 
     }
 
