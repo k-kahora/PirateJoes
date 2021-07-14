@@ -360,12 +360,12 @@ public final class GraphMaker {
 
             LinkedList<Vector2> inList = new LinkedList<>();
 
-            for (int i = j; i < listOfLines.size; ++i) {
+            for (int i = j + 1; i < listOfLines.size; ++i) {
 
                 Vector2 point1 = listOfLines.get(i);
 
                 if (xORy) {
-                    if (Math.abs(point.y - point1.y) < 0.9) {
+                    if (Math.abs(point.y - point1.y) < 0.1) {
 
                         inList.add(point);
                         inList.add(point1);
@@ -376,7 +376,7 @@ public final class GraphMaker {
                     }
                 } else {
 
-                    if (Math.abs(point.x - point1.x) < 0.9) {
+                    if (Math.abs(point.x - point1.x) < 0.1) {
 
                         inList.add(point);
                         inList.add(point1);
@@ -402,21 +402,27 @@ public final class GraphMaker {
 
         LinkedList<Vector2> lastLine = new LinkedList<>();
 
-        if (start.x - end.x < 0.9) {
+
+
+        if (!xORy && start.x - end.x < 0.9) {
 
             lastLine.add(start);
             lastLine.add(end);
+            returnLines.add(lastLine);
 
         }
 
-        if (start.y - end.y < 0.9) {
+        if (xORy && start.y - end.y < 0.9) {
 
             lastLine.add(start);
             lastLine.add(end);
+            returnLines.add(lastLine);
 
         }
 
-        returnLines.add(lastLine);
+
+
+
 
         return returnLines;
 

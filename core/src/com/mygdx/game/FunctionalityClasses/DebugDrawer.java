@@ -75,12 +75,14 @@ public class DebugDrawer {
     {
         Gdx.gl.glLineWidth(lineWidth);
         debugRenderer.setProjectionMatrix(projectionMatrix);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
         debugRenderer.setColor(color);
         debugRenderer.circle(start.x, start.y, radius);
         debugRenderer.end();
         Gdx.gl.glLineWidth(1);
     }
+
+
 
     public static void DrawDebugPolygon(Polygon polygon, int lineWidth, Color color, Matrix4 projectionMatrix)
     {

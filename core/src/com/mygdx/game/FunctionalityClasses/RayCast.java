@@ -119,6 +119,107 @@ public class RayCast {
 
     }
 
+
+
+    public static Vector2 castRayNoObsatcle(Vector2 start, Vector2 endPoint, ArrayList<ArrayList<TileData>> map) {
+
+        Vector2 direction = castDirection(start, endPoint);
+
+        start = endPoint;
+
+        Vector2 returnPoint = new Vector2();
+
+        float newMax = new Vector2(start.x - endPoint.x, start.y - endPoint.y).len();
+
+        // the x is the length of teh ray for unit in the x direction and the y is the length of the array one unit in the y direction
+        Vector2 scaler = new Vector2((float)Math.sqrt(1 + Math.pow((direction.y / direction.x),2)), (float)Math.sqrt(1 + Math.pow((direction.x / direction.y),2)));
+
+        Vector2 mapCheckPos = new Vector2((int)start.x/16, (int)start.y/16);
+
+        boolean canShoot = false;
+
+        Vector2 vectorRayLength1D = new Vector2();
+
+        Vector2 charecterMap = new Vector2();
+
+        Vector2 vectorStep = new Vector2();
+
+        if (direction.x < 0) {
+
+            vectorStep.x = -1;
+            vectorRayLength1D.x = (start.x/16 - mapCheckPos.x) * scaler.x;
+
+        } else {
+
+            vectorStep.x = 1;
+            vectorRayLength1D.x = ((mapCheckPos.x + 1) - start.x/16) * scaler.x;
+
+        }
+
+        if (direction.y < 0) {
+
+            vectorStep.y = -1;
+            vectorRayLength1D.y = (start.y/16 - mapCheckPos.y) * scaler.y;
+
+        } else {
+
+            vectorStep.y = 1;
+            vectorRayLength1D.y = ((mapCheckPos.y + 1) - start.y/16) * scaler.y;
+
+        }
+
+        boolean foundTile = false;
+        final float MAX_DISTANCE = direction.len();
+        float fDistance = 0f;
+
+
+
+        while(!canShoot && fDistance <= MAX_DISTANCE) {
+
+            if (vectorRayLength1D.x < vectorRayLength1D.y) {
+
+                mapCheckPos.x += vectorStep.x;
+                fDistance = vectorRayLength1D.x * 16;
+                vectorRayLength1D.x += scaler.x;
+
+            } else {
+
+                mapCheckPos.y += vectorStep.y;
+                fDistance = vectorRayLength1D.y * 16;
+                vectorRayLength1D.y += scaler.y;
+
+            }
+
+
+
+            if (fDistance >= MAX_DISTANCE) {
+
+                //returnPoint = direction.scl(fDistance * 16).add(start);
+
+                direction.nor();
+
+                returnPoint = direction.scl(MAX_DISTANCE * 16).add(start);
+
+                return returnPoint;
+            }
+
+
+
+
+
+
+
+        }
+
+        return returnPoint;
+
+
+
+
+    }
+
+
+    // target based raycast
     public static boolean castRay(Vector2 start, Vector2 direction, Vector2 target, ArrayList<ArrayList<TileData>> map) {
 
         // the x is the length of teh ray for unit in the x direction and the y is the length of the array one unit in the y direction
@@ -232,7 +333,16 @@ public class RayCast {
 
     }
 
+
+
+
     public static Vector2 castDirection(Vector2 start, Vector2 end) {
+
+        return new Vector2(end.x - start.x, end.y - start.y).nor();
+
+    }
+
+    public static Vector2 castDirectionOpposite(Vector2 end, Vector2 start) {
 
         return new Vector2(end.x - start.x, end.y - start.y).nor();
 
