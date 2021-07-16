@@ -517,31 +517,50 @@ public final class GraphMaker {
 
                  */
 
-            try {
+
+                float slope, y1, y2, x1, x2, xIntersection, yIntersection, intersectionEquation;
 
                 switch (point.getPlane()) {
 
                     case HORZ:
-                        point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().y, plane.HORZ);
+                        //point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().y, plane.HORZ);
+
+                        y1 = point.postion.y; y2 = target.y; x1 = point.postion.x; x2 = target.x; intersectionEquation = point.getStart().y;
+
+                        slope = (y2 - y1) / (x2 - x1);
+
+
+
+                        xIntersection = ((intersectionEquation - y2) / slope) + x2;
+
+
+                        point.finalPoint = new Vector2(xIntersection, intersectionEquation);
+
+                        break;
+
 
                     case VERT:
-                        point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().x, plane.VERT);
+
+                        y1 = point.postion.y; y2 = target.y; x1 = point.postion.x; x2 = target.x; intersectionEquation = point.getStart().x;
+
+                        slope = (y2 - y1) / (x2 - x1);
+
+
+
+                        yIntersection = ((intersectionEquation - x2) * slope) + y2;
+
+
+                        point.finalPoint = new Vector2(intersectionEquation, yIntersection);
+
+                        break;
+
 
                     default:
-                        throw new Exception();
+                        System.out.println("EROOR");
 
                 }
 
-            } catch (Exception e) {
-
-                System.out.println("Not valid plane ERROR");
-                Gdx.app.exit();
-
-            }
-
-
             goodPoints.add(point);
-
 
         }
 

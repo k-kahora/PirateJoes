@@ -578,7 +578,6 @@ public class WanderVirus extends AbstractEnemy{
     private LinkedList<LinkedList<Vector2>> linesHorizontal = new LinkedList<>(), linesVertical = new LinkedList<>();
     private void drawRays() {
 
-        System.out.println(validReflectShots.size());
 
         for (ReflectionPoint rayPoint : validReflectShots) {
 

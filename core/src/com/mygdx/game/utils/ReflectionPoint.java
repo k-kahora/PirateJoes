@@ -23,7 +23,7 @@ public class ReflectionPoint {
 
     private Vector2 limitStart, limitEnd;
 
-    private plane xORy;
+    private plane xORy = plane.HORZ;
 
     public ReflectionPoint(ReflectionPoint reflectionPoint, Vector2 limitStart, Vector2 limitEnd) {
 
