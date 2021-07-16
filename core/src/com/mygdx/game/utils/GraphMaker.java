@@ -1,9 +1,13 @@
 package com.mygdx.game.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
+import com.mygdx.game.Enumerators.plane;
+import com.mygdx.game.FunctionalityClasses.Ray;
+import com.mygdx.game.FunctionalityClasses.RayCast;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
 import sun.awt.image.ImageWatched;
@@ -477,6 +481,72 @@ public final class GraphMaker {
         map.removeAll(removeEdges, false);
 
         //map.clear();
+
+    }
+
+    // make sure testPoint is set
+    public static LinkedList<ReflectionPoint> betweenrays(Array<ReflectionPoint> reflectPoints, Vector2 target, ArrayList<ArrayList<TileData>> map) {
+
+        LinkedList<ReflectionPoint> goodPoints = new LinkedList<>();
+
+        for (ReflectionPoint point : reflectPoints) {
+
+            // check y positions
+
+
+                /*
+                if (point.getLimitEnd().y < target.y && point.getLimitStart().y > target.y) {
+
+                    point.finalPoint = RayCast.castRay(point.postion, RayCast.castDirection(point.postion, target), map);
+                    goodPoints.add(point);
+
+
+                }
+
+                 */
+
+
+
+                /*
+                if (point.getLimitEnd().x < target.x && point.getLimitStart().x > target.x) {
+
+                    point.finalPoint = RayCast.castRay(point.postion, RayCast.castDirection(point.postion, target), map);
+                    goodPoints.add(point);
+
+                }
+
+                 */
+
+            try {
+
+                switch (point.getPlane()) {
+
+                    case HORZ:
+                        point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().y, plane.HORZ);
+
+                    case VERT:
+                        point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().x, plane.VERT);
+
+                    default:
+                        throw new Exception();
+
+                }
+
+            } catch (Exception e) {
+
+                System.out.println("Not valid plane ERROR");
+                Gdx.app.exit();
+
+            }
+
+
+            goodPoints.add(point);
+
+
+        }
+
+        return goodPoints;
+
 
     }
 

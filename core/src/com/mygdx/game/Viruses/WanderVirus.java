@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Types;
+import com.mygdx.game.Enumerators.plane;
 import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
 import com.mygdx.game.FunctionalityClasses.RayCast;
@@ -36,8 +37,8 @@ public class WanderVirus extends AbstractEnemy{
     private Array<Vector2> rayo = new Array<Vector2>();
 
     private Array<Vector2> arraayOfReducedRays = new Array<>();
-    private ArrayList<ReflectionPoint> reflectionPointHorz = new ArrayList<>();
-    private ArrayList<ReflectionPoint> reflectionPointVert = new ArrayList<>();
+    private ArrayList<ReflectionPoint> reflectionPoints = new ArrayList<>();
+
 
     private Vector2 centerPos = new Vector2();
 
@@ -389,8 +390,6 @@ public class WanderVirus extends AbstractEnemy{
 
         public BoundingPoint(float radius) {
 
-
-
             position = new Vector2(200,200);
             this.radius = radius;
         }
@@ -432,51 +431,26 @@ public class WanderVirus extends AbstractEnemy{
     }
 
 
-    private Array<ReflectionPoint> reflectionRaysStart = new Array<>();
-    private Array<ReflectionPoint> reflectionRaysEnd = new Array<>();
+    private Array<ReflectionPoint> reflectionRays = new Array<>();
+
 
     private void castAllRays() {
 
 
-        //rays.add(RayCast.castRay(centerPos, shotLine, fluVirusTileColliderMap.get(0)));
-        // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2(), fluVirusTileColliderMap.get(0)));
 
-        // the four corners
+        if (!reflectionPoints.isEmpty()) {
 
-        /*
-        if (!reflectionPointHorz.isEmpty()) {
+            for (ReflectionPoint point : reflectionPoints) {
 
-            for (ReflectionPoint point : reflectionPointHorz) {
-
-                reflectionRays.add(point.setTestPoint(RayCast.castRayNoObsatcle(point.getStart(), point.postion,fluVirusTileColliderMap.get(0))));
-                reflectionRays.add(point.setTestPoint(RayCast.castRayNoObsatcle(point.getEnd(), point.postion,fluVirusTileColliderMap.get(0))));
-
+                // start point
+                reflectionRays.add(new ReflectionPoint(point, RayCast.castRayNoObsatcle(point.postion, point.getStart(),fluVirusTileColliderMap.get(0)),
+                        // endPoint
+                        RayCast.castRayNoObsatcle(point.postion, point.getEnd(), fluVirusTileColliderMap.get(0))));
+                //reflectionRaysStart.add(new ReflectionPoint(point, RayCast.castRayNoObsatcle(point.postion, target.getCenterPosition(),fluVirusTileColliderMap.get(0))));
             }
 
         }
 
-
-         */
-
-        if (!reflectionPointVert.isEmpty()) {
-
-            for (ReflectionPoint point : reflectionPointVert) {
-
-                reflectionRaysStart.add(new ReflectionPoint(point, RayCast.castRayNoObsatcle(point.postion, point.getStart(),fluVirusTileColliderMap.get(0))));
-                reflectionRaysEnd.add(new ReflectionPoint(point, RayCast.castRayNoObsatcle(point.postion, point.getEnd(),fluVirusTileColliderMap.get(0))));
-            }
-
-        }
-
-        if (!reflectionPointHorz.isEmpty()) {
-
-            for (ReflectionPoint point : reflectionPointVert) {
-
-                reflectionRaysStart.add(new ReflectionPoint(point, RayCast.castRayNoObsatcle(point.postion, point.getStart(),fluVirusTileColliderMap.get(0))));
-                reflectionRaysEnd.add(new ReflectionPoint(point, RayCast.castRayNoObsatcle(point.postion, point.getEnd(),fluVirusTileColliderMap.get(0))));
-            }
-
-        }
 
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 256)), fluVirusTileColliderMap.get(0)));
         rays.add(RayCast.castRay(centerPos, RayCast.castDirection(centerPos, new Vector2(16, 16)), fluVirusTileColliderMap.get(0)));
@@ -505,8 +479,6 @@ public class WanderVirus extends AbstractEnemy{
             linesVertical = GraphMaker.makeLines(arraayOfReducedRays, false);
             linesHorizontal = GraphMaker.makeLines(arraayOfReducedRays, true);
 
-            System.out.println(linesHorizontal.size() + ": size");
-
             /*
             for (LinkedList<Vector2> vec : linesHorizontal) {
 
@@ -518,13 +490,13 @@ public class WanderVirus extends AbstractEnemy{
 
             for (LinkedList<Vector2> vec : linesVertical) {
 
-                reflectionPointVert.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), getPosition(), false));
+                reflectionPoints.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), getPosition(), plane.VERT));
 
             }
 
             for (LinkedList<Vector2> vec : linesHorizontal) {
 
-                //reflectionPointVert.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), getPosition(), false));
+                reflectionPoints.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), getPosition(), plane.HORZ));
 
             }
 
@@ -560,9 +532,11 @@ public class WanderVirus extends AbstractEnemy{
            // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2((float)Math.sin(i), (float)Math.cos(i)), fluVirusTileColliderMap.get(0)));
         //}
 
+        validReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
+
     }
 
-
+    private LinkedList<ReflectionPoint> validReflectShots = new LinkedList<>();
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -582,7 +556,7 @@ public class WanderVirus extends AbstractEnemy{
 
     private void drawHorizontalRays() {
 
-        for (ReflectionPoint reflect : reflectionPointHorz) {
+        for (ReflectionPoint reflect : reflectionPoints) {
 
             //DebugDrawer.DrawDebugCircle(new Vector2(reflect.getX(), reflect.getY()), 3f, 4, Color.PINK, AbstractLevel.getViewport().getCamera().combined);
 
@@ -593,7 +567,7 @@ public class WanderVirus extends AbstractEnemy{
 
     private void drawVericalRays() {
 
-        for (ReflectionPoint reflect : reflectionPointVert) {
+        for (ReflectionPoint reflect : reflectionPoints) {
 
             //DebugDrawer.DrawDebugCircle(new Vector2(reflect.getX(), reflect.getY()), 3f, 4, Color.ORANGE, AbstractLevel.getViewport().getCamera().combined);
 
@@ -604,26 +578,31 @@ public class WanderVirus extends AbstractEnemy{
     private LinkedList<LinkedList<Vector2>> linesHorizontal = new LinkedList<>(), linesVertical = new LinkedList<>();
     private void drawRays() {
 
-        for (ReflectionPoint rayPoint : reflectionRaysStart) {
+        System.out.println(validReflectShots.size());
+
+        for (ReflectionPoint rayPoint : validReflectShots) {
+
+            DebugDrawer.DrawDebugLine(rayPoint.postion, rayPoint.finalPoint, 8, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+
+        }
+
+        /*
+        for (ReflectionPoint rayPoint : reflectionRays) {
 
             //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
             //DebugDrawer.DrawDebugLine(rayPoint.testPoint, rayPoint.getStart(), 8, Color.OLIVE, AbstractLevel.getViewport().getCamera().combined);
-            DebugDrawer.DrawDebugLine(rayPoint.testPoint, rayPoint.getStart(), 8, Color.CHARTREUSE, AbstractLevel.getViewport().getCamera().combined);
+
+
+
+            DebugDrawer.DrawDebugLine(rayPoint.getLimitStart(), rayPoint.getStart(), 8, Color.CHARTREUSE, AbstractLevel.getViewport().getCamera().combined);
+
+            DebugDrawer.DrawDebugLine(rayPoint.getLimitEnd(), rayPoint.getEnd(), 8, Color.ORANGE, AbstractLevel.getViewport().getCamera().combined);
             //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
 
         }
 
-        for (ReflectionPoint rayPoint : reflectionRaysEnd) {
 
-            //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
-            //DebugDrawer.DrawDebugLine(rayPoint.testPoint, rayPoint.getStart(), 8, Color.OLIVE, AbstractLevel.getViewport().getCamera().combined);
-            DebugDrawer.DrawDebugLine(rayPoint.testPoint, rayPoint.getEnd(), 8, Color.ORANGE, AbstractLevel.getViewport().getCamera().combined);
-            //DebugDrawer.DrawDebugCircle(ray, 5f, 4, Color.RED, AbstractLevel.getViewport().getCamera().combined);
-
-        }
-
-
-        drawVericalRays();
+         */
 
 
         /*
@@ -681,8 +660,7 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         rays.clear();
-        reflectionRaysStart.clear();
-        reflectionRaysEnd.clear();
+        reflectionRays.clear();
 
         //DebugDrawer.DrawDebugPolygon(polygon, 7, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
