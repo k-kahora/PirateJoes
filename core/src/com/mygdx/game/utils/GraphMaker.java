@@ -525,6 +525,10 @@ public final class GraphMaker {
                     case HORZ:
                         //point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().y, plane.HORZ);
 
+                        // this code fins the intercept of the given reflection point.
+                        // using the position of the target and the position of the reflection point a line in
+                        // point slope form is given
+
                         y1 = point.postion.y; y2 = target.y; x1 = point.postion.x; x2 = target.x; intersectionEquation = point.getStart().y;
 
                         slope = (y2 - y1) / (x2 - x1);
@@ -535,6 +539,16 @@ public final class GraphMaker {
 
 
                         point.finalPoint = new Vector2(xIntersection, intersectionEquation);
+
+                        // this makes sure the point is in bounds between teh reflectable surface
+                        if (point.finalPoint.x < point.getStart().x && point.finalPoint.x > point.getEnd().x
+                                || point.finalPoint.x > point.getStart().x && point.finalPoint.x < point.getEnd().x) {
+
+                            //if (!RayCast.castRay(point.finalPoint, RayCast.castDirection(point.finalPoint, target), target, map))
+                            //    goodPoints.add(point);
+
+                        }
+
 
                         break;
 
@@ -552,6 +566,15 @@ public final class GraphMaker {
 
                         point.finalPoint = new Vector2(intersectionEquation, yIntersection);
 
+                        if (point.finalPoint.y < point.getStart().y && point.finalPoint.y > point.getEnd().y
+                        || point.finalPoint.y > point.getStart().y && point.finalPoint.y < point.getEnd().y) {
+
+                            goodPoints.add(point);
+
+                        }
+
+
+
                         break;
 
 
@@ -560,7 +583,6 @@ public final class GraphMaker {
 
                 }
 
-            goodPoints.add(point);
 
         }
 
