@@ -89,7 +89,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     public AbstractLevel(PirateJoes pirateJoes) {
 
         this.pirateJoes = pirateJoes;
-        camera = new OrthographicCamera(cameraWidth * worldUnits * 4,cameraHeight * worldUnits * 4);
+        camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
@@ -232,7 +232,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-               character.death();
+               //character.death();
 
             }
 

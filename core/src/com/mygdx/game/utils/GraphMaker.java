@@ -544,8 +544,8 @@ public final class GraphMaker {
                         if (point.finalPoint.x < point.getStart().x && point.finalPoint.x > point.getEnd().x
                                 || point.finalPoint.x > point.getStart().x && point.finalPoint.x < point.getEnd().x) {
 
-                            //if (!RayCast.castRay(point.finalPoint, RayCast.castDirection(point.finalPoint, target), target, map))
-                            //    goodPoints.add(point);
+                            if (RayCast.castRay(point.finalPoint, RayCast.castDirection(point.finalPoint, target), target, map))
+                                goodPoints.add(point);
 
                         }
 
@@ -569,7 +569,9 @@ public final class GraphMaker {
                         if (point.finalPoint.y < point.getStart().y && point.finalPoint.y > point.getEnd().y
                         || point.finalPoint.y > point.getStart().y && point.finalPoint.y < point.getEnd().y) {
 
-                            goodPoints.add(point);
+                            if (RayCast.castRay(point.finalPoint, RayCast.castDirection(point.finalPoint, target), target, map))
+                                goodPoints.add(point);
+
 
                         }
 

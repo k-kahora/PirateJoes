@@ -338,13 +338,13 @@ public class RayCast {
 
     public static Vector2 castDirection(Vector2 start, Vector2 end) {
 
-        return new Vector2(end.x - start.x, end.y - start.y).nor();
+        return new Vector2(end.x - start.x, end.y - start.y);
 
     }
 
     public static Vector2 castDirectionOpposite(Vector2 end, Vector2 start) {
 
-        return new Vector2(end.x - start.x, end.y - start.y).nor();
+        return new Vector2(end.x - start.x, end.y - start.y);
 
     }
 

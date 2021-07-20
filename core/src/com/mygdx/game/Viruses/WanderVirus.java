@@ -176,6 +176,7 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         public Builder hyper(Array<Point<Integer, Integer>> edges) {
+
             this.type = Types.HYPER;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
@@ -234,12 +235,16 @@ public class WanderVirus extends AbstractEnemy{
 
         //rayCast = RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, fluVirusTileColliderMap.get(0));
 
-        if (RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, target.getCenterPosition(),fluVirusTileColliderMap.get(0))) {
+        if (type != Types.HYPER) {
 
-            canShoot = true;
+            if (RayCast.castRay(new Vector2(getX() + getWidth() / 2, getY() + getHeight() / 2), shotLine, target.getCenterPosition(), fluVirusTileColliderMap.get(0))) {
 
-        } else {
-            canShoot = false;
+                canShoot = true;
+
+            } else {
+                canShoot = false;
+            }
+
         }
 
 
@@ -265,10 +270,7 @@ public class WanderVirus extends AbstractEnemy{
             // i fthe bullets in a certain radius it can see the target
             else if (new Vector2(a.getX() - target.getX(), a.getY() - target.getY()).len() < 20f) {
 
-
-
                 canShoot = true;
-
                 a.playerHit = true;
 
             }
@@ -310,7 +312,6 @@ public class WanderVirus extends AbstractEnemy{
 
             case STILL:
                 break;
-
 
             case WANDER:
                 //behavior.calculateSteering(steeringOutput);
@@ -356,6 +357,12 @@ public class WanderVirus extends AbstractEnemy{
 
                 break;
 
+            case HYPER:
+
+                castAllRays();
+
+                break;
+
 
 
         }
@@ -374,7 +381,7 @@ public class WanderVirus extends AbstractEnemy{
         setBoundingBox(rectangle);
 
         collisionLogic();
-        castAllRays();
+
         //local.updateLocation((int)getX(), (int)getY());
        // moveBy(0.5f, 2f);
 
@@ -430,13 +437,10 @@ public class WanderVirus extends AbstractEnemy{
         }
     }
 
-
     private Array<ReflectionPoint> reflectionRays = new Array<>();
 
 
     private void castAllRays() {
-
-
 
         if (!reflectionPoints.isEmpty()) {
 
@@ -470,6 +474,7 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         if (!sortCalled) {
+
             rays = GraphMaker.sortRays(rays, centerPos);
 
             arraayOfReducedRays = GraphMaker.listToArray(GraphMaker.reducePoints(rays));
@@ -528,6 +533,8 @@ public class WanderVirus extends AbstractEnemy{
 
         polygon.setVertices(points);
 
+        // 360 rays
+
         //for (int i = 0; i < 360; i+=6) {
            // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2((float)Math.sin(i), (float)Math.cos(i)), fluVirusTileColliderMap.get(0)));
         //}
@@ -550,38 +557,18 @@ public class WanderVirus extends AbstractEnemy{
 
         //System.out.println(rayCast);
 
-        drawRays();
-
-    }
-
-    private void drawHorizontalRays() {
-
-        for (ReflectionPoint reflect : reflectionPoints) {
-
-            //DebugDrawer.DrawDebugCircle(new Vector2(reflect.getX(), reflect.getY()), 3f, 4, Color.PINK, AbstractLevel.getViewport().getCamera().combined);
-
-        }
-
-
-    }
-
-    private void drawVericalRays() {
-
-        for (ReflectionPoint reflect : reflectionPoints) {
-
-            //DebugDrawer.DrawDebugCircle(new Vector2(reflect.getX(), reflect.getY()), 3f, 4, Color.ORANGE, AbstractLevel.getViewport().getCamera().combined);
-
-        }
+        //drawRays();
 
     }
 
     private LinkedList<LinkedList<Vector2>> linesHorizontal = new LinkedList<>(), linesVertical = new LinkedList<>();
+
     private void drawRays() {
 
 
         for (ReflectionPoint rayPoint : validReflectShots) {
 
-            DebugDrawer.DrawDebugLine(rayPoint.postion, rayPoint.finalPoint, 8, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+            DebugDrawer.DrawDebugLine(rayPoint.finalPoint, target.getCenterPosition(), 8, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
         }
 
@@ -804,10 +791,6 @@ public class WanderVirus extends AbstractEnemy{
 
            }
 
-
-
-
-
             if (Math.abs(Math.toDegrees(vectorToAngle(noz)) - randomDegree) < 3.0){
                 //System.out.println("true");
                 rotating = true;
@@ -818,18 +801,53 @@ public class WanderVirus extends AbstractEnemy{
             } else if (Math.toDegrees(vectorToAngle(noz)) < randomDegree) {
                 nozzle.rotate(+2);
             }
-
            // System.out.println(Math.toDegrees(vectorToAngle(noz)) - randomDegree);
-
-
-
-
-
         }
 
 
         //DELETE TESTING
         boolean chance2 = true;
+
+        private void rotateToTarget(Vector2 start) {
+
+            //System.out.println(Math.abs(Math.toDegrees(vectorToAngle(tip)) - Math.toDegrees(vectorToAngle(shotLine))));
+
+            if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(start, tip)) > 88
+                    && Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(start, tip)) < 92) {
+
+
+            }
+
+            else if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(start, tip)) > 90) {
+                nozzle.rotate(-rotationRate);
+            } else {
+                nozzle.rotate(+rotationRate);
+            }
+
+        }
+
+        private void timedShot(float delta) {
+
+            if (missFireTimer > SteeringUtils.rangeOfTimes(0f, 10f) || !chance) {
+
+                missFireTimer = 0;
+
+
+                //if (canShoot) {
+
+                chance = false;
+
+                // if it can shoot and it isnt current in a timeout then calculate next chance
+
+
+                timeElapsedNoz += delta;
+                nozzle.setRegion(nozzleAnimation.getKeyFrame(timeElapsedNoz, true));
+
+
+                // }
+            }
+
+        }
 
         public void act(float delta) {
 
@@ -843,12 +861,10 @@ public class WanderVirus extends AbstractEnemy{
             // mutates tip
             tip = SteeringUtils.angleToVector(tip, (float) Math.toRadians(nozzle.getRotation()));
 
-
             //nozzle.rotate(rotationRate);
 
             //nozzle.setRotation(shotLine.angleDeg());
             //tip.setAngleDeg(shotLine.angleDeg());
-
 
             if (chance)
                 missFireTimer += delta;
@@ -857,66 +873,56 @@ public class WanderVirus extends AbstractEnemy{
             // if its a stupid type it never aims for the player
 
             //modifys tip using complex bounce algorithim
-            if (type == Types.HYPER && chance2) {
-                try {
-                    SteeringUtils.bounceShot(tip, target, WanderVirus.this, fluVirusTileColliderMap);
-                } catch (Exception e) {
 
-                }
-            chance2 = false;
-        }
+            if (type == Types.HYPER  && validReflectShots.size() > 0) {
+
+                int size = validReflectShots.size();
+
+                canShoot = true;
+
+                int random = (int)(Math.random() * size);
+
+                ReflectionPoint reflectPoint = validReflectShots.get(1);
+
+                Vector2 returnPoint = new Vector2(reflectPoint.finalPoint.x - WanderVirus.this.getPosition().x, reflectPoint.finalPoint.y - WanderVirus.this.getPosition().y);
+
+                rotateToTarget(returnPoint);
+
+                timedShot(delta);
+
+            } else if (type == Types.HYPER && validReflectShots.isEmpty()) {
+
+                canShoot = false;
+
+            }
 
 
-            if (canShoot) {
+
+            if (canShoot && type != Types.HYPER) {
 
 
 
                 if (type != Types.STUPID) {
 
 
+                    rotateToTarget(shotLine);
 
-                    //System.out.println(Math.abs(Math.toDegrees(vectorToAngle(tip)) - Math.toDegrees(vectorToAngle(shotLine))));
-
-                    if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) > 88
-                        && Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) < 92) {
-
-
-                    }
-
-                    else if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(shotLine, tip)) > 90) {
-                        nozzle.rotate(-rotationRate);
-                    } else {
-                        nozzle.rotate(+rotationRate);
-                    }
                 }
 
 
                 // the range of time between each fire
-            if (missFireTimer > SteeringUtils.rangeOfTimes(0f, 10f) || !chance) {
-
-                missFireTimer = 0;
-
-
-                //if (canShoot) {
-
-                    chance = false;
-
-                    // if it can shoot and it isnt current in a timeout then calculate next chance
-
-
-                    timeElapsedNoz += delta;
-                    nozzle.setRegion(nozzleAnimation.getKeyFrame(timeElapsedNoz, true));
-
-
-               // }
+                timedShot(delta);
 
 
 
 
-            }
-            // when it doesnt see the player call rotate and rotate inr andom directions
+
+
+
+
+            // when it doesnt see the player call rotate and rotate in random directions
+
             } else {
-
 
                 nozzle.setRegion(nozzleAnimation.getKeyFrame(0f));
                 timeElapsedNoz = 0;
@@ -924,22 +930,7 @@ public class WanderVirus extends AbstractEnemy{
 
                 rotate();
 
-
-
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
 
         public void draw(Batch batch) {
@@ -948,7 +939,6 @@ public class WanderVirus extends AbstractEnemy{
 
             if (COLOR != null)
             nozzle.setColor(COLOR);
-
 
         }
 
@@ -964,15 +954,11 @@ public class WanderVirus extends AbstractEnemy{
             sillVec.scl(16f);
 
 
-           return new Vector2(sillVec.x + centerX, centery + sillVec.y);
+            return new Vector2(sillVec.x + centerX, centery + sillVec.y);
 
         }
 
-
-
         public boolean isFinished(float delta) {
-
-
 
             if (nozzleAnimation.isAnimationFinished(timeElapsedNoz)) {
 
