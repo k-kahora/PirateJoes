@@ -256,29 +256,6 @@ public class WanderVirus extends AbstractEnemy{
         if (isTagged())
             setDeath();
 
-        if (testBullets.peek() != null) {
-
-            a = testBullets.element();
-
-            if (a.remove) {
-
-
-                canShoot = false;
-
-            }
-
-            // i fthe bullets in a certain radius it can see the target
-            else if (new Vector2(a.getX() - target.getX(), a.getY() - target.getY()).len() < 20f) {
-
-                canShoot = true;
-                a.playerHit = true;
-
-            }
-
-
-
-        }
-
 
 
 
@@ -286,12 +263,20 @@ public class WanderVirus extends AbstractEnemy{
             // add random time elapsed
             if (nozzle.isFinished(delta)) {
 
-
-                getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
-                        .initCollision(tileDataMap).maxBounces(1)
-                        .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+                if (type != Types.HYPER)
 
 
+                    getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, SteeringUtils.angleToVector((float)Math.toRadians(nozzle.nozzle.getRotation() - 90)), bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
+                            .initCollision(tileDataMap).maxBounces(1)
+                            .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+
+                else {
+
+                    getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, nozzle.returnPoint, bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
+                            .initCollision(tileDataMap).maxBounces(1)
+                            .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
+
+                }
 
             }
 
@@ -495,13 +480,13 @@ public class WanderVirus extends AbstractEnemy{
 
             for (LinkedList<Vector2> vec : linesVertical) {
 
-                reflectionPoints.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), getPosition(), plane.VERT));
+                reflectionPoints.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), centerPos, plane.VERT));
 
             }
 
             for (LinkedList<Vector2> vec : linesHorizontal) {
 
-                reflectionPoints.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), getPosition(), plane.HORZ));
+                reflectionPoints.add(new ReflectionPoint(vec.getFirst(), vec.getLast(), centerPos, plane.HORZ));
 
             }
 
@@ -756,6 +741,8 @@ public class WanderVirus extends AbstractEnemy{
         }
 
         public Turret(float fireRate, int missFire) {
+
+
             this.missFire = missFire;
             start = new Vector3();
             this.fireRate = fireRate;
@@ -806,15 +793,17 @@ public class WanderVirus extends AbstractEnemy{
 
 
         //DELETE TESTING
-        boolean chance2 = true;
 
-        private void rotateToTarget(Vector2 start) {
+
+        private boolean rotateToTarget(Vector2 start) {
 
             //System.out.println(Math.abs(Math.toDegrees(vectorToAngle(tip)) - Math.toDegrees(vectorToAngle(shotLine))));
 
             if (Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(start, tip)) > 88
                     && Math.toDegrees(SteeringUtils.calcAngleBetweenVectors(start, tip)) < 92) {
 
+
+                    return true;
 
             }
 
@@ -824,11 +813,13 @@ public class WanderVirus extends AbstractEnemy{
                 nozzle.rotate(+rotationRate);
             }
 
+            return false;
+
         }
 
         private void timedShot(float delta) {
 
-            if (missFireTimer > SteeringUtils.rangeOfTimes(0f, 10f) || !chance) {
+           // if ( /* missFireTimer > SteeringUtils.rangeOfTimes(0f, 10f) */ !chance) {
 
                 missFireTimer = 0;
 
@@ -845,9 +836,17 @@ public class WanderVirus extends AbstractEnemy{
 
 
                 // }
-            }
+           // }
 
         }
+
+        private void fire() {
+
+
+
+        }
+
+        private Vector2 returnPoint = new Vector2();
 
         public void act(float delta) {
 
@@ -856,7 +855,6 @@ public class WanderVirus extends AbstractEnemy{
             nozzle.setPosition(xOffset, WanderVirus.this.getY());
             //start.set(nozzle.getX(), nozzle.getY() + WanderVirus.this.getHeight()/2, 0);
             //endPoint.set(start, new Vector3(tip.x, tip.y, 0));
-
 
             // mutates tip
             tip = SteeringUtils.angleToVector(tip, (float) Math.toRadians(nozzle.getRotation()));
@@ -874,55 +872,54 @@ public class WanderVirus extends AbstractEnemy{
 
             //modifys tip using complex bounce algorithim
 
+
+
             if (type == Types.HYPER  && validReflectShots.size() > 0) {
 
                 int size = validReflectShots.size();
 
-                canShoot = true;
-
                 int random = (int)(Math.random() * size);
 
-                ReflectionPoint reflectPoint = validReflectShots.get(1);
+                ReflectionPoint reflectPoint = validReflectShots.get(0);
 
-                Vector2 returnPoint = new Vector2(reflectPoint.finalPoint.x - WanderVirus.this.getPosition().x, reflectPoint.finalPoint.y - WanderVirus.this.getPosition().y);
+                returnPoint = new Vector2(reflectPoint.finalPoint.x - WanderVirus.this.centerPos.x, reflectPoint.finalPoint.y - WanderVirus.this.centerPos.y);
 
-                rotateToTarget(returnPoint);
+                canShoot = rotateToTarget(returnPoint);
 
-                timedShot(delta);
+                if (canShoot) {
+
+
+                         timedShot(delta);
+
+                         canShoot = false;
+
+
+                }
 
             } else if (type == Types.HYPER && validReflectShots.isEmpty()) {
 
-                canShoot = false;
+                nozzle.setRegion(nozzleAnimation.getKeyFrame(0f));
+                timeElapsedNoz = 0;
+                missFireTimer = 0;
+
+                rotate();
 
             }
 
-
-
             if (canShoot && type != Types.HYPER) {
 
-
-
                 if (type != Types.STUPID) {
-
 
                     rotateToTarget(shotLine);
 
                 }
 
-
                 // the range of time between each fire
                 timedShot(delta);
 
-
-
-
-
-
-
-
             // when it doesnt see the player call rotate and rotate in random directions
 
-            } else {
+            } else if (type != Types.HYPER) {
 
                 nozzle.setRegion(nozzleAnimation.getKeyFrame(0f));
                 timeElapsedNoz = 0;
@@ -944,17 +941,16 @@ public class WanderVirus extends AbstractEnemy{
 
         public Vector2 tip() {
 
-            Vector3 newVec = endPoint.getEndPoint(start, 16f);
-
-            float centerX = getX() + getWidth()/2;
-            float centery = getY() + getHeight()/2;
-
-            Vector2 sillVec = SteeringUtils.angleToVector((float)Math.toRadians(nozzle.getRotation() - 90));
-
-            sillVec.scl(16f);
+            Vector2 tipEnd = WanderVirus.this.centerPos;
 
 
-            return new Vector2(sillVec.x + centerX, centery + sillVec.y);
+
+
+
+
+
+
+            return tipEnd;
 
         }
 
@@ -972,11 +968,7 @@ public class WanderVirus extends AbstractEnemy{
 
             justShot = false;
 
-
             return false;
         }
-
-
     }
-
 }

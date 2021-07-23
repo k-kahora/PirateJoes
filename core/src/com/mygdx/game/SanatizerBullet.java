@@ -68,10 +68,11 @@ public class SanatizerBullet extends AbstractBullet  {
         this.quad = builder.quad;
         this.playerShot = builder.playerShot;
 
-        setPosition(x ,y);
+
         this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
         sprite.scale(-0.2f);
+        setPosition(x - sprite.getWidth() / 2,y - sprite.getHeight() / 2);
 
     }
 
