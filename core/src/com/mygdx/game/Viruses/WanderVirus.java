@@ -460,12 +460,15 @@ public class WanderVirus extends AbstractEnemy{
 
         if (!sortCalled) {
 
+            // sorts rays by angle
             rays = GraphMaker.sortRays(rays, centerPos);
 
+            // reduces dupelicate rays
             arraayOfReducedRays = GraphMaker.listToArray(GraphMaker.reducePoints(rays));
 
             // linesHorizontal = GraphMaker.makeLines(arraayOfReducedRays, false);
 
+            // seperates lines by direction
             linesVertical = GraphMaker.makeLines(arraayOfReducedRays, false);
             linesHorizontal = GraphMaker.makeLines(arraayOfReducedRays, true);
 
@@ -524,9 +527,20 @@ public class WanderVirus extends AbstractEnemy{
            // rays.add(RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), new Vector2((float)Math.sin(i), (float)Math.cos(i)), fluVirusTileColliderMap.get(0)));
         //}
 
+        //validReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
+
+        //if (validReflectShots.size() > 2)
+
+        for (ReflectionPoint point : validReflectShots)
+        GraphMaker.returnEdgesInReflection(point, edges, testEdge, fluVirusTileColliderMap.get(0));
+
         validReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
 
+
     }
+
+    //DELETE
+    Array<Vector2> testEdge = new Array<>();
 
     private LinkedList<ReflectionPoint> validReflectShots = new LinkedList<>();
 
@@ -542,7 +556,10 @@ public class WanderVirus extends AbstractEnemy{
 
         //System.out.println(rayCast);
 
-        //drawRays();
+        drawRays();
+
+
+        System.out.println(reflectionPoints.size() + "Wander");
 
     }
 
@@ -573,7 +590,10 @@ public class WanderVirus extends AbstractEnemy{
         }
 
 
+
          */
+
+
 
 
         /*
@@ -848,6 +868,8 @@ public class WanderVirus extends AbstractEnemy{
 
         private Vector2 returnPoint = new Vector2();
 
+        boolean HyperRandomShotFlag = true;
+
         public void act(float delta) {
 
             float xOffset = WanderVirus.this.getX() + nozzle.getWidth() / 2;
@@ -876,13 +898,22 @@ public class WanderVirus extends AbstractEnemy{
 
             if (type == Types.HYPER  && validReflectShots.size() > 0) {
 
-                int size = validReflectShots.size();
+                if (HyperRandomShotFlag) {
 
-                int random = (int)(Math.random() * size);
+                    HyperRandomShotFlag = false;
 
-                ReflectionPoint reflectPoint = validReflectShots.get(0);
+                    int size = validReflectShots.size();
 
-                returnPoint = new Vector2(reflectPoint.finalPoint.x - WanderVirus.this.centerPos.x, reflectPoint.finalPoint.y - WanderVirus.this.centerPos.y);
+                    int random = (int)(Math.random() * size);
+
+                    ReflectionPoint reflectPoint = validReflectShots.get(random);
+
+                    returnPoint = new Vector2(reflectPoint.finalPoint.x - WanderVirus.this.centerPos.x, reflectPoint.finalPoint.y - WanderVirus.this.centerPos.y);
+
+
+                }
+
+
 
                 canShoot = rotateToTarget(returnPoint);
 
@@ -894,7 +925,11 @@ public class WanderVirus extends AbstractEnemy{
                          canShoot = false;
 
 
+
+
                 }
+
+
 
             } else if (type == Types.HYPER && validReflectShots.isEmpty()) {
 
@@ -961,6 +996,7 @@ public class WanderVirus extends AbstractEnemy{
                chance = true;
                timeElapsed2 += delta;
                timeElapsedNoz = 0;
+               HyperRandomShotFlag = true;
 
 
                 return true;

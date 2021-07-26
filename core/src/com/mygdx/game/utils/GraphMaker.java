@@ -2,12 +2,15 @@ package com.mygdx.game.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.Tile;
 import com.mygdx.game.Enumerators.plane;
+import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.Ray;
 import com.mygdx.game.FunctionalityClasses.RayCast;
+import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TilePath;
 import sun.awt.image.ImageWatched;
@@ -369,6 +372,7 @@ public final class GraphMaker {
                 Vector2 point1 = listOfLines.get(i);
 
                 if (xORy) {
+
                     if (Math.abs(point.y - point1.y) < 0.1) {
 
                         inList.add(point);
@@ -377,7 +381,9 @@ public final class GraphMaker {
                     } else {
 
                         break;
+
                     }
+
                 } else {
 
                     if (Math.abs(point.x - point1.x) < 0.1) {
@@ -610,6 +616,156 @@ public final class GraphMaker {
         }
 
         return noDupe;
+
+
+    }
+
+    public static void returnEdgesInReflection(ReflectionPoint reflectionPoint, Array<Point<Integer, Integer>> edgeMap, Array<Vector2> returnEdges, ArrayList<ArrayList<TileData>> map) {
+
+        returnEdges.clear();
+
+        Vector2 endVec = new Vector2(reflectionPoint.getEnd());
+
+        Vector2 startVec = new Vector2(reflectionPoint.getStart());
+
+        endVec.sub(reflectionPoint.postion);
+        startVec.sub(reflectionPoint.postion);
+
+        double angle1 = Math.atan2(endVec.x, endVec.y), angle2 = Math.atan2(startVec.x, startVec.y), max, min;
+
+        if (angle1 > angle2) {
+
+            max = angle1;
+            min = angle2;
+
+        } else {
+
+            max = angle2;
+            min = angle1;
+
+        }
+
+        System.out.println("Max: " + max + " " + "Min: " + min);
+
+        for (Point point : edgeMap) {
+
+            Vector2 voint = new Vector2((int)point.getIndexi(), (int)point.getIndexj()).sub(reflectionPoint.postion);
+
+            double ang = Math.atan2(voint.x, voint.y);
+
+
+            if (ang > min && ang < max) {
+
+                returnEdges.add(voint.add(reflectionPoint.postion));
+
+            }
+
+        }
+
+        Array<Vector2> castPoints = new Array<Vector2>();
+
+        castPoints.add(RayCast.castRay(reflectionPoint.getStart(), RayCast.castDirection(reflectionPoint.postion, reflectionPoint.getStart()), map));
+        castPoints.add(RayCast.castRay(reflectionPoint.getEnd(), RayCast.castDirection(reflectionPoint.postion, reflectionPoint.getEnd()), map));
+        DebugDrawer.DrawDebugLine(reflectionPoint.getStart(), castPoints.get(0), 8, Color.FOREST, AbstractLevel.getViewport().getCamera().combined);
+        DebugDrawer.DrawDebugLine(reflectionPoint.getEnd(), castPoints.get(1), 8, Color.YELLOW, AbstractLevel.getViewport().getCamera().combined);
+
+        for (Vector2 vec : returnEdges) {
+
+            Vector2 startPoint = calcStartPoint(reflectionPoint, vec);
+            castPoints.add(RayCast.castRay(startPoint, RayCast.castDirection(startPoint,vec), map));
+
+            Vector2 end = RayCast.castRay(startPoint, RayCast.castDirection(startPoint,vec), map);
+
+            //DebugDrawer.DrawDebugLine(startPoint, end, 8, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+
+
+        }
+
+        reflectionPoint.addDoublePoints(castPoints);
+
+    }
+
+    private static Vector2 calcStartPoint(ReflectionPoint point, Vector2 target) {
+
+        LinkedList<ReflectionPoint> goodPoints = new LinkedList<>();
+
+            // check y positions
+
+
+                /*
+                if (point.getLimitEnd().y < target.y && point.getLimitStart().y > target.y) {
+
+                    point.finalPoint = RayCast.castRay(point.postion, RayCast.castDirection(point.postion, target), map);
+                    goodPoints.add(point);
+
+
+                }
+
+                 */
+
+
+
+                /*
+                if (point.getLimitEnd().x < target.x && point.getLimitStart().x > target.x) {
+
+                    point.finalPoint = RayCast.castRay(point.postion, RayCast.castDirection(point.postion, target), map);
+                    goodPoints.add(point);
+
+                }
+
+                 */
+
+
+            float slope, y1, y2, x1, x2, xIntersection, yIntersection, intersectionEquation;
+            Vector2 returnPoint = new Vector2();
+
+            switch (point.getPlane()) {
+
+                case HORZ:
+                    //point.finalPoint = RayCast.castRayWithLimit(point.postion, target, point.getStart().y, plane.HORZ);
+
+                    // this code fins the intercept of the given reflection point.
+                    // using the position of the target and the position of the reflection point a line in
+                    // point slope form is given
+
+                    y1 = point.postion.y; y2 = target.y; x1 = point.postion.x; x2 = target.x; intersectionEquation = point.getStart().y;
+
+                    slope = (y2 - y1) / (x2 - x1);
+
+
+
+                    xIntersection = ((intersectionEquation - y2) / slope) + x2;
+
+
+                    returnPoint = new Vector2(xIntersection, intersectionEquation);
+
+                    // this makes sure the point is in bounds between teh reflectable surface
+
+                    return returnPoint;
+
+
+                case VERT:
+
+                    y1 = point.postion.y; y2 = target.y; x1 = point.postion.x; x2 = target.x; intersectionEquation = point.getStart().x;
+
+                    slope = (y2 - y1) / (x2 - x1);
+
+
+
+                    yIntersection = ((intersectionEquation - x2) * slope) + y2;
+
+
+                    returnPoint = new Vector2(intersectionEquation, yIntersection);
+
+
+                    return returnPoint;
+
+
+
+                default:
+                    return null;
+
+            }
 
 
     }

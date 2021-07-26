@@ -1,13 +1,14 @@
 package com.mygdx.game.utils;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Enumerators.plane;
 import com.mygdx.game.FunctionalityClasses.RayCast;
 import com.sun.jdi.connect.Connector;
 
 public class ReflectionPoint {
 
-    private Vector2 start, end, location;
+    private final Vector2 start, end, location;
 
     public Vector2 midpoint;
 
@@ -17,13 +18,15 @@ public class ReflectionPoint {
 
     private boolean validShot = false;
 
-    public Vector2 postion = new Vector2();
+    public final Vector2 postion = new Vector2();
 
     public Vector2 testPoint = new Vector2();
 
     private Vector2 limitStart, limitEnd;
 
     private plane xORy = plane.HORZ;
+
+    private Array<Vector2> secondRays = new Array<Vector2>();
 
     public ReflectionPoint(ReflectionPoint reflectionPoint, Vector2 limitStart, Vector2 limitEnd) {
 
@@ -123,4 +126,17 @@ public class ReflectionPoint {
         return xORy;
 
     }
+
+    public void addDoublePoints(Array<Vector2> rays) {
+
+        secondRays = rays;
+
+    }
+
+    public Array<Vector2> getSecondRays() {
+
+        return secondRays;
+
+    }
+
 }

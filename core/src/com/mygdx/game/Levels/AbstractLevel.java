@@ -89,7 +89,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     public AbstractLevel(PirateJoes pirateJoes) {
 
         this.pirateJoes = pirateJoes;
-        camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
+        camera = new OrthographicCamera(cameraWidth * worldUnits * 2,cameraHeight * worldUnits * 2);
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
@@ -187,26 +187,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         if (!character.isDead())
             character.act(Gdx.graphics.getDeltaTime());
 
-        for (AbstractEnemy a : groupOfViruses) {
 
-            a.act(delta);
-            a.draw(getPirateJoe().batch, 0);
-            //removedBullets.addAll
-
-            a.isHit(bullets);
-
-            bullets.addAll(a.getVirusBullets());
-            a.clearBullets();
-
-            for (MainCharacter.LandMine l : mines) {
-                yogurt(a, l);
-            }
-
-            if (a.isDead())
-                killedViruses.add(a);
-        }
-
-        groupOfViruses.removeAll(killedViruses, false);
 
         for (int i = 0; i < bullets.size(); ++i) {
 
@@ -232,7 +213,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-               //character.death();
+               // character.death();
 
             }
 
@@ -256,6 +237,27 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
             }
 
         }
+
+        for (AbstractEnemy a : groupOfViruses) {
+
+            a.act(delta);
+            a.draw(getPirateJoe().batch, 0);
+            //removedBullets.addAll
+
+            a.isHit(bullets);
+
+            bullets.addAll(a.getVirusBullets());
+            a.clearBullets();
+
+            for (MainCharacter.LandMine l : mines) {
+                yogurt(a, l);
+            }
+
+            if (a.isDead())
+                killedViruses.add(a);
+        }
+
+        groupOfViruses.removeAll(killedViruses, false);
 
         bullets.removeAll(removedBullets);
 
