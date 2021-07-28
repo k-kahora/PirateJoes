@@ -493,11 +493,20 @@ public class WanderVirus extends AbstractEnemy{
 
             }
 
+            //for (ReflectionPoint reflectionPoint : reflectionPoints) {
+
+
+
+            //}
+
+
+            // sets up second angle
+
+
             sortCalled = true;
 
             rayo = rays;
 
-            Vector2[] arrayOfVectors = arraayOfReducedRays.toArray(Vector2.class);
 
             Array<Float> arrayOfFloats = new Array<Float>();
 
@@ -531,8 +540,9 @@ public class WanderVirus extends AbstractEnemy{
 
         //if (validReflectShots.size() > 2)
 
-        for (ReflectionPoint point : validReflectShots)
-        GraphMaker.returnEdgesInReflection(point, edges, testEdge, fluVirusTileColliderMap.get(0));
+
+
+        GraphMaker.returnEdgesInReflection(reflectionPoints.get(22), edges, testEdge, fluVirusTileColliderMap.get(0));
 
         validReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
 
@@ -556,10 +566,10 @@ public class WanderVirus extends AbstractEnemy{
 
         //System.out.println(rayCast);
 
-        drawRays();
+        // drawRays();
 
 
-        System.out.println(reflectionPoints.size() + "Wander");
+        //System.out.println(reflectionPoints.size() + "Wander");
 
     }
 
@@ -916,6 +926,8 @@ public class WanderVirus extends AbstractEnemy{
 
 
                 canShoot = rotateToTarget(returnPoint);
+
+                canShoot = false;
 
                 if (canShoot) {
 

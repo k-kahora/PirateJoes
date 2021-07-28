@@ -79,7 +79,7 @@ public class Level5 extends AbstractLevel{
 
         collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
-        character.setPosition(200,150);
+        character.setPosition(200,100);
 
         getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper(levelEdges).build());
 

@@ -54,7 +54,6 @@ public class DebugDrawer {
         Gdx.gl.glLineWidth(lineWidth);
         debugRenderer.setProjectionMatrix(projectionMatrix);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-
         debugRenderer.setColor(color);
         debugRenderer.line(start, end);
         debugRenderer.end();

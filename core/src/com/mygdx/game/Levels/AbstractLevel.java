@@ -89,7 +89,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     public AbstractLevel(PirateJoes pirateJoes) {
 
         this.pirateJoes = pirateJoes;
-        camera = new OrthographicCamera(cameraWidth * worldUnits * 2,cameraHeight * worldUnits * 2);
+        camera = new OrthographicCamera(cameraWidth * worldUnits * 4,cameraHeight * worldUnits * 4);
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
@@ -172,12 +172,14 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         mines = character.getLandMines();
 
-
+/*
         if (groupOfViruses.isEmpty()) {
             clear();
             LevelManager.incrementLeve();
             ParticleManager.clear();
         }
+
+ */
 
         character.draw(getPirateJoe().batch, 0);
 
