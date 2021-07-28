@@ -34,6 +34,8 @@ public class WanderVirus extends AbstractEnemy{
 
     private boolean sortCalled = false;
 
+    private Array<ReflectionPoint> validSecondShots = new Array<>();
+
     private Array<Vector2> rayo = new Array<Vector2>();
 
     private Array<Vector2> arraayOfReducedRays = new Array<>();
@@ -493,6 +495,9 @@ public class WanderVirus extends AbstractEnemy{
 
             }
 
+            //for (ReflectionPoint point : reflectionPoints)
+
+
             //for (ReflectionPoint reflectionPoint : reflectionPoints) {
 
 
@@ -525,7 +530,14 @@ public class WanderVirus extends AbstractEnemy{
 
             }
 
+
+
         }
+
+
+
+        GraphMaker.returnEdgesInReflection(reflectionPoints.get(4), edges, testEdge, fluVirusTileColliderMap.get(0));
+        reflectionPoints.get(4).updateShots(target.getCenterPosition(), fluVirusTileColliderMap.get(0));
 
 
         polygon.setVertices(points);
@@ -542,7 +554,7 @@ public class WanderVirus extends AbstractEnemy{
 
 
 
-        GraphMaker.returnEdgesInReflection(reflectionPoints.get(22), edges, testEdge, fluVirusTileColliderMap.get(0));
+
 
         validReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
 

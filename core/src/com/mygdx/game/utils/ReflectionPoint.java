@@ -9,13 +9,17 @@ import com.mygdx.game.Enumerators.plane;
 import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.RayCast;
 import com.mygdx.game.Levels.AbstractLevel;
+import com.mygdx.game.Tiles.TileData;
 import com.sun.jdi.connect.Connector;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class ReflectionPoint {
 
     private Array<ReflectionPoint> reflectionPoints = new Array<>();
+
+    private LinkedList<ReflectionPoint> validShotsList = new LinkedList<>();
 
     private final Vector2 start, end, location;
 
@@ -42,6 +46,21 @@ public class ReflectionPoint {
         this(reflectionPoint.start, reflectionPoint.end, reflectionPoint.location, reflectionPoint.xORy);
         this.limitStart = limitStart;
         this.limitEnd = limitEnd;
+
+    }
+
+
+    public void updateShots(Vector2 target, ArrayList<ArrayList<TileData>> map) {
+
+        validShotsList = GraphMaker.betweenrays(reflectionPoints, target, map);
+
+        System.out.println(validShotsList.size() + " size of valif");
+
+        for (ReflectionPoint valid : validShotsList) {
+
+            DebugDrawer.DrawDebugLine(valid.finalPoint, target, 5, Color.ORANGE, AbstractLevel.getViewport().getCamera().combined);
+
+        }
 
     }
 
@@ -138,9 +157,11 @@ public class ReflectionPoint {
 
     public void addDoublePoints(Array<Vector2> rays) {
 
+        reflectionPoints.clear();
+
         Polygon polygon = new Polygon();
 
-        DebugDrawer.DrawDebugCircle(postion, 10f, 5, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+        //DebugDrawer.DrawDebugCircle(postion, 10f, 5, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
 
 
@@ -163,15 +184,17 @@ public class ReflectionPoint {
 
         }
 
-        for (ReflectionPoint ref : reflectionPoints) {
+        System.out.println(reflectionPoints.size + "size of reflec");
 
-            DebugDrawer.DrawDebugLine(ref.getStart(), ref.getEnd(), 8, Color.YELLOW, AbstractLevel.getViewport().getCamera().combined);
+        for (ReflectionPoint point : reflectionPoints) {
+
+            DebugDrawer.DrawDebugLine(point.getStart(), point.getEnd(), 5, Color.YELLOW, AbstractLevel.getViewport().getCamera().combined);
 
         }
 
-        System.out.println(reflectionPoints.size + "size");
 
-        reflectionPoints.clear();
+
+
 
         /*
 

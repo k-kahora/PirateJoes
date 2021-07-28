@@ -722,8 +722,8 @@ public final class GraphMaker {
         castPoints.add(RayCast.castRay(reflectionPoint.getStart(), RayCast.castDirection(reflectionPoint.postion, reflectionPoint.getStart()), map));
         castPoints.add(RayCast.castRay(reflectionPoint.getEnd(), RayCast.castDirection(reflectionPoint.postion, reflectionPoint.getEnd()), map));
 
-        DebugDrawer.DrawDebugLine(reflectionPoint.getStart(), castPoints.get(0), 8, Color.OLIVE, AbstractLevel.getViewport().getCamera().combined);
-        DebugDrawer.DrawDebugLine(reflectionPoint.getEnd(), castPoints.get(1), 8, Color.OLIVE, AbstractLevel.getViewport().getCamera().combined);
+        //DebugDrawer.DrawDebugLine(reflectionPoint.getStart(), castPoints.get(0), 8, Color.OLIVE, AbstractLevel.getViewport().getCamera().combined);
+        //DebugDrawer.DrawDebugLine(reflectionPoint.getEnd(), castPoints.get(1), 8, Color.OLIVE, AbstractLevel.getViewport().getCamera().combined);
 
         if (!returnEdges.isEmpty()) {
 
