@@ -76,11 +76,11 @@ public class Level2 extends AbstractLevel{
 
         collisionTiles = GraphMaker.createGraph(secondLayer.getTileMap());
 
-        character.setPosition(200,200);
+        character.setPosition(100,220);
 
         getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper(levelEdges).build());
 
-        getFluViruses().get(0).setPosition(40, 100);
+        getFluViruses().get(0).setPosition(200, 150);
 
         /*
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());//

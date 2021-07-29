@@ -68,10 +68,12 @@ public class SanatizerBullet extends AbstractBullet  {
         this.quad = builder.quad;
         this.playerShot = builder.playerShot;
 
+        sprite.setScale(0.6f);
 
         this.bulletColider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
-        sprite.scale(-0.2f);
+
+
         setPosition(x - sprite.getWidth() / 2,y - sprite.getHeight() / 2);
 
     }
@@ -107,7 +109,7 @@ public class SanatizerBullet extends AbstractBullet  {
             this.speed = speed;
             this.velocity = velocity.scl(speed);
             this.sprite = new Sprite(texture);
-            this.rectangle = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
+            this.rectangle = new Rectangle(x + 5, y + 5, sprite.getWidth(), sprite.getHeight());
             this.mapIndex = -1;
 
 
@@ -275,10 +277,10 @@ public class SanatizerBullet extends AbstractBullet  {
 
         // update bounding box
 
-        rectangle.x = getX();
-        rectangle.y = getY();
-        rectangle.width = sprite.getWidth();
-        rectangle.height = sprite.getHeight();
+        rectangle.x = getX() + 3;
+        rectangle.y = getY() + 3;
+        rectangle.width = 3;
+        rectangle.height = 3;
 
         timeElapsed += delta;
 

@@ -62,7 +62,7 @@ public class DebugDrawer {
     public static void DrawDebugRectangle(float x, float y, float width, float height, Color color, Matrix4 projectionMatrix) {
 
         debugRenderer.setProjectionMatrix(projectionMatrix);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
         debugRenderer.setColor(color);
         debugRenderer.rect(x,y,width,height);
         debugRenderer.end();

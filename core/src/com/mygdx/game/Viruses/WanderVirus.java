@@ -180,7 +180,7 @@ public class WanderVirus extends AbstractEnemy{
         public Builder hyper(Array<Point<Integer, Integer>> edges) {
 
             this.type = Types.HYPER;
-            this.bulletSpeed = 3.2f;
+            this.bulletSpeed = 4.2f;
             this.COLOR = Color.TEAL;
             this.edges = edges;
 
