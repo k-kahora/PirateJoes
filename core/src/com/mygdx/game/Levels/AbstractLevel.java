@@ -172,14 +172,14 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         mines = character.getLandMines();
 
-/*
+
         if (groupOfViruses.isEmpty()) {
             clear();
             LevelManager.incrementLeve();
             ParticleManager.clear();
         }
 
- */
+
 
         character.draw(getPirateJoe().batch, 0);
 

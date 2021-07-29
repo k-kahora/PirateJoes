@@ -262,6 +262,9 @@ public final class GraphMaker {
 
         for (Vector2 vec : array) {
 
+            if (vec == null)
+                continue;
+
             arrayList.add(new Vector2Compare(vec));
 
         }
@@ -534,7 +537,8 @@ public final class GraphMaker {
 
                         }
 
-                        if (point.finalPoint.x > min && point.finalPoint.x < max) {
+                        if (point.finalPoint.x > min && point.finalPoint.x < max && ((target.y > point.postion.y && target.y > point.getStart().y)
+                                || (target.y < point.postion.y && target.y < point.getStart().y))) {
 
                             if (RayCast.castRay(point.finalPoint, RayCast.castDirection(point.finalPoint, target), target, map))
                                 goodPoints.add(point);
@@ -572,7 +576,8 @@ public final class GraphMaker {
 
                         }
 
-                        if (point.finalPoint.y > min && point.finalPoint.y < max) {
+                        if (point.finalPoint.y > min && point.finalPoint.y < max && ((target.x > point.postion.x && target.x > point.getStart().x)
+                                || (target.x < point.postion.x && target.x < point.getStart().x))) {
 
                             if (RayCast.castRay(point.finalPoint, RayCast.castDirection(point.finalPoint, target), target, map))
                                 goodPoints.add(point);
@@ -662,51 +667,6 @@ public final class GraphMaker {
 
             double minimumLevel = 0, maxLevel = 0;
 
-            if (reflectionPoint.getPlane() == plane.HORZ) {
-
-                if (reflectionPoint.getStart().y - reflectionPoint.postion.y > 0) {
-
-                    if (ppoint.y < reflectionPoint.getStart().y) {
-
-                        continue;
-
-                    }
-
-                } else {
-
-                    if (ppoint.y > reflectionPoint.getStart().y) {
-
-                        continue;
-
-                    }
-
-                }
-
-            }
-
-            if (reflectionPoint.getPlane() == plane.VERT) {
-
-                if (reflectionPoint.getStart().x - reflectionPoint.postion.x > 0) {
-
-                    if (ppoint.x < reflectionPoint.getStart().x) {
-
-                        continue;
-
-                    }
-
-
-                } else {
-
-                    if (ppoint.x > reflectionPoint.getStart().x) {
-
-                        continue;
-
-                    }
-
-                }
-
-            }
-
             if (ang > min && ang < max ) {
 
                 returnEdges.add(voint.add(reflectionPoint.postion));
@@ -754,7 +714,7 @@ public final class GraphMaker {
 
     }
 
-    private static Vector2 calcStartPoint(ReflectionPoint point, Vector2 target) {
+    public static Vector2 calcStartPoint(ReflectionPoint point, Vector2 target) {
 
         LinkedList<ReflectionPoint> goodPoints = new LinkedList<>();
 

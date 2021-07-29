@@ -35,6 +35,8 @@ public class ReflectionPoint {
 
     public Vector2 testPoint = new Vector2();
 
+    public Array<Vector2> validReflectionShots = new Array<>();
+
     private Vector2 limitStart, limitEnd;
 
     private plane xORy = plane.HORZ;
@@ -50,17 +52,29 @@ public class ReflectionPoint {
     }
 
 
-    public void updateShots(Vector2 target, ArrayList<ArrayList<TileData>> map) {
+    // this is only called on the first reflected points
+
+    public Array<Vector2> updateShots(Vector2 target, ArrayList<ArrayList<TileData>> map) {
+
+        validReflectionShots.clear();
 
         validShotsList = GraphMaker.betweenrays(reflectionPoints, target, map);
 
-        System.out.println(validShotsList.size() + " size of valif");
-
         for (ReflectionPoint valid : validShotsList) {
 
-            DebugDrawer.DrawDebugLine(valid.finalPoint, target, 5, Color.ORANGE, AbstractLevel.getViewport().getCamera().combined);
+
+
+                Vector2 finalFinalPoint = GraphMaker.calcStartPoint(this, valid.finalPoint);
+
+                validReflectionShots.add(finalFinalPoint);
+
+
+                 //DebugDrawer.DrawDebugLine(target, valid.finalPoint, 5, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+
 
         }
+
+        return validReflectionShots;
 
     }
 

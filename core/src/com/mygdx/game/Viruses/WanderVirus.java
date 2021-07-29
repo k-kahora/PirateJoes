@@ -275,7 +275,7 @@ public class WanderVirus extends AbstractEnemy{
                 else {
 
                     getVirusBullets().add(new SanatizerBullet.Builder(nozzle.tip().x, nozzle.tip().y, nozzle.returnPoint, bulletSpeed, assetManager.manager.get(assetManager.bulletSprite))
-                            .initCollision(tileDataMap).maxBounces(1)
+                            .initCollision(tileDataMap).maxBounces(2)
                             .explosionAnimation(assetManager.manager.get(assetManager.splashBullet)).build());
 
                 }
@@ -429,6 +429,8 @@ public class WanderVirus extends AbstractEnemy{
 
     private void castAllRays() {
 
+        validDoubleReflectionShots.clear();
+
         if (!reflectionPoints.isEmpty()) {
 
             for (ReflectionPoint point : reflectionPoints) {
@@ -530,14 +532,19 @@ public class WanderVirus extends AbstractEnemy{
 
             }
 
+            for (ReflectionPoint reflectionPoint : reflectionPoints)
+
+            GraphMaker.returnEdgesInReflection(reflectionPoint, edges, testEdge, fluVirusTileColliderMap.get(0));
 
 
         }
 
 
+        //GraphMaker.returnEdgesInReflection(reflectionPoints.get(7), edges, testEdge, fluVirusTileColliderMap.get(0));
 
-        GraphMaker.returnEdgesInReflection(reflectionPoints.get(4), edges, testEdge, fluVirusTileColliderMap.get(0));
-        reflectionPoints.get(4).updateShots(target.getCenterPosition(), fluVirusTileColliderMap.get(0));
+        for (ReflectionPoint reflectionPoint : reflectionPoints)
+
+        validDoubleReflectionShots.addAll(reflectionPoint.updateShots(target.getCenterPosition(), fluVirusTileColliderMap.get(0)));
 
 
         polygon.setVertices(points);
@@ -556,7 +563,7 @@ public class WanderVirus extends AbstractEnemy{
 
 
 
-        validReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
+        validSingleReflectShots = GraphMaker.betweenrays(reflectionRays , target.getCenterPosition(), fluVirusTileColliderMap.get(0));
 
 
     }
@@ -564,7 +571,8 @@ public class WanderVirus extends AbstractEnemy{
     //DELETE
     Array<Vector2> testEdge = new Array<>();
 
-    private LinkedList<ReflectionPoint> validReflectShots = new LinkedList<>();
+    private LinkedList<ReflectionPoint> validSingleReflectShots = new LinkedList<>();
+    private Array<Vector2> validDoubleReflectionShots = new Array<>();
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -590,7 +598,7 @@ public class WanderVirus extends AbstractEnemy{
     private void drawRays() {
 
 
-        for (ReflectionPoint rayPoint : validReflectShots) {
+        for (ReflectionPoint rayPoint : validSingleReflectShots) {
 
             DebugDrawer.DrawDebugLine(rayPoint.finalPoint, target.getCenterPosition(), 8, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
@@ -918,17 +926,17 @@ public class WanderVirus extends AbstractEnemy{
 
 
 
-            if (type == Types.HYPER  && validReflectShots.size() > 0) {
+            if (type == Types.STUPID  && validSingleReflectShots.size() > 0) {
 
                 if (HyperRandomShotFlag) {
 
                     HyperRandomShotFlag = false;
 
-                    int size = validReflectShots.size();
+                    int size = validSingleReflectShots.size();
 
-                    int random = (int)(Math.random() * size);
+                    int random = (int) (Math.random() * size);
 
-                    ReflectionPoint reflectPoint = validReflectShots.get(random);
+                    ReflectionPoint reflectPoint = validSingleReflectShots.get(random);
 
                     returnPoint = new Vector2(reflectPoint.finalPoint.x - WanderVirus.this.centerPos.x, reflectPoint.finalPoint.y - WanderVirus.this.centerPos.y);
 
@@ -936,26 +944,54 @@ public class WanderVirus extends AbstractEnemy{
                 }
 
 
-
                 canShoot = rotateToTarget(returnPoint);
 
-                canShoot = false;
+                //canShoot = false;
 
                 if (canShoot) {
 
 
-                         timedShot(delta);
+                    timedShot(delta);
 
-                         canShoot = false;
-
-
+                    canShoot = false;
 
 
                 }
 
 
+            } else if(validDoubleReflectionShots.size > 0 && Types.HYPER == type) {
 
-            } else if (type == Types.HYPER && validReflectShots.isEmpty()) {
+                System.out.println("succy");
+
+                if (HyperRandomShotFlag) {
+
+                    HyperRandomShotFlag = false;
+                    int size = validDoubleReflectionShots.size;
+                    int random = (int) (Math.random() * size);
+                    Vector2 reflectPoint = validDoubleReflectionShots.get(random);
+
+                    returnPoint = reflectPoint.sub(WanderVirus.this.centerPos);
+
+
+
+                }
+
+                canShoot = rotateToTarget(returnPoint);
+
+                //canShoot = false;
+
+                if (canShoot) {
+
+
+                    timedShot(delta);
+
+                    canShoot = false;
+
+
+                }
+
+
+            } else if (type == Types.HYPER && validSingleReflectShots.isEmpty()) {
 
                 nozzle.setRegion(nozzleAnimation.getKeyFrame(0f));
                 timeElapsedNoz = 0;
