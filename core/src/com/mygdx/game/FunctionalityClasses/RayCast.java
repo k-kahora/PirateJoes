@@ -326,7 +326,7 @@ public class RayCast {
 
 
     // target based raycast
-    public static boolean castRay(Vector2 start, Vector2 direction, Vector2 target, ArrayList<ArrayList<TileData>> map) {
+    public static boolean castRay(Vector2 start, Vector2 direction, Vector2 limit, ArrayList<ArrayList<TileData>> map) {
 
         // the x is the length of teh ray for unit in the x direction and the y is the length of the array one unit in the y direction
         Vector2 scaler = new Vector2((float)Math.sqrt(1 + Math.pow((direction.y / direction.x),2)), (float)Math.sqrt(1 + Math.pow((direction.x / direction.y),2)));

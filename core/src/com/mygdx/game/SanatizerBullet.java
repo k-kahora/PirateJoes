@@ -109,7 +109,7 @@ public class SanatizerBullet extends AbstractBullet  {
             this.speed = speed;
             this.velocity = velocity.scl(speed);
             this.sprite = new Sprite(texture);
-            this.rectangle = new Rectangle(x + 5, y + 5, sprite.getWidth(), sprite.getHeight());
+            this.rectangle = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
             this.mapIndex = -1;
 
 
@@ -277,10 +277,12 @@ public class SanatizerBullet extends AbstractBullet  {
 
         // update bounding box
 
-        rectangle.x = getX() + 3;
-        rectangle.y = getY() + 3;
-        rectangle.width = 3;
-        rectangle.height = 3;
+        float val = sprite.getWidth() - 4;
+
+        rectangle.x = getX() + 2;
+        rectangle.y = getY() + 2;
+        rectangle.width = val;
+        rectangle.height = val;
 
         timeElapsed += delta;
 

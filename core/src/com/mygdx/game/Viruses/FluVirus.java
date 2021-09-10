@@ -248,7 +248,7 @@ public class FluVirus extends AbstractEnemy  {
         if (drawPath) {
 
             followPath.calculateSteering(steeringOutput);
-            applySteering(delta);
+            applySteering(steeringOutput,delta);
 
         }
 

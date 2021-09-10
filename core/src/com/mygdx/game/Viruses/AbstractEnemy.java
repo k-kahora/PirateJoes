@@ -37,7 +37,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     final List<SanatizerBullet> removeBullets;
     final ArrayList<ArrayList<ArrayList<TileData>>> fluVirusTileColliderMap;
     final Circle detectionCircle;
-    final BlendedSteering<Vector2> blendedSteering;
+    final PrioritySteering<Vector2> prioritySteering;
 
     public final LinePath<Vector2> defaultPath;
     Array<Vector2> wayPoints = new Array<>(2);
@@ -60,7 +60,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         assetManager.loadEnemys();
         assetManager.loadCharecter();
         assetManager.manager.finishLoading();
-        blendedSteering = new BlendedSteering<>(this);
+        prioritySteering = new PrioritySteering<>(this);
         this.removeBullets = new LinkedList<>();
 
     }
@@ -115,8 +115,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
 
 
-        blendedSteering.calculateSteering(steeringOutput);
-        applySteering(delta);
+        prioritySteering.calculateSteering(steeringOutput);
+        applySteering(steeringOutput, delta);
 
 
 
@@ -124,14 +124,12 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     }
 
-    @Override
-    public final void applySteering(float delta) {
+    public final void applySteering(SteeringAcceleration<Vector2> steer, float delta) {
         boolean anyAccerlaeration = false;
 
-        steeringOutput.linear.scl(delta);
-        velocity.x = steeringOutput.linear.x;
-        velocity.y = steeringOutput.linear.y;
-        moveBy(velocity.x, velocity.y);
+
+        position.mulAdd(steer.linear, delta);
+
         anyAccerlaeration = true;
 
         // if there is a steeringOutput velocity then apply
