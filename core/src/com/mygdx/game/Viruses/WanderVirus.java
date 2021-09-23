@@ -240,7 +240,7 @@ public class WanderVirus extends AbstractEnemy{
 
         for (Ray<Vector2> ray : raysObs) {
 
-            DebugDrawer.DrawDebugLine(ray.start, ray.end, 5, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
+           // DebugDrawer.DrawDebugLine(ray.start, ray.end, 5, Color.PURPLE, AbstractLevel.getViewport().getCamera().combined);
 
         }
 

@@ -76,7 +76,7 @@ public class MainMenu extends AbstractLevel{
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                getPirateJoe().setScreen(new Level3(getPirateJoe()));
+                getPirateJoe().setScreen(new Level5(getPirateJoe()));
             }
         });
 

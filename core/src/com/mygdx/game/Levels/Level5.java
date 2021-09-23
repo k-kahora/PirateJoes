@@ -82,6 +82,7 @@ public class Level5 extends AbstractLevel{
         character.setPosition(30,200);
 
         getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());
+
         getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper(levelEdges).build());
 
         getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).hyper(levelEdges).build());
