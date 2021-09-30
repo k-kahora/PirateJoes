@@ -128,6 +128,11 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         boolean anyAccerlaeration = false;
 
 
+        steeringOutput.linear.scl(delta);
+        velocity.x = steeringOutput.linear.x;
+        velocity.y = steeringOutput.linear.y;
+        moveBy(velocity.x, velocity.y);
+
         position.mulAdd(steer.linear, delta);
 
         anyAccerlaeration = true;

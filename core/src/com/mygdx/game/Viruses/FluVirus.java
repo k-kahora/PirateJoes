@@ -57,14 +57,12 @@ public class FluVirus extends AbstractEnemy  {
 
     private float shotAnimation = 1/12f, closeAnimation = 1/50f;
 
-
     private Animation<TextureRegion> slimeMoves;
     private Animation<TextureRegion> slimeBlows;
 
     private boolean canColide;
 
     public float timeElapsed = 0;
-
 
     private FluVirus(Builder builder) {
 
@@ -246,7 +244,6 @@ public class FluVirus extends AbstractEnemy  {
         }
            // update(delta);
         if (drawPath) {
-
             followPath.calculateSteering(steeringOutput);
             applySteering(steeringOutput,delta);
 

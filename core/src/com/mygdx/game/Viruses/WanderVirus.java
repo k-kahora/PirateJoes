@@ -622,7 +622,7 @@ public class WanderVirus extends AbstractEnemy{
 
         // FWANDERdrawRays();
 
-        // drawRays();
+        //drawRays();
         //System.out.println(reflectionPoints.size() + "Wander");
 
     }

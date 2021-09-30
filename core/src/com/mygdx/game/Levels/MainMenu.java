@@ -71,12 +71,11 @@ public class MainMenu extends AbstractLevel{
         stage.addActor(background);
         stage.addActor(table);
 
-
         startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                getPirateJoe().setScreen(new Level5(getPirateJoe()));
+                getPirateJoe().setScreen(new Level1(getPirateJoe()));
             }
         });
 
