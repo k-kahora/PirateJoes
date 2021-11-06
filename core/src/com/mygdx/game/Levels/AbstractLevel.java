@@ -8,9 +8,12 @@ import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Enumerators.LEVELS;
@@ -25,6 +28,7 @@ import com.mygdx.game.utils.Point;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimerTask;
 
 /*
 Skeltal implementaion for all levels implemnts screen and Level all Actual levels must extend this class
@@ -45,9 +49,15 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private static PirateJoes pirateJoes;
 
+    BitmapFont font = new BitmapFont();
+
     private float timeElapsed = 0f;
     public final static String tileDir;
     private static int levelCount = 0;
+
+    private Animation<TextureRegion> container;
+
+    private Sprite spriteContainer = new Sprite();
 
     protected TileEditor baseLayer,secondLayer;
 
@@ -77,6 +87,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private LinkedList<MainCharacter.LandMine> mines;
 
     protected Array<Point<Integer, Integer>> levelEdges = new Array<>();
+    TextureAtlas containerAtlas;
 
     static {
         cameraHeight = 17;
@@ -88,14 +99,24 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     public AbstractLevel(PirateJoes pirateJoes) {
 
+
         this.pirateJoes = pirateJoes;
         camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
 
+        // all assets need to be loaded after loadAssets
+
         loadAssets();
+        containerAtlas = assetManager.manager.get(assetManager.container);
         wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.bruh), true);
+
+        container = new Animation<TextureRegion>(1/12f, containerAtlas.getRegions());
+
+        spriteContainer.setRegion(container.getKeyFrame(200f));
+        spriteContainer.setBounds(0,0, spriteContainer.getRegionWidth(), spriteContainer.getRegionHeight());
+        spriteContainer.setPosition(viewport.getWorldWidth()/2 - spriteContainer.getWidth() / 2, viewport.getWorldHeight()/2 - spriteContainer.getHeight() /2);
 
         groupOfViruses = new Array<>();
         killedViruses = new Array<>();
@@ -109,11 +130,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         //bullets = character.getBullets();
         removedBullets = new LinkedList<>();
-
-
-
-
-
+        
     }
 
     public abstract void initMessages();
@@ -146,7 +163,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     public final void loadAssets() {
 
         assetManager = new MyAssetManager();
-        assetManager.loadTileMap();
+        assetManager.load();
         assetManager.manager.finishLoading();
 
     }
@@ -166,30 +183,40 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     }
 
+    private boolean nextLevel(float delta) {
+
+
+
+
+        return container.isAnimationFinished(delta);
+
+
+    }
+
+    private float timeElapsedCont = 0;
+
     public void update(float delta) {
+
+        System.out.println(delta);
 
 
 
         mines = character.getLandMines();
 
 
-        if (groupOfViruses.isEmpty()) {
-            clear();
-            LevelManager.incrementLeve();
-            ParticleManager.clear();
-        }
+
+
 
 
 
         character.draw(getPirateJoe().batch, 0);
+
 
         for (MainCharacter.LandMine l : character.getLandMines())
             l.draw(getPirateJoe().batch,delta);
 
         if (!character.isDead())
             character.act(Gdx.graphics.getDeltaTime());
-
-
 
         for (int i = 0; i < bullets.size(); ++i) {
 
@@ -200,7 +227,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                     // never refrences the same bullet
                     if (bullet != bullets.get(i))
                         bulletCollision(bullet, bullets.get(i));
-
                 }
 
             }
@@ -225,7 +251,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                     character.reduceTimesFired(bullets.get(i));
                 }
             }
-
 
             for (MainCharacter.LandMine mine : character.getLandMines())
 
@@ -265,6 +290,27 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         ParticleManager.updateBulletSplashes(getPirateJoe().batch, delta);
         ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta, groupOfViruses, character);
+
+        if (groupOfViruses.isEmpty()) {
+
+            clear();
+            spriteContainer.setRegion(container.getKeyFrame(timeElapsedCont, true));
+            timeElapsedCont += delta;
+            spriteContainer.draw(getPirateJoe().batch);
+
+            if (container.isAnimationFinished(timeElapsedCont)) {
+                font.draw(getPirateJoe().batch, " " + LevelManager.currentLevel + "\n" + LevelManager.currentLevel.getLevelDescription(), 300, 200);
+
+
+
+                //ParticleManager.clear();
+
+                //LevelManager.incrementLeve();
+            }
+
+        }
+
+
 
     }
 
@@ -325,6 +371,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         getPirateJoe().batch.setProjectionMatrix(getViewport().getCamera().combined);
 
+
+
         // turns pixle cordinates to world cordinates
         getViewport().getCamera().unproject(PirateJoes.mouseCordinates);
 
@@ -335,7 +383,12 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         secondLayer.draw(getPirateJoe().batch);
         getWalls().draw(getPirateJoe().batch);
 
+
+
+
+
         update(delta);
+
 
         getPirateJoe().batch.end();
         character.drawDebugBox();
@@ -352,7 +405,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     public static class LevelManager {
 
-        public static LEVELS currentLevel = LEVELS.LEVEL1;
+        public static LEVELS currentLevel = LEVELS.LEVEL5;
+
+
 
         public static void incrementLeve() {
 

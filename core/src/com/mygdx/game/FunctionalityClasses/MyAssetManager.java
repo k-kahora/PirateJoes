@@ -47,6 +47,7 @@ public class MyAssetManager {
 
     public AssetDescriptor<TextureAtlas> nozzle= new AssetDescriptor<TextureAtlas>("spriteSheets/nozzle.atlas", TextureAtlas.class);
 
+    public AssetDescriptor<TextureAtlas> container = new AssetDescriptor<TextureAtlas>("spriteSheets/container.atlas", TextureAtlas.class);
 
     // adds to teh loading que
     public void load() {
@@ -74,6 +75,7 @@ public class MyAssetManager {
     public void loadGui() {
         manager.load(skin);
         manager.load(startScreen);
+        manager.load(container);
     }
 
     public void loadTileMap() {
