@@ -141,7 +141,7 @@ public class MainMenu extends AbstractLevel{
 
         stage.draw();
         stage.act();
-        stage.getBatch().setColor(sprite.getColor());
+        //stage.getBatch().setColor(sprite.getColor());
         //viewport.getCamera().update();
     }
 

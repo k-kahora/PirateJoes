@@ -12,6 +12,8 @@ public class SpriteAccessor implements TweenAccessor<Sprite> {
     @Override
     public int getValues(Sprite target, int tweenType, float[] returnValues) {
 
+
+
         switch (tweenType) {
             case ALPHA:
                 returnValues[0] = target.getColor().a;
@@ -31,6 +33,8 @@ public class SpriteAccessor implements TweenAccessor<Sprite> {
     @Override
     public void setValues(Sprite target, int tweenType, float[] newValues) {
 
+
+
         switch (tweenType) {
 
             case ALPHA:
@@ -38,10 +42,12 @@ public class SpriteAccessor implements TweenAccessor<Sprite> {
                 break;
 
             case POSITION_X:
-                target.setX(newValues[1]);
+                target.setPosition(newValues[1], target.getY());
+                break;
 
             case POSTION_Y:
-                target.setY(newValues[2]);
+                target.setPosition(target.getX(), newValues[2]);
+                break;
 
 
             default:
