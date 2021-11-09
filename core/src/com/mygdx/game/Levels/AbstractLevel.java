@@ -1,5 +1,6 @@
 package com.mygdx.game.Levels;
 
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
@@ -8,12 +9,10 @@ import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Enumerators.LEVELS;
@@ -25,10 +24,11 @@ import com.mygdx.game.Tiles.TileData;
 import com.mygdx.game.Tiles.TileEditor;
 import com.mygdx.game.Viruses.AbstractEnemy;
 import com.mygdx.game.utils.Point;
+import com.mygdx.game.TweenCustom.SpriteAccessor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimerTask;
 
 /*
 Skeltal implementaion for all levels implemnts screen and Level all Actual levels must extend this class
@@ -46,6 +46,8 @@ Impe,emting level is very important for path finding as it alows the level to be
 
 
 public abstract class AbstractLevel implements Level, Screen, Telegraph {
+
+    private ArrayList<Sprite> spriteList = new ArrayList<>();
 
     private static PirateJoes pirateJoes;
 
@@ -86,6 +88,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private LinkedList<SanatizerBullet> removedBullets;
     private LinkedList<MainCharacter.LandMine> mines;
 
+    private TweenManager tweenManager = new TweenManager();
+
     protected Array<Point<Integer, Integer>> levelEdges = new Array<>();
     TextureAtlas containerAtlas;
 
@@ -109,6 +113,8 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         // all assets need to be loaded after loadAssets
 
         loadAssets();
+        Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+
         containerAtlas = assetManager.manager.get(assetManager.container);
         wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.bruh), true);
 
@@ -116,7 +122,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         spriteContainer.setRegion(container.getKeyFrame(200f));
         spriteContainer.setBounds(0,0, spriteContainer.getRegionWidth(), spriteContainer.getRegionHeight());
-        spriteContainer.setPosition(viewport.getWorldWidth()/2 - spriteContainer.getWidth() / 2, viewport.getWorldHeight()/2 - spriteContainer.getHeight() /2);
+        //spriteContainer.setPosition(viewport.getWorldWidth()/2 - spriteContainer.getWidth() / 2, viewport.getWorldHeight()/2 - spriteContainer.getHeight() /2);
+
+        spriteContainer.setPosition(0,0);
 
         groupOfViruses = new Array<>();
         killedViruses = new Array<>();
@@ -130,6 +138,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         //bullets = character.getBullets();
         removedBullets = new LinkedList<>();
+
+
+        //Tween.to(spriteContainer, SpriteAccessor.POSITION_X, 0.5f).target(0).ease(Bounce.OUT).delay(1.0f).repeatYoyo(2, 0.5f).start(tweenManager);
         
     }
 
@@ -185,31 +196,47 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private boolean nextLevel(float delta) {
 
-
-
-
         return container.isAnimationFinished(delta);
-
 
     }
 
     private float timeElapsedCont = 0;
 
+    boolean called = true, start = false;
+
+    private void gameStart(float delta) {
+
+        tweenManager.update(delta);
+
+        if (start) {
+
+            update(delta);
+
+        }
+
+        else {
+
+            spriteContainer.setRegion(container.getKeyFrame(container.getAnimationDuration()));
+            spriteContainer.draw(getPirateJoe().batch);
+
+            Tween.to(spriteContainer, SpriteAccessor.POSITION_X, 5f).target(-400).setCallback(new TweenCallback() {
+                @Override
+                public void onEvent(int type, BaseTween<?> source) {
+                    start = true;
+                }
+            }).start(tweenManager);
+
+        }
+
+
+    }
+
     public void update(float delta) {
-
-        System.out.println(delta);
-
-
 
         mines = character.getLandMines();
 
 
 
-
-
-
-
-        character.draw(getPirateJoe().batch, 0);
 
 
         for (MainCharacter.LandMine l : character.getLandMines())
@@ -227,6 +254,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                     // never refrences the same bullet
                     if (bullet != bullets.get(i))
                         bulletCollision(bullet, bullets.get(i));
+
                 }
 
             }
@@ -256,11 +284,9 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (Intersector.overlaps(mine.boundingBox, bullets.get(i).getBoundingBox()))
              {
-
                  mine.activate();
                  bullets.get(i).remove = true;
                  //removedBullets.add(bullets.get(i));
-
             }
 
         }
@@ -282,6 +308,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (a.isDead())
                 killedViruses.add(a);
+
         }
 
         groupOfViruses.removeAll(killedViruses, false);
@@ -291,28 +318,53 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         ParticleManager.updateBulletSplashes(getPirateJoe().batch, delta);
         ParticleManager.updateSlimeSploshions(getPirateJoe().batch, delta, groupOfViruses, character);
 
+        if (enableAnimation) {   // When it jumped to the postion needed
+
+            timeElapsedCont += delta;
+            spriteContainer.setRegion(container.getKeyFrame(timeElapsedCont, false));
+
+        }
+
+
         if (groupOfViruses.isEmpty()) {
 
             clear();
-            spriteContainer.setRegion(container.getKeyFrame(timeElapsedCont, true));
-            timeElapsedCont += delta;
+            if (called) {
+                spriteContainer.setRegion(container.getKeyFrame(0));
+                called = false;
+                Tween.to(spriteContainer, SpriteAccessor.POSITION_X, 1.0f).target(0).setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        enableAnimation = true;
+                    }
+                }).start(tweenManager);
+
+
+
+            }
+
+
+
             spriteContainer.draw(getPirateJoe().batch);
 
             if (container.isAnimationFinished(timeElapsedCont)) {
                 font.draw(getPirateJoe().batch, " " + LevelManager.currentLevel + "\n" + LevelManager.currentLevel.getLevelDescription(), 300, 200);
 
+                ParticleManager.clear();
 
+                getPirateJoe().setScreen(new Level1(getPirateJoe()));
 
-                //ParticleManager.clear();
+               //LevelManager.incrementLeve();
 
-                //LevelManager.incrementLeve();
             }
 
         }
 
-
-
     }
+
+    boolean enableAnimation = false;
+
+
 
     public Array<AbstractEnemy> getFluViruses() {
 
@@ -363,6 +415,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     public void render(float delta) {
 
+
         timeElapsed += delta;
 
         // sets mouse cord relative to pixels
@@ -371,9 +424,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         getPirateJoe().batch.setProjectionMatrix(getViewport().getCamera().combined);
 
-
-
-        // turns pixle cordinates to world cordinates
+        // turns pixel cordinates to world cordinates
         getViewport().getCamera().unproject(PirateJoes.mouseCordinates);
 
         getPirateJoe().batch.begin();
@@ -383,12 +434,10 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         secondLayer.draw(getPirateJoe().batch);
         getWalls().draw(getPirateJoe().batch);
 
+        gameStart(delta);
 
 
-
-
-        update(delta);
-
+        character.draw(getPirateJoe().batch, 0);
 
         getPirateJoe().batch.end();
         character.drawDebugBox();
@@ -400,46 +449,18 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     @Override
     public Array<Connection<TileData>> getConnections(TileData fromNode) {
+
         return fromNode.getConnectionArray();
+
     }
 
     public static class LevelManager {
 
-        public static LEVELS currentLevel = LEVELS.LEVEL5;
-
+        public static LEVELS currentLevel = LEVELS.LEVEL1;
 
 
         public static void incrementLeve() {
 
-            switch (currentLevel) {
-
-                case LEVEL1:
-                    TileData.Indexer.reset();
-                    getPirateJoe().setScreen(new Level2(getPirateJoe()));
-                    currentLevel = LEVELS.LEVEL2;
-                    break;
-                case LEVEL2:
-                    //getPirateJoe().setScreen(new Level3(getPirateJoe()));
-                    TileData.Indexer.reset();
-                    getPirateJoe().setScreen(new Level3(getPirateJoe()));
-                    currentLevel = LEVELS.LEVEL3;
-                    break;
-                case LEVEL3:
-                    TileData.Indexer.reset();
-                    getPirateJoe().setScreen(new Level4(getPirateJoe()));
-                    currentLevel = LEVELS.LEVEL4;
-                    break;
-                case LEVEL4:
-                    TileData.Indexer.reset();
-                    getPirateJoe().setScreen(new Level5(getPirateJoe()));
-                    currentLevel = LEVELS.LEVEL5;
-                    break;
-                case LEVEL5:
-                    //getPirateJoe().setScreen(new Finish(getPirateJoe()));
-                    currentLevel = LEVELS.FINISH;
-                    break;
-
-            }
 
 
         }
@@ -449,7 +470,5 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     public void addBullets(SanatizerBullet sanatizerBullet) {
         bullets.add(sanatizerBullet);
     }
-
-
 
 }

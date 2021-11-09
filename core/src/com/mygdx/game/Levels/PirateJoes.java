@@ -17,43 +17,25 @@ public class PirateJoes extends Game {
 	static SpriteBatch batch;
 	Stage stage;
 
+	@Override
+	public void setScreen(Screen screen) {
 
+		super.setScreen(screen);
+
+	}
 
 	@Override
 	public void create () {
 
 		System.out.println(System.getProperty("user.dir"));
 
-
-
-
-
 		//setScreen(new MainMenu());
 
-
-
-		batch = getBatch();
+		batch = new SpriteBatch();
 
 		setScreen(new MainMenu(this));
 
-
-
-
-
-
 		// final Dialog dialog = new Dialog("You Clicked", skin);
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 		button.addListener(new ClickListener() {
 			@Override
@@ -98,7 +80,7 @@ public class PirateJoes extends Game {
 	}
 
 	public static SpriteBatch getBatch() {
-		return new SpriteBatch();
+		return batch;
 	}
 
 

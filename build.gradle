@@ -56,6 +56,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 
+        implementation "org.mini2Dx:universal-tween-engine:6.3.3"
         
     }
 }
@@ -74,6 +75,8 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
+
+        implementation "org.mini2Dx:universal-tween-engine:6.3.3"
         
     }
 }
@@ -91,6 +94,7 @@ project(":html") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1:sources"
+        implementation "org.mini2Dx:universal-tween-engine:6.3.3"
     }
 }
 
@@ -103,5 +107,6 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        implementation "org.mini2Dx:universal-tween-engine:6.3.3"
     }
 }

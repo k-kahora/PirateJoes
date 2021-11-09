@@ -1,5 +1,7 @@
 package com.mygdx.game.Levels;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.*;
 
 import com.badlogic.gdx.ai.msg.Telegram;
@@ -15,11 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
-import com.mygdx.game.Levels.Level1;
-import com.mygdx.game.Levels.PirateJoes;
 import com.mygdx.game.Tiles.TileData;
+import com.mygdx.game.TweenCustom.SpriteAccessor;
 
 import java.util.ArrayList;
 
@@ -29,8 +29,10 @@ public class MainMenu extends AbstractLevel{
 
     Button startButton, quitButtom;
 
+    private TweenManager tweenManager;
+
     Table table;
-    Sprite sprite;
+    Sprite sprite = new Sprite();
     Image background;
 
     Skin mainMenuSkin;
@@ -47,9 +49,20 @@ public class MainMenu extends AbstractLevel{
     @Override
     public void show() {
 
+
+
+        tweenManager = new TweenManager();
+        Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+
         assetManager = new MyAssetManager();
-        assetManager.loadGui();
+        assetManager.load();
         assetManager.manager.finishLoading();
+
+        sprite.setTexture(assetManager.manager.get(assetManager.skull));
+        sprite.setBounds(100,100,100,100);
+
+        Tween.set(sprite, SpriteAccessor.ALPHA).target(0).start(tweenManager);
+        Tween.to(sprite, SpriteAccessor.ALPHA, 4).target(1).start(tweenManager);
 
   // world size is width divedide by 16 and height
                                                                          // divided by 16
@@ -72,12 +85,18 @@ public class MainMenu extends AbstractLevel{
         stage.addActor(table);
 
         startButton.addListener(new ChangeListener() {
+
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
                 getPirateJoe().setScreen(new Level1(getPirateJoe()));
+
             }
+
         });
+
+
+
 
         quitButtom.addListener(new ChangeListener() {
             @Override
@@ -90,22 +109,39 @@ public class MainMenu extends AbstractLevel{
 
     }
 
+    private void runPirate() {
+
+        getPirateJoe().setScreen(new Level1(getPirateJoe()));
+
+    }
+
     @Override
     public void render(float delta) {
+
+        tweenManager.update(delta);
+
+
+
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         getPirateJoe().batch.setProjectionMatrix(getViewport().getCamera().combined);
 
+
+
         getPirateJoe().batch.begin();
 
+        getPirateJoe().batch.setColor(sprite.getColor());
+
        // background.draw(getPirateJoe().batch,1);
+        //getPirateJoe().batch.draw(sprite.getTexture(), 10, 10);
 
         getPirateJoe().batch.end();
 
         stage.draw();
         stage.act();
+        stage.getBatch().setColor(sprite.getColor());
         //viewport.getCamera().update();
     }
 
