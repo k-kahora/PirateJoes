@@ -30,7 +30,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     private SpriteBatch sprite;
     private boolean tagged;
     private Rectangle boundingBox;
-    public  MyAssetManager assetManager = new MyAssetManager();
+    public static MyAssetManager assetManager = new MyAssetManager();
     Entity target;
     Vector2 velocity;
     private LinkedList<SanatizerBullet> virusBullets;

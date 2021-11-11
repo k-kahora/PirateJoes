@@ -78,18 +78,18 @@ public class Level3 extends AbstractLevel{
 
         character.setPosition(100,60);
 
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).smart().build());
+        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).wander().build());
         getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).build());
 
 
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).wander().build());
+
 
 
         //getFluViruses().add(new FluVirus.Builder(character, this).collisionInit(collisonMaps).build());//
-        //getFluViruses().get(3).setPosition(40, 40);
-        getFluViruses().get(0).setPosition(20, 30);
+
+        getFluViruses().get(0).setPosition(300, 160);
         getFluViruses().get(1).setPosition(400, 200);
-        getFluViruses().get(2).setPosition(350, 100);
+
     }
 
 

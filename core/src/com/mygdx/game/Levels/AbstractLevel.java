@@ -127,7 +127,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         spriteContainer.setPosition(-10,0);
 
-        container.setPlayMode(Animation.PlayMode.REVERSED);
+
 
         groupOfViruses = new Array<>();
         killedViruses = new Array<>();
@@ -143,6 +143,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         removedBullets = new LinkedList<>();
 
         spriteContainer.setRegion(container.getKeyFrame(container.getAnimationDuration()));
+        container.setPlayMode(Animation.PlayMode.REVERSED);
 
 
         //Tween.to(spriteContainer, SpriteAccessor.POSITION_X, 0.5f).target(0).ease(Bounce.OUT).delay(1.0f).repeatYoyo(2, 0.5f).start(tweenManager);
@@ -207,7 +208,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private float timeElapsedCont = 0;
 
-    boolean called = true, startGame = false, tweenCalled = true, startContainerLeave = true;
+    boolean called = true, startGame = false, tweenCalled = true, startContainerLeave = false, fontTimeFlag = true;
 
     float timeElaspedContBack = 0;
 
@@ -216,11 +217,24 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         character.draw(getPirateJoe().batch, 0);
         tweenManager.update(delta);
 
+
+
+
+
         if (startGame) {
 
             update(delta);
 
         } else {
+
+            fontTimer += delta;
+
+            if (fontTimer > 4 && fontTimeFlag) {
+
+
+                startContainerLeave = true;
+
+            }
 
 
 
@@ -247,23 +261,35 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
                 spriteContainer.setRegion(container.getKeyFrame(timeElaspedContBack, false));
 
+                fontTimeFlag = false;
+
                 if (container.isAnimationFinished(timeElaspedContBack)) {
 
-                    tweenCalled = false;
-                    startContainerLeave = false;
-                    container.setPlayMode(Animation.PlayMode.NORMAL);
+
+                        tweenCalled = false;
+                        startContainerLeave = false;
+                        container.setPlayMode(Animation.PlayMode.NORMAL);
+
 
                 }
 
             }
 
 
-            spriteContainer.draw(getPirateJoe().batch);
+
+
+
 
             for (AbstractEnemy a : groupOfViruses) {
                 a.draw(getPirateJoe().batch, 0);
 
             }
+
+            spriteContainer.draw(getPirateJoe().batch);
+
+            if (fontTimeFlag)
+                font.draw(getPirateJoe().batch, "" + LevelManager.currentLevel + "\n" + LevelManager.currentLevel.getLevelDescription(), 300, 200);
+
 
         }
 
@@ -274,7 +300,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         mines = character.getLandMines();
 
-        spriteContainer.draw(getPirateJoe().batch);
+
 
         for (MainCharacter.LandMine l : character.getLandMines())
             l.draw(getPirateJoe().batch,delta);
@@ -357,7 +383,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         if (enableAnimation) {
 
-            timeElapsedCont +=delta;
+            timeElapsedCont += delta;
             spriteContainer.setRegion(container.getKeyFrame(timeElapsedCont, false));
 
         }
@@ -382,22 +408,23 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
 
 
-
+            spriteContainer.draw(getPirateJoe().batch);
 
             if (container.isAnimationFinished(timeElapsedCont)) {
 
-                font.draw(getPirateJoe().batch, " " + LevelManager.currentLevel + "\n" + LevelManager.currentLevel.getLevelDescription(), 300, 200);
+                    ParticleManager.clear();
 
-                ParticleManager.clear();
-
-
-               LevelManager.incrementLeve();
+                    LevelManager.incrementLeve();
 
             }
 
         }
 
+
+
     }
+
+    float fontTimer = 0;
 
     boolean enableAnimation = false;
 

@@ -5,7 +5,7 @@ import com.mygdx.game.Levels.*;
 
 public enum LEVELS {
 
-        LEVEL1("Wow", new Level1(AbstractLevel.getPirateJoe())),
+        LEVEL1("Welcome to Quimbers", new Level1(AbstractLevel.getPirateJoe())),
         LEVEL2("More", new Level2(AbstractLevel.getPirateJoe())),
         LEVEL3("Slop", new Level3(AbstractLevel.getPirateJoe())),
         LEVEL4("Rocket Bois", new Level4(AbstractLevel.getPirateJoe())),

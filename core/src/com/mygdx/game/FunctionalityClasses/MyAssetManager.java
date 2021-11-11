@@ -49,6 +49,9 @@ public class MyAssetManager {
 
     public AssetDescriptor<TextureAtlas> container = new AssetDescriptor<TextureAtlas>("spriteSheets/container.atlas", TextureAtlas.class);
 
+    public AssetDescriptor<TextureAtlas> pizzaNozzle = new AssetDescriptor<TextureAtlas>("spriteSheets/pizza_nozzle.atlas", TextureAtlas.class);
+
+    public AssetDescriptor<TextureAtlas> pizza = new AssetDescriptor<TextureAtlas>("spriteSheets/pizza.atlas", TextureAtlas.class);
     // adds to teh loading que
     public void load() {
 

@@ -18,6 +18,7 @@ import com.mygdx.game.Enumerators.Types;
 import com.mygdx.game.Enumerators.plane;
 import com.mygdx.game.FunctionalityClasses.DebugDrawer;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
+import com.mygdx.game.FunctionalityClasses.MyAssetManager;
 import com.mygdx.game.FunctionalityClasses.RayCast;
 import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Levels.Level;
@@ -68,6 +69,8 @@ public class WanderVirus extends AbstractEnemy{
     private boolean seeking = false;
     private boolean canShoot = false, dead = false;
     private float fireRate = 0.1f;
+
+    private TextureAtlas nozzleAtlas;
 
     private RaycastObstacleAvoidance<Vector2> obstacleAvoidance;
 
@@ -133,11 +136,13 @@ public class WanderVirus extends AbstractEnemy{
 
         this.tileCollider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
-        this.nozzle = new Turret(1/29f, 10);
+        this.nozzle = new Turret(1/29f, 10, this.nozzleAtlas);
 
         this.currentLevel = builder.currentLevel;
 
         this.edges = builder.edges;
+
+        this.nozzleAtlas = builder.nozzleAtlas;
 
         behavior = wander;
 
@@ -150,6 +155,8 @@ public class WanderVirus extends AbstractEnemy{
         private final Level currentLevel;
         private final EntityLocation target;
         private final ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap;
+
+        private TextureAtlas nozzleAtlas;
         private float bulletSpeed;
         private PrioritySteering<Vector2> behavior;
         private Color COLOR;
@@ -158,6 +165,7 @@ public class WanderVirus extends AbstractEnemy{
 
         private Types type;
         private Flee<Vector2> flee;
+
 
         public Builder(EntityLocation target, Level currentLevel, ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap) {
 
@@ -180,6 +188,7 @@ public class WanderVirus extends AbstractEnemy{
         public Builder wander() {
             this.type = Types.WANDER;
             this.COLOR = Color.CHARTREUSE;
+            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
             return this;
         }
 
@@ -187,6 +196,7 @@ public class WanderVirus extends AbstractEnemy{
             this.type = Types.ROCKET;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
+            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
 
             return this;
         }
@@ -197,12 +207,14 @@ public class WanderVirus extends AbstractEnemy{
             this.bulletSpeed = 4.2f;
             this.COLOR = Color.TEAL;
             this.edges = edges;
+            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
 
             return this;
         }
 
         public Builder stupid() {
             this.type = Types.STUPID;
+            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
 
             return this;
         }
@@ -210,6 +222,7 @@ public class WanderVirus extends AbstractEnemy{
         public Builder smart() {
             this.type = Types.SMART;
             this.COLOR = Color.LIME;
+            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
 
             return this;
         }
@@ -217,6 +230,7 @@ public class WanderVirus extends AbstractEnemy{
         public Builder invisible() {
 
             this.COLOR = Color.CLEAR;
+            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
 
             return this;
         }
@@ -810,20 +824,20 @@ public class WanderVirus extends AbstractEnemy{
         float centerx, centery;
 
         public Turret() {
-            this(1/5f,-1);
+            this(1/5f,-1, null);
         }
 
         public Turret(float fireRate) {
-            this(fireRate, -1);
+            this(fireRate, -1, null);
         }
 
-        public Turret(float fireRate, int missFire) {
+        public Turret(float fireRate, int missFire, TextureAtlas nozzleTexture) {
 
 
             this.missFire = missFire;
             start = new Vector3();
             this.fireRate = fireRate;
-            nozzleAnimation = new Animation<TextureRegion>(fireRate, assetManager.manager.get(assetManager.nozzle).getRegions());
+            nozzleAnimation = new Animation<TextureRegion>(fireRate, nozzleTexture.getRegions());
             nozzle = new Sprite(nozzleAnimation.getKeyFrame(0f));
 
           //  nozzle.setPosition(centerx, centery);
