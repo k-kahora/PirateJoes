@@ -78,7 +78,7 @@ public class Level2 extends AbstractLevel{
 
         character.setPosition(100,220);
 
-        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps).wander().build());
+        getFluViruses().add(new WanderVirus.Builder(character, this, collisonMaps, assetManager).wander().build());
 
         getFluViruses().get(0).setPosition(400, 50);
 

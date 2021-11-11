@@ -31,7 +31,7 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> slime = new AssetDescriptor<TextureAtlas>("spriteSheets/slime_right.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
-    public AssetDescriptor<Texture> fluVirus = new AssetDescriptor<Texture>("spriteSheets/FluVirus.png", Texture.class);
+    public AssetDescriptor<TextureAtlas> fluVirus = new AssetDescriptor<TextureAtlas>("spriteSheets/fluVirus.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> startScreen = new AssetDescriptor<Texture>("sprites/homescreen.png", Texture.class);
     //public AssetDescriptor<TextureAtlas> barrier = new AssetDescriptor<>("spriteSheets/barrier_version_.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> bruh = new AssetDescriptor<TextureAtlas>("spriteSheets/collision_map.atlas", TextureAtlas.class);
@@ -94,6 +94,8 @@ public class MyAssetManager {
         manager.load(slimeBlows);
         manager.load(slimeSploshion);
         manager.load(nozzle);
+        manager.load(pizzaNozzle);
+        manager.load(pizza);
 
     }
 

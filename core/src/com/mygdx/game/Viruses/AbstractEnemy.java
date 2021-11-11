@@ -30,7 +30,7 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     private SpriteBatch sprite;
     private boolean tagged;
     private Rectangle boundingBox;
-    public static MyAssetManager assetManager = new MyAssetManager();
+    public MyAssetManager assetManager = new MyAssetManager();
     Entity target;
     Vector2 velocity;
     private LinkedList<SanatizerBullet> virusBullets;
@@ -44,9 +44,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
     private Level level;
 
-
-
     public AbstractEnemy(EntityLocation target, Level currentLevel) {
+
         this.target = target;
         this.detectionCircle = new Circle();
         this.boundingBox = new Rectangle();

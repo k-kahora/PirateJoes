@@ -38,6 +38,8 @@ public class WanderVirus extends AbstractEnemy{
     private final Flee<Vector2> flee;
     private final Seek<Vector2> seek;
 
+    private final Animation<TextureRegion> virusAnimation;
+
     private boolean sortCalled = false;
 
     private Array<ReflectionPoint> validSecondShots = new Array<>();
@@ -98,8 +100,14 @@ public class WanderVirus extends AbstractEnemy{
 
     private WanderVirus(Builder builder) {
         super(builder.target, builder.currentLevel);
-        this.spr = new Sprite(assetManager.manager.get(assetManager.fluVirus));
-        setBounds(getX(), getY(), spr.getWidth(), spr.getHeight());
+        this.virusAnimation = builder.virusAnimation;
+        this.spr = new Sprite(virusAnimation.getKeyFrame(10f));
+        spr.setBounds(0,0, spr.getRegionWidth(), spr.getRegionHeight());
+
+        System.out.println(spr.getWidth() + "Width");
+
+        setBounds(getX(), getY(), 16, 16);
+
         //this.seek = new Arrive<Vector2>(this,(Location)builder.target).setTimeToTarget(1f).setArrivalTolerance(2f).setDecelerationRadius(80f).setEnabled(true);
 
         this.target = builder.target;
@@ -136,17 +144,23 @@ public class WanderVirus extends AbstractEnemy{
 
         this.tileCollider = new TileCollision.Builder().tileMap(tileDataMap.get(0), tileDataMap.get(1)).calcCorners(rectangle).charecter(this).build();
 
+        this.nozzleAtlas = builder.nozzleAtlas;
+        if (nozzleAtlas == null)
+            assert false;
+
         this.nozzle = new Turret(1/29f, 10, this.nozzleAtlas);
 
         this.currentLevel = builder.currentLevel;
 
         this.edges = builder.edges;
 
-        this.nozzleAtlas = builder.nozzleAtlas;
+
 
         behavior = wander;
 
         COLOR = builder.COLOR;
+
+
 
     }
 
@@ -162,12 +176,15 @@ public class WanderVirus extends AbstractEnemy{
         private Color COLOR;
 
         private Array<Point<Integer, Integer>> edges = new Array<>();
+        private Animation<TextureRegion> virusAnimation;
 
         private Types type;
         private Flee<Vector2> flee;
 
+        private final MyAssetManager myAssetManager;
 
-        public Builder(EntityLocation target, Level currentLevel, ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap) {
+
+        public Builder(EntityLocation target, Level currentLevel, ArrayList<ArrayList<ArrayList<TileData>>> tileDataMap, MyAssetManager myAssetManager) {
 
             this.tileDataMap = tileDataMap;
             this.currentLevel = currentLevel;
@@ -175,6 +192,11 @@ public class WanderVirus extends AbstractEnemy{
             this.type = Types.STILL;
             this.bulletSpeed = 2.1f;
             this.COLOR = null;
+            this.myAssetManager = myAssetManager;
+            this.nozzleAtlas = myAssetManager.manager.get(myAssetManager.nozzle);
+
+            this.virusAnimation = new Animation<TextureRegion>(1/24f, myAssetManager.manager.get(myAssetManager.fluVirus).getRegions());
+            //System.out.println("Bruh" + myAssetManager.manager.get(myAssetManager.pizza).getRegions().get(3).getRegionHeight());
 
         }
 
@@ -187,8 +209,10 @@ public class WanderVirus extends AbstractEnemy{
 
         public Builder wander() {
             this.type = Types.WANDER;
-            this.COLOR = Color.CHARTREUSE;
-            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
+            //this.COLOR = Color.CHARTREUSE;
+            this.nozzleAtlas = myAssetManager.manager.get(myAssetManager.pizzaNozzle);
+            this.virusAnimation = new Animation<TextureRegion>(1/12f, myAssetManager.manager.get(myAssetManager.pizza).getRegions());
+
             return this;
         }
 
@@ -196,7 +220,7 @@ public class WanderVirus extends AbstractEnemy{
             this.type = Types.ROCKET;
             this.bulletSpeed = 3.2f;
             this.COLOR = Color.TEAL;
-            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
+
 
             return this;
         }
@@ -207,14 +231,14 @@ public class WanderVirus extends AbstractEnemy{
             this.bulletSpeed = 4.2f;
             this.COLOR = Color.TEAL;
             this.edges = edges;
-            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
+
 
             return this;
         }
 
         public Builder stupid() {
             this.type = Types.STUPID;
-            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
+
 
             return this;
         }
@@ -222,7 +246,7 @@ public class WanderVirus extends AbstractEnemy{
         public Builder smart() {
             this.type = Types.SMART;
             this.COLOR = Color.LIME;
-            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
+
 
             return this;
         }
@@ -230,7 +254,7 @@ public class WanderVirus extends AbstractEnemy{
         public Builder invisible() {
 
             this.COLOR = Color.CLEAR;
-            this.nozzleAtlas = assetManager.manager.get(assetManager.pizzaNozzle);
+
 
             return this;
         }
@@ -258,6 +282,10 @@ public class WanderVirus extends AbstractEnemy{
 
         }
 
+        timeElapsed += delta;
+
+
+        spr.setRegion(virusAnimation.getKeyFrame(timeElapsed, true));
 
 
         centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
@@ -281,7 +309,7 @@ public class WanderVirus extends AbstractEnemy{
         shotLine.x = target.getX() - getX();
         shotLine.y = target.getY() - getY();
 
-        timeElapsed += delta;
+
 
         //rayCast = RayCast.castRay(new Vector2(getX() + getWidth()/2, getY() + getHeight()/2), shotLine, fluVirusTileColliderMap.get(0));
 
@@ -629,8 +657,8 @@ public class WanderVirus extends AbstractEnemy{
 
         nozzle.draw(batch);
 
-        if (COLOR != null)
-            spr.setColor(COLOR);
+       // if (COLOR != null)
+       //     spr.setColor(COLOR);
 
         //System.out.println(rayCast);
 
@@ -810,8 +838,6 @@ public class WanderVirus extends AbstractEnemy{
 
         private final float rotationRate = 4f;
 
-
-
         private Vector2 tip = new Vector2(1,0);
         private Vector3 start;
         private float timeElapsedNoz = 0f, missFireTimer = 0f;
@@ -822,14 +848,6 @@ public class WanderVirus extends AbstractEnemy{
         private float timeElasped = 0f;
 
         float centerx, centery;
-
-        public Turret() {
-            this(1/5f,-1, null);
-        }
-
-        public Turret(float fireRate) {
-            this(fireRate, -1, null);
-        }
 
         public Turret(float fireRate, int missFire, TextureAtlas nozzleTexture) {
 
