@@ -52,6 +52,9 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> pizzaNozzle = new AssetDescriptor<TextureAtlas>("spriteSheets/pizza_nozzle.atlas", TextureAtlas.class);
 
     public AssetDescriptor<TextureAtlas> pizza = new AssetDescriptor<TextureAtlas>("spriteSheets/pizza.atlas", TextureAtlas.class);
+
+    public AssetDescriptor<TextureAtlas> bone = new AssetDescriptor<TextureAtlas>("spriteSheets/bonner.atlas", TextureAtlas.class);
+    public AssetDescriptor<TextureAtlas> meat = new AssetDescriptor<TextureAtlas>("spriteSheets/meat.atlas", TextureAtlas.class);
     // adds to teh loading que
     public void load() {
 
@@ -96,6 +99,8 @@ public class MyAssetManager {
         manager.load(nozzle);
         manager.load(pizzaNozzle);
         manager.load(pizza);
+        manager.load(meat);
+        manager.load(bone);
 
     }
 

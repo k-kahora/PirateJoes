@@ -98,13 +98,16 @@ public class WanderVirus extends AbstractEnemy{
     private final Types type;
     private final Level currentLevel;
 
+
+
     private WanderVirus(Builder builder) {
         super(builder.target, builder.currentLevel);
         this.virusAnimation = builder.virusAnimation;
         this.spr = new Sprite(virusAnimation.getKeyFrame(10f));
         spr.setBounds(0,0, spr.getRegionWidth(), spr.getRegionHeight());
 
-        System.out.println(spr.getWidth() + "Width");
+
+        this.fireRate = builder.fireRate;
 
         setBounds(getX(), getY(), 16, 16);
 
@@ -148,7 +151,8 @@ public class WanderVirus extends AbstractEnemy{
         if (nozzleAtlas == null)
             assert false;
 
-        this.nozzle = new Turret(1/29f, 10, this.nozzleAtlas);
+
+        this.nozzle = new Turret(fireRate, 10, this.nozzleAtlas);
 
         this.currentLevel = builder.currentLevel;
 
@@ -181,6 +185,8 @@ public class WanderVirus extends AbstractEnemy{
         private Types type;
         private Flee<Vector2> flee;
 
+        private float fireRate;
+
         private final MyAssetManager myAssetManager;
 
 
@@ -194,6 +200,7 @@ public class WanderVirus extends AbstractEnemy{
             this.COLOR = null;
             this.myAssetManager = myAssetManager;
             this.nozzleAtlas = myAssetManager.manager.get(myAssetManager.nozzle);
+            this.fireRate = 1/29f;
 
             this.virusAnimation = new Animation<TextureRegion>(1/24f, myAssetManager.manager.get(myAssetManager.fluVirus).getRegions());
             //System.out.println("Bruh" + myAssetManager.manager.get(myAssetManager.pizza).getRegions().get(3).getRegionHeight());
@@ -229,8 +236,12 @@ public class WanderVirus extends AbstractEnemy{
 
             this.type = Types.HYPER;
             this.bulletSpeed = 4.2f;
-            this.COLOR = Color.TEAL;
+            //this.COLOR = Color.TEAL;
             this.edges = edges;
+            this.fireRate = 1/10f;
+
+            this.nozzleAtlas = myAssetManager.manager.get(myAssetManager.bone);
+            this.virusAnimation = new Animation<TextureRegion>(1/12f, myAssetManager.manager.get(myAssetManager.meat).getRegions());
 
 
             return this;
@@ -1019,8 +1030,6 @@ public class WanderVirus extends AbstractEnemy{
 
 
             } else if(validDoubleReflectionShots.size > 0 && Types.HYPER == type) {
-
-                System.out.println("succy");
 
                 if (HyperRandomShotFlag) {
 
