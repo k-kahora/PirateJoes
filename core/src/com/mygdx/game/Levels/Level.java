@@ -12,9 +12,7 @@ import java.util.ArrayList;
 
 public interface Level extends IndexedGraph<TileData> {
 
-
     public void loadAssets();
-
 
     public ArrayList<ArrayList<ArrayList<TileData>>> getCollisionMap();
 

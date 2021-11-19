@@ -11,7 +11,6 @@ import com.mygdx.game.FunctionalityClasses.RayCast;
 import com.mygdx.game.Levels.AbstractLevel;
 import com.mygdx.game.Tiles.TileData;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class ObstacleAvoidance implements RaycastCollisionDetector<Vector2> {

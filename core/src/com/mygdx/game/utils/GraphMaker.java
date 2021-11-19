@@ -591,7 +591,7 @@ public final class GraphMaker {
 
 
                     default:
-                        System.out.println("EROOR");
+                        
 
                 }
 
@@ -649,8 +649,7 @@ public final class GraphMaker {
 
         }
 
-        System.out.println("Max: " + max + " " + "Min: " + min);
-
+        
         // the four points
 
         edgeMap.add(new Point<Integer, Integer>(16, 256));
@@ -709,7 +708,7 @@ public final class GraphMaker {
 
 
 
-        System.out.println(castPoints.size + "cast points");
+ 
         reflectionPoint.addDoublePoints(castPoints);
 
     }

@@ -578,9 +578,7 @@ public class MainCharacter extends Actor implements EntityLocation {
             sprite.setPosition(getX(), getY());
 
             arrayOfTextures = yogurtBlowUp.getKeyFrames();
-
-            System.out.println("Number of Frames = " + arrayOfTextures.length);
-
+            
         }
 
         public void draw(SpriteBatch batch, float delta) {

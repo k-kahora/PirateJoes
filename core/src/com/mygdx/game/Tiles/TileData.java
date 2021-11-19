@@ -24,18 +24,18 @@ public class TileData implements Cloneable{
     private int left;
     public static int TILE_WIDTH;
     public static int TILE_HEIGHT;
-    public final boolean broken;
+    public boolean broken;
     private Tile tile;
     private Array<Connection<TileData>> connectionArray = new Array<>();
     public int INDEX = 9000;
-    private final Point<Float, Float> position;
-    private final boolean isWalls;
+    private Point<Float, Float> position;
+    private boolean isWalls;
     public boolean stable = true;
     private Array<Edge<Integer>> edges = new Array<>();
 
     private Vector2 weakPoint = new Vector2();
 
-    private final Rectangle box;
+    private Rectangle box;
 
     static {
 
@@ -249,9 +249,31 @@ public class TileData implements Cloneable{
 
     private Vector2 weakPoint = new Vector2();
      */
-    @Override
-    public TileData clone() throws CloneNotSupportedException {
-        TileData clone = (TileData)super.clone();
+
+    public TileData clone() {
+        TileData clone = new TileData();
+
+        clone.textureRegion = this.textureRegion;
+	clone.atlas = this.atlas;
+	clone.top = this.top;
+	clone.right = this.right;
+	clone.left = this.left;
+	clone.bottom = this.bottom;
+	clone.broken = this.broken;
+	clone.tile = this.tile;
+	clone.connectionArray = this.connectionArray;
+	clone.INDEX = this.INDEX;
+	clone.position = this.position;
+	clone.isWalls = this.isWalls;
+	clone.stable = this.stable;
+	clone.edges = this.edges;
+	clone.weakPoint = this.weakPoint;
+	clone.box = this.box;
+
+
+
+
+
         return  clone;
     }
 

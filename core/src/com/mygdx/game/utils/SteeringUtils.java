@@ -51,9 +51,7 @@ public final class SteeringUtils {
 
         int third = objects.length / 5;
         if (index > third * 1 && index < third * 2) {
-
-            System.out.println("Frame of death: " + index);
-
+            
             return true;
         }
         return false;
@@ -110,7 +108,7 @@ public final class SteeringUtils {
         // makes a copy then parses the map getting rid of all the ?
 
 
-        System.out.println(originalDimension.size() + "SiZe BEFORE");
+
 
         if (!parsed) {
             deepCopy(originalDimension, map.get(0));
@@ -118,9 +116,6 @@ public final class SteeringUtils {
         }
 
         // valid copy
-
-        System.out.println(originalDimension.get(14).get(28).getTile() + "SiZe");
-
 
 
 

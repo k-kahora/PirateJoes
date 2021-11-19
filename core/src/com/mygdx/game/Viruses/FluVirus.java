@@ -73,16 +73,13 @@ public class FluVirus extends AbstractEnemy  {
         this.target = builder.target;
         this.level = builder.level;
 
-
         this.canColide = builder.canCollide;
-
 
         slimeMoves = new Animation<TextureRegion>(1/12f, assetManager.manager.get(assetManager.slime).getRegions());
         slimeBlows = new Animation<TextureRegion>(closeAnimation, assetManager.manager.get(assetManager.slimeBlows).getRegions());
 
         this.sprite = new Sprite(slimeBlows.getKeyFrame(0));
         this.position = new Vector2(getX(), getY());
-
 
         this.splashAtlas = assetManager.manager.get(assetManager.splashBullet);
 

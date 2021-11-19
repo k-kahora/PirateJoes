@@ -88,7 +88,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     private LinkedList<MainCharacter.LandMine> mines;
 
     private TweenManager tweenManager = new TweenManager();
-
     protected Array<Point<Integer, Integer>> levelEdges = new Array<>();
     TextureAtlas containerAtlas;
 
@@ -241,7 +240,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             if (!tweenCalled) {
 
-                System.out.println("Tween");
+                
 
                 tweenCalled = true;
                 Tween.to(spriteContainer, SpriteAccessor.POSITION_X, 2.5f).target(0, -600).setCallback(new TweenCallback() {

@@ -198,7 +198,7 @@ public class ReflectionPoint {
 
         }
 
-        System.out.println(reflectionPoints.size + "size of reflec");
+        
 
         for (ReflectionPoint point : reflectionPoints) {
 

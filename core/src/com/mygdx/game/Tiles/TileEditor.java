@@ -48,10 +48,10 @@ public class TileEditor  {
             fileReader = new Scanner(file);
 
             if (atlas == null)
-                //System.out.println("NULL NULL !!");
+                
                 throw new Exception("Null Atlas");
         } catch (Exception exception) {
-            System.out.println("!BRUH");
+            
         }
 
 
@@ -247,7 +247,7 @@ public class TileEditor  {
 
                 xPosition += TileData.TILE_WIDTH;
 
-//                System.out.println(tileDataMap.get(i).get(j).INDEX);
+
 
             }
         }

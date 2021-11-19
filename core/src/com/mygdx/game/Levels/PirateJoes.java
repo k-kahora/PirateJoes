@@ -27,7 +27,7 @@ public class PirateJoes extends Game {
 	@Override
 	public void create () {
 
-		System.out.println(System.getProperty("user.dir"));
+		
 
 		//setScreen(new MainMenu());
 

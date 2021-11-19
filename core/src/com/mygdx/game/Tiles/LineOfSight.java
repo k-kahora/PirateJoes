@@ -24,7 +24,7 @@ public class LineOfSight {
         this.endPoint = endPoint;
 
         this.slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);/// (endPoint.x - startPoint.x);
-        System.out.println(slope);
+        
 
     }
 
