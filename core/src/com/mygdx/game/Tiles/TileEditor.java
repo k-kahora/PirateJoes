@@ -40,6 +40,7 @@ public class TileEditor  {
     private TextureAtlas atlas;
     private Level level;
     private boolean isWalls;
+    private char[][] map;
 
     private Array<TileData> collidableTiles = new Array<>();
 
@@ -50,20 +51,11 @@ public class TileEditor  {
         this.level = level;
     }
 
-    public TileEditor(String fileName, TextureAtlas atlas, boolean isWalls) {
+    public TileEditor(char[][] rawMap, TextureAtlas atlas, boolean isWalls) {
 
         //System.out.println(atlas);
 
-        try {
-            file = new File(AbstractLevel.tileDir + fileName);
-            //fileReader = new FileReader(file);
-
-            if (atlas == null)
-                
-                throw new Exception("Null Atlas");
-        } catch (Exception exception) {
-            
-        }
+        this.map = rawMap;
 
 
         startingPoint = 0;
@@ -73,8 +65,7 @@ public class TileEditor  {
         tileMap = new ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>>();
         this.isWalls = isWalls;
 
-        this.fileHandle = Gdx.files.internal(AbstractLevel.tileDir + fileName);  // new FileHandle(file, Files.FileType.Internal);
-        this.reader = fileHandle.reader();
+        // new FileHandle(file, Files.FileType.Internal);
 
         loadTiles();
 
@@ -84,9 +75,9 @@ public class TileEditor  {
     int rows = 0;
 
 
-    public TileEditor(String fileName, TextureAtlas atlas) {
+    public TileEditor(char[][] rawMap, TextureAtlas atlas) {
 
-       this(fileName, atlas, false);
+        this(rawMap, atlas, false);
 
     }
 
@@ -109,44 +100,19 @@ public class TileEditor  {
         }
 
 
-        char charMan = 'f';
 
-        for (int i = 0; i < arrayNum; ++i) {
+        for (int i = 0 ; i < map.length; ++i) {
 
-
-            lie++;
-
-            rows = 0;
-
-            System.out.println();
+            for (int j = 0; j < map[i].length; ++j) {
 
 
-            do {
+                String cov = map[i][j] + "";
 
 
-                try {
-
-                  delim = Character.toString((char)reader.read());
-
-
-                    if (delim.equals("|")) {
-
-                        break;
-
-                    }
-
-                   System.out.print(delim);
-
-
-                }
-                catch (Exception e) {
-
-                }
-                rows++;
                 // another test no glitched tiles
 
 
-                switch (delim) {
+                switch (cov) {
 
                     case ("#"):
                         tile = com.mygdx.game.Enumerators.Tile.GRASS;
@@ -204,20 +170,15 @@ public class TileEditor  {
                         break;
                 }
 
-                if (flag) {
-                    tileMap.get(i).add(tile);
+                tileMap.get(i).add(tile);
 
-                } else {
 
-                    flag = true;
 
-                }
 
-            } while (!delim.equals("|"));
+            }
 
         }
-        try {reader.close();}
-        catch (Exception e) {}
+
 
         //System.out.println(tileMap);
         loadTileData();
@@ -238,7 +199,7 @@ public class TileEditor  {
     // iterates through arrayList of tileData with enum vales and sets apprpiate tile data to a new arraay
     // using the tiledata class
 
-//    this also assigns tile data with the appropiate positon based on the static vars in the class
+    //    this also assigns tile data with the appropiate positon based on the static vars in the class
     private ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> loadTileData() {
 
         int xPosition = 0;
@@ -298,7 +259,7 @@ public class TileEditor  {
 
             for (com.mygdx.game.Tiles.TileData data : array1) {
 
-               // System.out.println(data.getTextureRegion() + " the texture");
+                // System.out.println(data.getTextureRegion() + " the texture");
 
                 if (data.stable) {
 

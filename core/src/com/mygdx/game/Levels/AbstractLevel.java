@@ -117,7 +117,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 
         containerAtlas = assetManager.manager.get(assetManager.container);
-        wallsMaker = new TileEditor("wallMap.txt", assetManager.manager.get(assetManager.bruh), true);
+        wallsMaker = new TileEditor(StaticLevels.walls, assetManager.manager.get(assetManager.bruh), true);
 
         container = new Animation<TextureRegion>(1/24f, containerAtlas.getRegions());
 

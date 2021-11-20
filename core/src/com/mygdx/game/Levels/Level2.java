@@ -56,8 +56,8 @@ public class Level2 extends AbstractLevel{
 
     @Override
     public void show() {
-        baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
-        secondLayer = new TileEditor("level2.txt", getAssetManager().manager.get(getAssetManager().bruh));
+       // baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
+       // secondLayer = new TileEditor("level2.txt", getAssetManager().manager.get(getAssetManager().bruh));
         setRender();
         secondLayer.addLevel(this);
         collisonMaps = new ArrayList<>();
