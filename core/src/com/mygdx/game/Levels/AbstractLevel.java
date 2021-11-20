@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Enumerators.LEVELS;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
@@ -74,7 +75,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     public final MainCharacter character;
 
-    public static FillViewport viewport;
+    public static FitViewport viewport;
 
     public static final int cameraWidth;
     public static final int cameraHeight;
@@ -105,7 +106,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         this.pirateJoes = pirateJoes;
         camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
         camera.translate((31 * 16)/2, (17*16)/2);
-        viewport = new FillViewport(camera.viewportWidth,camera.viewportHeight, camera);
+        viewport = new FitViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
 
 

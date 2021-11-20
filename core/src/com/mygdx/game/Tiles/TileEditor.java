@@ -1,8 +1,11 @@
 package com.mygdx.game.Tiles;
 
+import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.ai.steer.behaviors.FollowFlowField;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -15,14 +18,22 @@ import com.mygdx.game.utils.GraphMaker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.*;
 
 public class TileEditor  {
 
+    private static int lie = 0;
+
+    private FileHandle fileHandle;
+
     private String commentSymbol;
-    private Scanner fileReader;
+    private Reader reader;
+    //private FileReader fileReader;
     private File file;
-    private ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>> tileMap;
+    private ArrayList<ArrayList<Tile>> tileMap;
     private ArrayList<ArrayList<com.mygdx.game.Tiles.TileData>> tileMapData;
     private List<TileData> weakPoints = new LinkedList<>();
     private int startingPoint;
@@ -45,7 +56,7 @@ public class TileEditor  {
 
         try {
             file = new File(AbstractLevel.tileDir + fileName);
-            fileReader = new Scanner(file);
+            //fileReader = new FileReader(file);
 
             if (atlas == null)
                 
@@ -61,11 +72,16 @@ public class TileEditor  {
         this.atlas = atlas;
         tileMap = new ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>>();
         this.isWalls = isWalls;
+
+        this.fileHandle = Gdx.files.internal(AbstractLevel.tileDir + fileName);  // new FileHandle(file, Files.FileType.Internal);
+        this.reader = fileHandle.reader();
+
         loadTiles();
 
 
     }
 
+    int rows = 0;
 
 
     public TileEditor(String fileName, TextureAtlas atlas) {
@@ -75,47 +91,15 @@ public class TileEditor  {
     }
 
 
-    private int countLines() throws FileNotFoundException {
-
-        int lines = 0;
-
-
-        while (fileReader.hasNextLine()) {
-
-            if (fileReader.next().equals("/")) {
-                fileReader.nextLine();
-                startingPoint++;
-            } else {
-
-                fileReader.nextLine();
-                lines++;
-            }
-        }
-
-        fileReader.close();
-        fileReader = new Scanner(file);
-
-        return lines;
-    }
-
     private ArrayList<ArrayList<com.mygdx.game.Enumerators.Tile>> loadTiles() {
+
 
         com.mygdx.game.Enumerators.Tile tile = com.mygdx.game.Enumerators.Tile.AIR;
 
 
 
         String delim = "";
-        int arrayNum = 0;
-
-        try {
-
-            arrayNum = countLines();
-
-        } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
-
-        }
+        int arrayNum = 17;
 
         // initalizes the array withe emoty arrays
         for (int i = 0; i < arrayNum; ++i) {
@@ -125,23 +109,42 @@ public class TileEditor  {
         }
 
 
-        // this statement skips the comments
-        for (int i = 0; i < startingPoint; ++i) {
-            fileReader.nextLine();
-        }
+        char charMan = 'f';
 
         for (int i = 0; i < arrayNum; ++i) {
 
 
+            lie++;
+
+            rows = 0;
+
+            System.out.println();
+
+
             do {
 
-                delim = fileReader.next();
+
+                try {
+
+                  delim = Character.toString((char)reader.read());
 
 
-                // another test no glitched tiles
-                if (delim.equals("|")) {
-                    break;
+                    if (delim.equals("|")) {
+
+                        break;
+
+                    }
+
+                   System.out.print(delim);
+
+
                 }
+                catch (Exception e) {
+
+                }
+                rows++;
+                // another test no glitched tiles
+
 
                 switch (delim) {
 
@@ -197,21 +200,40 @@ public class TileEditor  {
 
                     default:
                         tile = Tile.NULL;
-                        System.out.println("Tile Error");
+                        flag = false;
+                        break;
                 }
 
-                tileMap.get(i).add(tile);
+                if (flag) {
+                    tileMap.get(i).add(tile);
+
+                } else {
+
+                    flag = true;
+
+                }
 
             } while (!delim.equals("|"));
 
         }
+        try {reader.close();}
+        catch (Exception e) {}
 
         //System.out.println(tileMap);
         loadTileData();
 
+
+
+
+
+
+
+
         return tileMap;
 
     }
+
+    boolean flag = true;
 
     // iterates through arrayList of tileData with enum vales and sets apprpiate tile data to a new arraay
     // using the tiledata class
