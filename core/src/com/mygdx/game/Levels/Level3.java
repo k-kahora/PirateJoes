@@ -57,8 +57,8 @@ public class Level3 extends AbstractLevel{
 
     @Override
     public void show() {
-      //  baseLayer = new TileEditor("level1.txt", getAssetManager().manager.get(getAssetManager().tileMap), true);
-      //  secondLayer = new TileEditor("level3.txt", getAssetManager().manager.get(getAssetManager().bruh));
+        baseLayer = new TileEditor(StaticLevels.background, getAssetManager().manager.get(getAssetManager().tileMap), true);
+      secondLayer = new TileEditor(StaticLevels.level3, getAssetManager().manager.get(getAssetManager().bruh));
         setRender();
         secondLayer.addLevel(this);
 
