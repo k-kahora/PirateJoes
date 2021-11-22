@@ -33,8 +33,27 @@ public enum LEVELS {
         }
 
         public Screen getCurrentLevel() {
-                return currentLevel;
+
+                switch (this) {
+
+                        case LEVEL1:
+                                return new Level1(AbstractLevel.getPirateJoe());
+                        case LEVEL2:
+                                return new Level2(AbstractLevel.getPirateJoe());
+                        case LEVEL3:
+                                return new Level3(AbstractLevel.getPirateJoe());
+                        case LEVEL4:
+                                return new Level4(AbstractLevel.getPirateJoe());
+                        case LEVEL5:
+                                return new Level5(AbstractLevel.getPirateJoe());
+                        default:
+                                return new Level1(AbstractLevel.getPirateJoe());
+
+                }
+
+
         }
+
 
 
 }

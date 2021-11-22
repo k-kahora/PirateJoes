@@ -48,6 +48,8 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     Sprite deathSprite = new Sprite();
 
+    private static int lives = 3;
+
     private final Deque<BulletSplash> splashAnimations;
 
     Vector2 direction, velocity, position;
@@ -461,6 +463,14 @@ public class MainCharacter extends Actor implements EntityLocation {
         return rectangle;
     }
 
+    public boolean hit() {
+
+        lives--;
+
+        return lives != 0;
+
+    }
+
     public void addCollider(TileCollision collision) {
         this.collision = collision;
     }
@@ -697,5 +707,16 @@ public class MainCharacter extends Actor implements EntityLocation {
         weakPoints = w;
     }
 
+    public static void levelUp() {
+
+        lives++;
+
+    }
+
+    public static void restart() {
+
+        lives = 3;
+
+    }
 
 }

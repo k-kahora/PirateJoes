@@ -20,4 +20,6 @@ public interface Level extends IndexedGraph<TileData> {
 
     public void addBullets(SanatizerBullet a);
 
+
+
 }

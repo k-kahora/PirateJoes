@@ -60,7 +60,7 @@ public class Level5 extends AbstractLevel{
     public void show() {
         baseLayer = new TileEditor(StaticLevels.background, getAssetManager().manager.get(getAssetManager().tileMap), true);
 
-        secondLayer = new TileEditor(StaticLevels.level4, getAssetManager().manager.get(getAssetManager().bruh));
+        secondLayer = new TileEditor(StaticLevels.level5, getAssetManager().manager.get(getAssetManager().bruh));
         //GraphMaker.edgeMap(secondLayer.getTileMap());
         setRender();
         secondLayer.addLevel(this);

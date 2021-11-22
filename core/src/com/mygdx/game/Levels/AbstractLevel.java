@@ -102,14 +102,11 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     public AbstractLevel(PirateJoes pirateJoes) {
 
-
         this.pirateJoes = pirateJoes;
         camera = new OrthographicCamera(cameraWidth * worldUnits,cameraHeight * worldUnits);
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FitViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
-
-
 
         // all assets need to be loaded after loadAssets
 
@@ -127,8 +124,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         spriteContainer.setPosition(-10,0);
 
-
-
         groupOfViruses = new Array<>();
         killedViruses = new Array<>();
 
@@ -144,7 +139,6 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         spriteContainer.setRegion(container.getKeyFrame(container.getAnimationDuration()));
         container.setPlayMode(Animation.PlayMode.REVERSED);
-
 
         //Tween.to(spriteContainer, SpriteAccessor.POSITION_X, 0.5f).target(0).ease(Bounce.OUT).delay(1.0f).repeatYoyo(2, 0.5f).start(tweenManager);
         
@@ -330,11 +324,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                 bullets.get(i).resetCollision();
             }
 
-            if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
 
-               character.death();
-
-            }
 
             if (bullets.get(i).remove) {
                 removedBullets.add(bullets.get(i));
@@ -350,6 +340,24 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                  mine.activate();
                  bullets.get(i).remove = true;
                  //removedBullets.add(bullets.get(i));
+            }
+            if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
+
+                groupOfViruses.clear();
+                clear();
+
+                if (character.hit()) {
+
+                    LevelManager.resetLevel();
+                } else {
+
+
+                    LevelManager.restart();
+                    character.reset();
+
+                }
+
+
             }
 
         }
@@ -527,9 +535,23 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
             makeNextLevelEnum++;
             currentLevel = LEVELS.values()[makeNextLevelEnum];
-
             getPirateJoe().setScreen(currentLevel.getCurrentLevel());
 
+        }
+        public static void resetLevel() {
+
+            ParticleManager.clear();
+            TileData.Indexer.reset();
+            getPirateJoe().setScreen(currentLevel.getCurrentLevel());
+
+        }
+
+        public static void restart() {
+            makeNextLevelEnum = 0;
+            currentLevel = LEVELS.values()[makeNextLevelEnum];
+            ParticleManager.clear();
+            TileData.Indexer.reset();
+            getPirateJoe().setScreen(currentLevel.getCurrentLevel());
 
         }
 
