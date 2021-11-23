@@ -74,10 +74,6 @@ public class TileData implements Cloneable{
         edges.add(new Edge<Integer>(new Point<>(right, bottom), new Point<>(left, bottom)));
 
 
-
-
-
-
         if (tile.getAtlasReference().equals("barrier14")) {
             textureRegion = atlas.findRegion(tile.getAtlasReference());
             broken = true;

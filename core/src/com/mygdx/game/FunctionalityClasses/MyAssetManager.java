@@ -29,7 +29,7 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> charecterIdleLeft = new AssetDescriptor<TextureAtlas>("spriteSheets/idleLeft.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> skull = new AssetDescriptor<Texture>("spriteSheets/skull.png", Texture.class);
     public AssetDescriptor<TextureAtlas> slime = new AssetDescriptor<TextureAtlas>("spriteSheets/slime_right.atlas", TextureAtlas.class);
-    public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap.atlas", TextureAtlas.class);
+    public AssetDescriptor<TextureAtlas> tileMap = new AssetDescriptor<TextureAtlas>("spriteSheets/tileMap_.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> bulletSprite = new AssetDescriptor<Texture>("spriteSheets/bulletSanitizer.png", Texture.class);
     public AssetDescriptor<TextureAtlas> fluVirus = new AssetDescriptor<TextureAtlas>("spriteSheets/fluVirus.atlas", TextureAtlas.class);
     public AssetDescriptor<Texture> startScreen = new AssetDescriptor<Texture>("sprites/homescreen.png", Texture.class);

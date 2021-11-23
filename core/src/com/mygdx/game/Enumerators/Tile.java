@@ -4,9 +4,9 @@ import java.util.EnumSet;
 
 public enum Tile {
 
-    AIR("tile_map1", EnumSet.of(Collisions.BOTTOM),false),
-    GRASS("tile_map2",EnumSet.of(Collisions.BOTTOM),false),
-    STONE("tile_map3",  EnumSet.of(Collisions.BOTTOM),false),
+    AIR("tileMap1", EnumSet.of(Collisions.BOTTOM),false),
+    GRASS("tileMap2",EnumSet.of(Collisions.BOTTOM),false),
+    STONE("tileMap3",  EnumSet.of(Collisions.BOTTOM),false),
     DOOR("barrier10",  EnumSet.of(Collisions.BOTTOM),false),
     BASKET_FULL("barrier10",EnumSet.of(Collisions.SOLID, Collisions.SOLID),false),
     INVISIBLE("barrier1", EnumSet.of(Collisions.NONE),false),
