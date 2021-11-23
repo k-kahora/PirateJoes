@@ -42,6 +42,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     public final LinePath<Vector2> defaultPath;
     Array<Vector2> wayPoints = new Array<>(2);
 
+    public boolean deathAnimation = false;
+
     private Level level;
 
     public AbstractEnemy(EntityLocation target, Level currentLevel) {
@@ -326,17 +328,29 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
             if (s.isLethal && Intersector.overlaps(getBoundingBox(), s.getBoundingBox())) {
 
-                tagged = true;
+                deathAnimation = true;
+
                 remove.add(s);
                 s.remove = true;
+                break;
 
             }
 
         }
 
+
+
         return remove;
 
     }
+
+    public void removeVirus() {
+
+        tagged = true;
+
+    }
+
+
 
     public LinkedList<SanatizerBullet> getVirusBullets() {
 

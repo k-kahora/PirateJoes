@@ -38,6 +38,8 @@ public class WanderVirus extends AbstractEnemy{
     private final Flee<Vector2> flee;
     private final Seek<Vector2> seek;
 
+    private final Animation<TextureRegion> deathAnimation;
+
     private final Animation<TextureRegion> virusAnimation;
 
     private boolean sortCalled = false;
@@ -117,6 +119,7 @@ public class WanderVirus extends AbstractEnemy{
         this.local = new BoundingPoint(30f);
         this.type = builder.type;
         this.bulletSpeed = builder.bulletSpeed;
+        this.deathAnimation = new Animation(1/6f, assetManager.manager.get(assetManager.enemeyDeath).getRegions());
 
 
 
@@ -295,9 +298,18 @@ public class WanderVirus extends AbstractEnemy{
 
         timeElapsed += delta;
 
+        if (super.deathAnimation) {
 
-        spr.setRegion(virusAnimation.getKeyFrame(timeElapsed, true));
+            spr.setRegion(deathAnimation.getKeyFrame(timeElapsed, true));
 
+            if (deathAnimation.isAnimationFinished(timeElapsed))
+                dead = true;
+
+        } else {
+
+            spr.setRegion(virusAnimation.getKeyFrame(timeElapsed, true));
+
+        }
 
         centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
 

@@ -52,6 +52,7 @@ public class MyAssetManager {
     public AssetDescriptor<TextureAtlas> pizzaNozzle = new AssetDescriptor<TextureAtlas>("spriteSheets/pizza_nozzle.atlas", TextureAtlas.class);
 
     public AssetDescriptor<TextureAtlas> pizza = new AssetDescriptor<TextureAtlas>("spriteSheets/pizza.atlas", TextureAtlas.class);
+    public AssetDescriptor<TextureAtlas> enemeyDeath = new AssetDescriptor<TextureAtlas>("spriteSheets/deathOfEnemey.atlas", TextureAtlas.class);
 
     public AssetDescriptor<TextureAtlas> bone = new AssetDescriptor<TextureAtlas>("spriteSheets/bonner.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> meat = new AssetDescriptor<TextureAtlas>("spriteSheets/meat.atlas", TextureAtlas.class);
@@ -101,6 +102,7 @@ public class MyAssetManager {
         manager.load(pizza);
         manager.load(meat);
         manager.load(bone);
+        manager.load(enemeyDeath);
 
     }
 
