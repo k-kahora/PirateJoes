@@ -9,12 +9,9 @@ public class AnimationManager {
 
     private final ArrayList<TextureRegion> frames = new ArrayList<TextureRegion>();
 
-
-
     private int maxFrames;
 
     private int frameCount = 0;
-
 
     private int startingFrame;
 
@@ -22,10 +19,6 @@ public class AnimationManager {
 
     private float animationCycle;
     private float animationTime;
-
-
-
-
 
     /*
 

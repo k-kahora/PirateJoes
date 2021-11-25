@@ -10,6 +10,8 @@ public enum LEVELS {
         LEVEL3("Slop", new Level3(AbstractLevel.getPirateJoe())),
         LEVEL4("Rocket Bois", new Level4(AbstractLevel.getPirateJoe())),
         LEVEL5("Bounce Shors", new Level5(AbstractLevel.getPirateJoe())),
+        LEVEL6("Maze", new Level5(AbstractLevel.getPirateJoe())),
+        LEVEL7("Challenge", new Level5(AbstractLevel.getPirateJoe())),
         FINISH("You win", new Level1(AbstractLevel.getPirateJoe())),
         GAME_OVER("Game Over", new Level1(AbstractLevel.getPirateJoe()));
 
@@ -46,6 +48,10 @@ public enum LEVELS {
                                 return new Level4(AbstractLevel.getPirateJoe());
                         case LEVEL5:
                                 return new Level5(AbstractLevel.getPirateJoe());
+                        case LEVEL6:
+                                return new Level6(AbstractLevel.getPirateJoe());
+                        case LEVEL7:
+                                return new Level7(AbstractLevel.getPirateJoe());
                         default:
                                 return new Level1(AbstractLevel.getPirateJoe());
 

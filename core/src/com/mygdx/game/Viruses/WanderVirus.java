@@ -119,7 +119,7 @@ public class WanderVirus extends AbstractEnemy{
         this.local = new BoundingPoint(30f);
         this.type = builder.type;
         this.bulletSpeed = builder.bulletSpeed;
-        this.deathAnimation = new Animation(1/6f, assetManager.manager.get(assetManager.enemeyDeath).getRegions());
+        this.deathAnimation = new Animation(1/100f, assetManager.manager.get(assetManager.enemeyDeath).getRegions());
 
 
 
@@ -282,9 +282,36 @@ public class WanderVirus extends AbstractEnemy{
     Ray<Vector2>[] raysObs = new Ray[3];
 
 
+    float deathTimeElapsed = 0;
 
     @Override
     public void act(float delta) {
+
+        if (super.deathAnimation) {
+
+            deathAct(delta);
+
+        } else {
+
+            realAct(delta);
+
+        }
+
+    }
+
+    public void deathAct(float delta) {
+
+
+        deathTimeElapsed += delta;
+        spr.setScale(6f);
+        spr.setRegion(deathAnimation.getKeyFrame(deathTimeElapsed, false));
+
+        if (deathAnimation.isAnimationFinished(deathTimeElapsed))
+            dead = true;
+
+    }
+
+    public void realAct(float delta) {
 
         rayConfiguration = obstacleAvoidance.getRayConfiguration();
 
@@ -298,18 +325,10 @@ public class WanderVirus extends AbstractEnemy{
 
         timeElapsed += delta;
 
-        if (super.deathAnimation) {
 
-            spr.setRegion(deathAnimation.getKeyFrame(timeElapsed, true));
+        spr.setRegion(virusAnimation.getKeyFrame(timeElapsed, true));
 
-            if (deathAnimation.isAnimationFinished(timeElapsed))
-                dead = true;
 
-        } else {
-
-            spr.setRegion(virusAnimation.getKeyFrame(timeElapsed, true));
-
-        }
 
         centerPos = new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
 
@@ -348,18 +367,9 @@ public class WanderVirus extends AbstractEnemy{
 
         }
 
-
-
-
-
-
         // if shot
         if (isTagged())
             setDeath();
-
-
-
-
 
             // add random time elapsed
             if (nozzle.isFinished(delta)) {
@@ -450,16 +460,9 @@ public class WanderVirus extends AbstractEnemy{
 
                 break;
 
-
-
         }
 
-
-
-
         //velocity.scl(0.8f);
-
-
 
         //moveBy(this.velocity.x, this.velocity.y);
         rectangle.x = getX();
@@ -469,11 +472,10 @@ public class WanderVirus extends AbstractEnemy{
 
         collisionLogic();
 
-        //local.updateLocation((int)getX(), (int)getY());
-       // moveBy(0.5f, 2f);
+        // local.updateLocation((int)getX(), (int)getY());
+        // moveBy(0.5f, 2f);
 
         nozzle.act(delta);
-
 
     }
 
@@ -678,7 +680,8 @@ public class WanderVirus extends AbstractEnemy{
 
         spr.draw(batch);
 
-        nozzle.draw(batch);
+        if (!super.deathAnimation)
+            nozzle.draw(batch);
 
        // if (COLOR != null)
        //     spr.setColor(COLOR);
@@ -799,8 +802,6 @@ public class WanderVirus extends AbstractEnemy{
     public void setDeath() {
         dead = true;
     }
-
-
 
     @Override
     public boolean handleMessage(Telegram telegram) {

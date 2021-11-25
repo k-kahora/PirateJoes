@@ -330,6 +330,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
                 deathAnimation = true;
 
+                slimeTagged = true;
+
                 remove.add(s);
                 s.remove = true;
                 break;
@@ -343,6 +345,8 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
         return remove;
 
     }
+
+    public boolean slimeTagged = false;
 
     public void removeVirus() {
 

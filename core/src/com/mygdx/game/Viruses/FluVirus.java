@@ -181,7 +181,7 @@ public class FluVirus extends AbstractEnemy  {
 
         //moveBy(velocity.x, velocity.y);
 
-        if (isTagged())
+        if (super.slimeTagged)
             benShot();
 
 //        when the target is in range begin detonatiion
