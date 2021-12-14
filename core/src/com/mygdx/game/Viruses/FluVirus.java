@@ -1,9 +1,11 @@
 package com.mygdx.game.Viruses;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.steer.behaviors.*;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.FunctionalityClasses.EntityLocation;
@@ -86,6 +88,8 @@ public class FluVirus extends AbstractEnemy  {
         maxSpeed = 300f;
         maxLinearAcceleration = 70f;
         this.getDetectionLine = new Vector2();
+        slimeSound.play();
+        slimeSound.loop();
 
         chase = new IndexedAStarPathFinder<TileData>(getLevel());
 
@@ -167,10 +171,14 @@ public class FluVirus extends AbstractEnemy  {
 
     }
 
-
+    private Sound slimeSound = Gdx.audio.newSound(Gdx.files.internal("Music/slime.wav"));
 
     @Override
     public void act(float delta) {
+
+
+        int OldX = (int)getX();
+        int OldY = (int)getY();
 
         //obstacleBehavior.setRaycastCollisionDetector(new RayCollisionDetection(fluVirusTileColliderMap.get(0), chase, obstacleBehavior.getRayConfiguration().updateRays()));
 
@@ -196,6 +204,8 @@ public class FluVirus extends AbstractEnemy  {
         }
 
         if (fuse) {
+
+            slimeSound.pause();
 
             fuseTime += delta;
             sprite.setRegion(slimeBlows.getKeyFrame(fuseTime, false));
@@ -353,6 +363,7 @@ public class FluVirus extends AbstractEnemy  {
     public void setDetonationToInstant() {
 
         instantDetonation = true;
+        fuse = true;
 
     }
 

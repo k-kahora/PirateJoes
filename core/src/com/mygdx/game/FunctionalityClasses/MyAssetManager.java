@@ -56,6 +56,11 @@ public class MyAssetManager {
 
     public AssetDescriptor<TextureAtlas> bone = new AssetDescriptor<TextureAtlas>("spriteSheets/bonner.atlas", TextureAtlas.class);
     public AssetDescriptor<TextureAtlas> meat = new AssetDescriptor<TextureAtlas>("spriteSheets/meat.atlas", TextureAtlas.class);
+
+    public AssetDescriptor<Texture> gameOver = new AssetDescriptor<Texture>("spriteSheets/gameOver.png", Texture.class);
+
+    public AssetDescriptor<TextureAtlas> melk = new AssetDescriptor<TextureAtlas>("spriteSheets/melk.atlas", TextureAtlas.class);
+
     // adds to teh loading que
     public void load() {
 
@@ -83,6 +88,8 @@ public class MyAssetManager {
         manager.load(skin);
         manager.load(startScreen);
         manager.load(container);
+        manager.load(gameOver);
+        manager.load(melk);
     }
 
     public void loadTileMap() {

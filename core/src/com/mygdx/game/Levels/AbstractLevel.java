@@ -7,6 +7,8 @@ import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Enumerators.LEVELS;
+import com.mygdx.game.FunctionalityClasses.HUD;
 import com.mygdx.game.FunctionalityClasses.MyAssetManager;
 import com.mygdx.game.MainCharacter;
 import com.mygdx.game.Particles.ParticleManager;
@@ -48,6 +51,11 @@ Impe,emting level is very important for path finding as it alows the level to be
 public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     private ArrayList<Sprite> spriteList = new ArrayList<>();
+
+    private static Music music = Gdx.audio.newMusic(Gdx.files.internal("Music/meh.wav"));;
+
+    private Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("Music/taco.wav"))
+           ;
 
     private static PirateJoes pirateJoes;
 
@@ -92,12 +100,15 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
     protected Array<Point<Integer, Integer>> levelEdges = new Array<>();
     TextureAtlas containerAtlas;
 
+    private static HUD hud;
+
     static {
         cameraHeight = 17;
         cameraWidth = 31;
         worldUnits = 16;
         //location of txt maps
         tileDir = "android/assets/tileMaps/";
+
     }
 
     public AbstractLevel(PirateJoes pirateJoes) {
@@ -107,6 +118,17 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         camera.translate((31 * 16)/2, (17*16)/2);
         viewport = new FitViewport(camera.viewportWidth,camera.viewportHeight, camera);
         aiDispatcher = new MessageDispatcher();
+
+        if (hud == null)
+            hud = new HUD(getPirateJoe().batch);
+
+
+
+        music.play();
+
+        music.setVolume(0.2f);
+        music.setLooping(true);
+
 
         // all assets need to be loaded after loadAssets
 
@@ -131,6 +153,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         character.setPosition(32,32);
 
         character.addTileMap(getWalls().getTileMap());
+
 
         bullets = new LinkedList<>();
 
@@ -341,14 +364,21 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                  bullets.get(i).remove = true;
                  //removedBullets.add(bullets.get(i));
             }
-            if (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox())) {
+            if (character.blown() || (bullets.get(i).isLethal && Intersector.overlaps(bullets.get(i).getBoundingBox(), character.getBoundingBox()))) {
 
                 groupOfViruses.clear();
                 clear();
 
                 if (character.hit()) {
 
-                    LevelManager.resetLevel();
+                    long id  = deathSound.play();
+
+                    deathSound.setPitch(id, 1);
+                    deathSound.setLooping(id, false);
+
+                    if (hud.updateLives())
+                        getPirateJoe().setScreen(new GameOver(getPirateJoe()));
+                    else LevelManager.resetLevel();
                 } else {
 
 
@@ -377,9 +407,10 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
                 yogurt(a, l);
             }
 
-            if (a.isDead())
-                killedViruses.add(a);
+            if (a.isDead()) {
 
+                killedViruses.add(a);
+            }
         }
 
         groupOfViruses.removeAll(killedViruses, false);
@@ -485,6 +516,12 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
     }
 
+    protected void setMusic(Music music) {
+
+        this.music = music;
+
+    }
+
     public void render(float delta) {
 
 
@@ -511,6 +548,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
 
         getPirateJoe().batch.end();
         character.drawDebugBox();
+        hud.stage.draw();
 
         //viewport.getCamera().position.set(character.getX(),character.getY(),0);
         getViewport().getCamera().update();
@@ -534,6 +572,7 @@ public abstract class AbstractLevel implements Level, Screen, Telegraph {
         public static void incrementLeve() {
 
             makeNextLevelEnum++;
+            TileData.Indexer.reset();
             currentLevel = LEVELS.values()[makeNextLevelEnum];
             getPirateJoe().setScreen(currentLevel.getCurrentLevel());
 

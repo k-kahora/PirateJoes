@@ -1,5 +1,6 @@
 package com.mygdx.game.Viruses;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.ai.steer.SteeringAcceleration;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.ai.steer.behaviors.BlendedSteering;
 import com.badlogic.gdx.ai.steer.behaviors.PrioritySteering;
 import com.badlogic.gdx.ai.steer.utils.paths.LinePath;
 import com.badlogic.gdx.ai.utils.Location;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
@@ -313,8 +315,9 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
     }
 
 
+    private Sound killSound = Gdx.audio.newSound(Gdx.files.internal("Music/yuh.wav"));
 
-
+    boolean sound = false;
 
     public Circle getDetectionCircle() {
         return detectionCircle;
@@ -334,6 +337,11 @@ public abstract class AbstractEnemy extends Actor implements EntitySteerable, Te
 
                 remove.add(s);
                 s.remove = true;
+
+                if (!sound) {
+                    long id = killSound.play();
+                    sound = true;
+                }
                 break;
 
             }

@@ -1,6 +1,7 @@
 package com.mygdx.game.Particles;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -15,6 +16,7 @@ import java.util.Vector;
 
 public class SlimeSploshion extends Sprite {
 
+    private Sound plosion = Gdx.audio.newSound(Gdx.files.internal("Music/explosion.wav"));
     private float start = 0;
     private Animation<TextureRegion> animation;
     private Object[] array;
@@ -50,6 +52,8 @@ public class SlimeSploshion extends Sprite {
     // this taakes a pos based on collision and adjust the particle accordingly
     //
 
+    boolean startB = true;
+
     public void update(float delta, Array<AbstractEnemy> arrs, MainCharacter character) {
         start += delta;
 
@@ -57,6 +61,11 @@ public class SlimeSploshion extends Sprite {
         centerY = getY() + getHeight() / 2;
 
         setRegion(animation.getKeyFrame(start));
+        if (startB) {
+            plosion.play();
+            startB = false;
+
+        }
         if (animation.isAnimationFinished(start)) {
             finished = true;
         }
@@ -79,7 +88,7 @@ public class SlimeSploshion extends Sprite {
 
         if (distance < killradius && SteeringUtils.middleAnimationForExplosion(array, animation.getKeyFrameIndex(start))) {
 
-            character.death();
+            character.blownUp();
 
         }
 

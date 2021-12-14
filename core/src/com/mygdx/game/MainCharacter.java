@@ -465,9 +465,22 @@ public class MainCharacter extends Actor implements EntityLocation {
 
     public boolean hit() {
 
-        lives--;
+
 
         return lives != 0;
+
+    }
+
+    private boolean blow = false;
+    public void blownUp() {
+
+        blow = true;
+
+    }
+
+    public boolean blown() {
+
+        return blow;
 
     }
 

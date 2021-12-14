@@ -107,6 +107,11 @@ public class TileCollision {
         int y2 = (int) (rectangle.getHeight() + futureY) / com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
         int y = (int) (futureY) / com.mygdx.game.Tiles.TileData.TILE_HEIGHT;
 
+        if  (x >= 31 || y >= 17 || x2 >= 31 || y2 >= 17) {
+
+            return false;
+
+        }
 
         for (int i = 0; i < tileMap.size(); ++i) {
 
@@ -175,6 +180,11 @@ public class TileCollision {
         int y = (int) (rectangle.getY() / com.mygdx.game.Tiles.TileData.TILE_HEIGHT);
         int x = (int) (futureX) / TileData.TILE_WIDTH;
 
+        if  (x >= 31 || y >= 17 || x2 >= 31 || y2 >= 17) {
+
+            return false;
+
+        }
 
         for (int i = 0; i < tileMap.size(); ++ i) {
 

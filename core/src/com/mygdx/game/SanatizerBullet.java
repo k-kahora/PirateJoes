@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -21,6 +22,7 @@ public class SanatizerBullet extends AbstractBullet  {
 
     private TileCollision bulletColider;
 
+    private Sound clink = Gdx.audio.newSound(Gdx.files.internal("Music/clink.wav"));
     private boolean collided = false;
     private final float x,y,speed;
     public boolean remove, outOfBounds, playerHit = false, isLethal = false;
@@ -208,6 +210,11 @@ public class SanatizerBullet extends AbstractBullet  {
 
     @Override
     public void bottomCollision(int x, int y) {
+        pitch+=0.5f;
+
+        long id = clink.play();
+        clink.setPitch(id,pitch);
+
         velocity.y *= -1;
         //rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getBottomEdge() - rectangle.getHeight());
         if (atlas != null)
@@ -216,9 +223,15 @@ public class SanatizerBullet extends AbstractBullet  {
     }
 
 
-
+    float pitch = 0;
     @Override
     public void topCollision(int x, int y) {
+
+        pitch+=0.5f;
+
+        long id = clink.play();
+        clink.setPitch(id,pitch);
+
         velocity.y *= -1;
         //rectangle.setPosition(rectangle.getX(), tileDataMap.get(0).get(y).get(x).getTopEdge());
 
@@ -231,6 +244,11 @@ public class SanatizerBullet extends AbstractBullet  {
     @Override
     public void rightCollision(int x, int y) {
 
+        pitch+=0.5f;
+
+        long id = clink.play();
+        clink.setPitch(id,pitch);
+
         velocity.x *= -1;
         //rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getRightEdge(), getY());
         if (atlas != null)
@@ -242,6 +260,11 @@ public class SanatizerBullet extends AbstractBullet  {
 
     @Override
     public void leftCollision(int x, int y) {
+
+        pitch+=0.5f;
+
+        long id = clink.play();
+        clink.setPitch(id,pitch);
 
         velocity.x *= -1;
         //rectangle.setPosition(tileDataMap.get(0).get(y).get(x).getLeftEdge() - rectangle.getWidth(), getY());
