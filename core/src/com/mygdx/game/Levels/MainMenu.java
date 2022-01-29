@@ -140,7 +140,7 @@ public class MainMenu extends AbstractLevel{
     @Override
     public void render(float delta) {
 
-        if (timeElasped > 15f ) {
+        if (timeElasped > 5f ) {
 
             stage.act();
 
