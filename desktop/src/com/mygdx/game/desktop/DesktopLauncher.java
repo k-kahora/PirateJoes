@@ -9,9 +9,10 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
 
-		config.title = "TraderJoesBlows";
+		config.title = "Quimbers";
 		config.width = 4096;
 		config.height = 2160;
+		config.resizable = false;
 
 
 		new LwjglApplication(new PirateJoes(), config);

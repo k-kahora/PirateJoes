@@ -88,8 +88,8 @@ public class FluVirus extends AbstractEnemy  {
         maxSpeed = 300f;
         maxLinearAcceleration = 70f;
         this.getDetectionLine = new Vector2();
-        slimeSound.play();
-        slimeSound.loop();
+        //slimeSound.play();
+        //slimeSound.loop();
 
         chase = new IndexedAStarPathFinder<TileData>(getLevel());
 

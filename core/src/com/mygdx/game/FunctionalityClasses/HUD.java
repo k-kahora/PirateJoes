@@ -42,7 +42,7 @@ public class HUD {
         port = new FitViewport(AbstractLevel.viewport.getCamera().viewportWidth, AbstractLevel.viewport.getCamera().viewportHeight, new OrthographicCamera());
         stage = new Stage(port, batch);
 
-        killLabel = new Label(String.format("Kills: %02d", kills), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        killLabel = new Label("Kills: 00", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         fullLife = new Image(new Texture(Gdx.files.internal("spriteSheets/heart_full.png")));
         noLife = new Image(new Texture(Gdx.files.internal("spriteSheets/heart_empty.png")));

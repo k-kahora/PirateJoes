@@ -140,11 +140,18 @@ public class MainMenu extends AbstractLevel{
     @Override
     public void render(float delta) {
 
-        if (timeElasped > 8f && !ran) {
+        if (timeElasped > 15f ) {
 
-            Tween.to(startLogo, SpriteAccessor.ALPHA, 4).target(0).start(tweenManager);
-            ran = true;
             stage.act();
+
+            if  (!ran) {
+                Tween.to(startLogo, SpriteAccessor.ALPHA, 4).target(0).start(tweenManager);
+                ran = true;
+
+            }
+
+
+
 
         }
 
